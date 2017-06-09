@@ -44,7 +44,9 @@ struct ram *ram_setup(struct hw **hws) {
 
   dummy_fill_ram(ram);
 
-  area = mmu_create_area(ram_read_byte, ram_read_word, ram_write_byte, ram_write_word, ram);
+  area = mmu_create_area(ram_read_byte, ram_read_word,
+                         ram_write_byte, ram_write_word,
+                         ram, MMU_PROTECTED);
   mmu_register_area(hws[HW_MMU]->data, ram->start, ram->size, area);
   
   return ram;
