@@ -33,7 +33,7 @@ struct hw **hw_setup() {
   hws = hw_initialize();
 
   hw_register(hws, HW_CPU, cpu_tick, cpu_setup(hws));
-  hw_register(hws, HW_MMU, NULL, mmu_setup(hws));
+  hw_register(hws, HW_MMU, mmu_tick, mmu_setup(hws));
   hw_register(hws, HW_RAM, NULL, ram_setup(hws));
   hw_register(hws, HW_ROM, NULL, rom_setup(hws));
   hw_register(hws, HW_BOOTROM, NULL, bootrom_setup(hws));

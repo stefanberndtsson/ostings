@@ -54,6 +54,7 @@ struct mmu {
   struct cpu *cpu;
 };
 
+void mmu_tick(struct hw *);
 struct mmu *mmu_setup(struct hw **);
 struct mmu_area *mmu_create_area(void *, void *, void *, void *, void *, enum mmu_protection);
 void mmu_register_area(struct mmu *, LONG, LONG, struct mmu_area *);

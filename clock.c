@@ -20,6 +20,7 @@ void clock_run(struct hw **hw) {
   while(1) {
     send_tick(hw[HW_SHIFTER]);
     if(clock & (CPU_DIVIDER-1)) {
+      send_tick(hw[HW_MMU]);
       send_tick(hw[HW_CPU]);
     }
     clock++;

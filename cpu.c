@@ -21,6 +21,11 @@ struct cpu *cpu_setup(struct hw **hws) {
   
   cpu->external = (struct cpu_external *)ostis_alloc(sizeof(struct cpu_external));
   cpu->exec = (struct cpu_exec *)ostis_alloc(sizeof(struct cpu_exec));
+
+  /* The BOOT instruction does not really exist, but is a special case for
+   * the power on state of the machine, where SP, PC and an extra Prefetch
+   * step is done.
+   */
   cpu->exec->instr = instr_boot_setup(0, cpu);
 
   cpu->hws = hws;
@@ -32,4 +37,13 @@ void cpu_tick(struct hw *hw) {
   //  struct cpu *cpu;
   //  cpu = (struct cpu *)hw->data;
   printf("DEBUG: Ticking away...\n");
+}
+
+void cpu_instr_register(struct cpu *cpu, WORD op, WORD op_mask, struct instr *instr) {
+  int i;
+  for(i=0;i<65536;i++) {
+    if((i&op_mask) == (op&op_mask)) {
+      cpu->internal->instr[i] = instr;
+    }
+  }
 }

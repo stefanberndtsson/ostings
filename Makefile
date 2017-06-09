@@ -22,6 +22,6 @@ $(LIBINSTR):
 	make -C instr
 
 clean:
-	rm -f $(OBJ) $(PRG) *~
+	rm -f $(OBJ) $(PRG) *~ core
 	make -C instr clean
 

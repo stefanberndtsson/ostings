@@ -2,6 +2,33 @@
 #include "hw.h"
 #include "mmu.h"
 
+/* These functions fetch their address and read/write data via the cpu->external interface 
+ * to somewhat simulate a CPU read/write request.
+ * Read data will be written to cpu->external->data, and at some point, either immediately,
+ * or after waitstates, cpu->external->data_available will be set, telling the CPU that
+ * the data can be used by the instruction in question.
+ * Writing works in a similar way.
+ *
+ * This all applies when the area is MMU protected. If not, everything is done immediately,
+ * and data_available is set right away.
+ */
+void mmu_read_byte(struct mmu *mmu) {
+  /* TODO: All */
+}
+
+void mmu_read_word(struct mmu *mmu) {
+  /* TODO: All */
+}
+
+void mmu_write_byte(struct mmu *mmu) {
+  /* TODO: All */
+}
+
+void mmu_write_word(struct mmu *mmu) {
+  /* TODO: All */
+}
+
+
 /* Register a memory segment for a particular hardware object 
  * This builds the memory map
  */
@@ -44,4 +71,10 @@ struct mmu *mmu_setup(struct hw **hws) {
   mmu->hws = hws;
 
   return mmu;
+}
+
+void mmu_tick(struct hw *hw) {
+  //  struct mmu *mmu;
+  //  mmu = (struct mmu *)hw->data;
+  printf("DEBUG: Ticking MMU...\n");
 }

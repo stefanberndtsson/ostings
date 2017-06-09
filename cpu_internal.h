@@ -36,6 +36,8 @@ enum cpu_main_states {
  * Cycles:     Total amount of CPU cycles executed so far
  * ICycle:     Cycles used by the last executed instruction
  * Main state: Overall state of CPU (RESET, HALT, RUNNING)
+ * 
+ * Instr:      All possible op-codes, mapped to structs
  */
 
 struct cpu_internal {

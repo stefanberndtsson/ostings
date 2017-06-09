@@ -35,17 +35,25 @@ static void handle_program_counter(struct cpu *cpu) {
 
 struct instr *instr_boot_setup(WORD op, struct cpu *cpu) {
   struct instr *instr;
-  instr_uop *uops[12] = {
+  instr_uop *uops[13] = {
     uop_unop,
     uop_read_word, handle_stack_pointer, uop_read_word, handle_stack_pointer,
     uop_read_word, handle_program_counter, uop_read_word, handle_program_counter,
-    uop_boot_prefetch, uop_unop, uop_prog_read
+    uop_boot_prefetch, uop_unop, uop_prog_read, uop_end
+  };
+  
+  enum instr_uops types[13] = {
+    INSTR_UOP_UNOP,
+    INSTR_UOP_READ_WORD, INSTR_UOP_UNOP, INSTR_UOP_READ_WORD, INSTR_UOP_UNOP,
+    INSTR_UOP_READ_WORD, INSTR_UOP_UNOP, INSTR_UOP_READ_WORD, INSTR_UOP_UNOP,
+    INSTR_UOP_BOOT_PREFETCH, INSTR_UOP_UNOP, INSTR_UOP_PROG_READ, INSTR_UOP_END
   };
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
   instr->op = op;
-  memcpy(instr->uops, uops, 12*sizeof(instr_uop *));
+  memcpy(instr->uops, uops, sizeof(uops));
+  memcpy(instr->uops_types, types, sizeof(types));
   return instr;
 }
 

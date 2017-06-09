@@ -5,6 +5,9 @@
 
 /* RESET */
 
+#define OP 0x4e70
+#define OP_MASK 0xffff
+
 /*
  * uOPs:
  * UNOP
@@ -35,13 +38,22 @@ struct instr *instr_reset_setup(WORD op, struct cpu *cpu) {
   instr->cpu = cpu;
   instr->op = op;
   instr->uops[0] = uop_unop;
+  instr->uops_types[0] = INSTR_UOP_UNOP;
   instr->uops[1] = uop_unop;
+  instr->uops_types[1] = INSTR_UOP_UNOP;
   instr->uops[2] = set_reset_pin;
+  instr->uops_types[2] = INSTR_UOP_UNOP;
   for(i=0;i<RESET_UOPS;i++) {
     instr->uops[i+3] = uop_unop;
+    instr->uops_types[i+3] = INSTR_UOP_UNOP;
   }
   instr->uops[RESET_UOPS+3] = clr_reset_pin;
+  instr->uops_types[RESET_UOPS+3] = INSTR_UOP_UNOP;
   instr->uops[RESET_UOPS+4] = uop_prog_read;
+  instr->uops_types[RESET_UOPS+4] = INSTR_UOP_PROG_READ;
+
+  cpu_instr_register(cpu, OP, OP_MASK, instr);
+  
   return instr;
 }
 
