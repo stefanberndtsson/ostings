@@ -5,6 +5,7 @@ struct cpu;
 
 #include "common.h"
 #include "hw.h"
+#include "mmu.h"
 #include "cpu_internal.h"
 #include "cpu_external.h"
 #include "cpu_exec.h"
@@ -14,6 +15,7 @@ struct cpu {
   struct cpu_external *external;
   struct cpu_exec *exec;
   struct hw **hws;
+  struct mmu *mmu;
 };
 
 void cpu_tick(struct hw *);

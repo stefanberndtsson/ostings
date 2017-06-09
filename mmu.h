@@ -4,7 +4,7 @@
 #include "common.h"
 #include "hw.h"
 
-#define MAX_AREAS (0xffff00>>8)+1
+#define MAX_AREAS ((0xffffff)+1)
 
 typedef BYTE read_byte_t(void *, LONG);
 typedef WORD read_word_t(void *, LONG);

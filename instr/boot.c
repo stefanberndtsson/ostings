@@ -7,7 +7,7 @@
 
 /*
  * uOPs:
- * UNOP
+ * UNOP (setup_address)
  * READ_WORD (SP-HIGH)
  * UNOP (handle word)
  * READ_WORD (SP-LOW)
@@ -26,17 +26,27 @@ static void handle_stack_pointer(struct cpu *cpu) {
   cpu->internal->a[7] |= cpu->external->data;
   cpu->internal->ssp <<= 16;
   cpu->internal->ssp |= cpu->external->data;
+  cpu->external->address += 2;
+  cpu->exec->uops_pos++;
 }
 
 static void handle_program_counter(struct cpu *cpu) {
   cpu->internal->pc <<= 16;
   cpu->internal->pc |= cpu->external->data;
+  cpu->external->address += 2;
+  cpu->exec->uops_pos++;
 }
 
-struct instr *instr_boot_setup(WORD op, struct cpu *cpu) {
+static void set_stack_pointer_address(struct cpu *cpu) {
+  cpu->external->address = 0x00000000;
+  cpu->internal->main_state = CPU_RUNNING;
+  cpu->exec->uops_pos++;
+}
+
+struct instr *instr_boot_setup(struct cpu *cpu) {
   struct instr *instr;
   instr_uop *uops[13] = {
-    uop_unop,
+    set_stack_pointer_address,
     uop_read_word, handle_stack_pointer, uop_read_word, handle_stack_pointer,
     uop_read_word, handle_program_counter, uop_read_word, handle_program_counter,
     uop_boot_prefetch, uop_unop, uop_prog_read, uop_end
@@ -51,7 +61,6 @@ struct instr *instr_boot_setup(WORD op, struct cpu *cpu) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
-  instr->op = op;
   memcpy(instr->uops, uops, sizeof(uops));
   memcpy(instr->uops_types, types, sizeof(types));
   return instr;

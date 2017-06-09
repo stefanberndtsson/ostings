@@ -27,15 +27,18 @@ enum exec_states {
  * uOPs Data Pos: Position within the uOPs Data
  * uOPs Data:     Data used by uOPs
  * Cycles:        Cycles consumed so far by the instruction
+ * Flag:          Various flaggning depending on current uOP
  *
  */
 struct cpu_exec {
   WORD op;
   struct instr *instr;
   enum exec_states state;
+  int uops_pos;
   int uops_data_pos;
   LONG uops_data[MAX_UOPS_PARAMS];
   uint32_t cycles;
+  int flag;
 };
 
 #endif /* OSTIS_CPU_EXEC_H */

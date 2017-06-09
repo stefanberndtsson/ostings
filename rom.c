@@ -18,7 +18,7 @@ static BYTE rom_read_byte(struct rom *rom, LONG address) {
 }
 
 static WORD rom_read_word(struct rom *rom, LONG address) {
-  return (rom_read_byte(rom, address)<<16)|rom_read_byte(rom, address+1);
+  return (rom_read_byte(rom, address)<<8)|rom_read_byte(rom, address+1);
 }
 
 static void rom_write_byte(struct rom *rom, LONG address, BYTE value) {

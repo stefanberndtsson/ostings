@@ -21,7 +21,7 @@ static BYTE bootrom_read_byte(struct bootrom *bootrom, LONG address) {
 }
 
 static WORD bootrom_read_word(struct bootrom *bootrom, LONG address) {
-  return (bootrom_read_byte(bootrom, address)<<16)|bootrom_read_byte(bootrom, address+1);
+  return (bootrom_read_byte(bootrom, address)<<8)|bootrom_read_byte(bootrom, address+1);
 }
 
 static void bootrom_write_byte(struct bootrom *bootrom, LONG address, BYTE value) {

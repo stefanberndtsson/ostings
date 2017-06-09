@@ -30,13 +30,12 @@ static void clr_reset_pin(struct cpu *cpu) {
   cpu_clr_reset_pin(cpu);
 }
 
-struct instr *instr_reset_setup(WORD op, struct cpu *cpu) {
+struct instr *instr_reset_setup(struct cpu *cpu) {
   int i;
   struct instr *instr;
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
-  instr->op = op;
   instr->uops[0] = uop_unop;
   instr->uops_types[0] = INSTR_UOP_UNOP;
   instr->uops[1] = uop_unop;

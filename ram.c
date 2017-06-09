@@ -19,7 +19,7 @@ static BYTE ram_read_byte(struct ram *ram, LONG address) {
 }
 
 static WORD ram_read_word(struct ram *ram, LONG address) {
-  return (ram_read_byte(ram, address)<<16)|ram_read_byte(ram, address+1);
+  return (ram_read_byte(ram, address)<<8)|ram_read_byte(ram, address+1);
 }
 
 static void ram_write_byte(struct ram *ram, LONG address, BYTE value) {

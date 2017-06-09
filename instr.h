@@ -26,19 +26,19 @@ typedef void instr_uop(struct cpu *);
  */
 enum instr_uops {
   INSTR_UOP_END=0,
-  INSTR_UOP_UNOP,
-  INSTR_UOP_UNOPCNT,
-  INSTR_UOP_PROG_READ,
-  INSTR_UOP_READ_LOW,
-  INSTR_UOP_READ_HIGH,
-  INSTR_UOP_READ_WORD,
-  INSTR_UOP_WRITE_LOW,
-  INSTR_UOP_WRITE_HIGH,
-  INSTR_UOP_WRITE_WORD,
-  INSTR_UOP_EXECUTE,
-  INSTR_UOP_BOOT_PREFETCH
+  INSTR_UOP_UNOP=1,
+  INSTR_UOP_UNOPCNT=2,
+  INSTR_UOP_PROG_READ=3,
+  INSTR_UOP_READ_LOW=4,
+  INSTR_UOP_READ_HIGH=5,
+  INSTR_UOP_READ_WORD=6,
+  INSTR_UOP_WRITE_LOW=7,
+  INSTR_UOP_WRITE_HIGH=8,
+  INSTR_UOP_WRITE_WORD=9,
+  INSTR_UOP_EXECUTE=10,
+  INSTR_UOP_BOOT_PREFETCH=11,
+  INSTR_UOP_MAX_COUNT
 };
-
 
 /* struct instr:
  * Instruction specific data
@@ -49,11 +49,12 @@ enum instr_uops {
  */
 struct instr {
   struct cpu *cpu;
-  WORD op;
   enum instr_uops uops_types[MAX_UOPS];
   instr_uop *uops[MAX_UOPS];
 };
 
-struct instr *instr_boot_setup(WORD, struct cpu *);
+struct instr *instr_boot_setup(struct cpu *);
+struct instr *instr_nop_setup(struct cpu *);
+struct instr *instr_reset_setup(struct cpu *);
 
 #endif /* OSTIS_INSTR_H */

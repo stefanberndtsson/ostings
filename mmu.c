@@ -1,6 +1,8 @@
+#include <stdio.h>
 #include "common.h"
 #include "hw.h"
 #include "mmu.h"
+#include "cpu.h"
 
 /* These functions fetch their address and read/write data via the cpu->external interface 
  * to somewhat simulate a CPU read/write request.
@@ -17,7 +19,19 @@ void mmu_read_byte(struct mmu *mmu) {
 }
 
 void mmu_read_word(struct mmu *mmu) {
-  /* TODO: All */
+  LONG addr;
+  struct mmu_area *area;
+  
+  addr = mmu->cpu->external->address;
+  area = mmu->areas[addr];
+
+  mmu->cpu->external->data = area->read_word(area->data, addr);
+  
+  if(area->mmu_protected == MMU_NOT_PROTECTED) {
+    mmu->cpu->external->data_available = 1;
+  }
+  
+  printf("DEBUG: Read Word from $%08x\n", addr);
 }
 
 void mmu_write_byte(struct mmu *mmu) {
@@ -34,13 +48,8 @@ void mmu_write_word(struct mmu *mmu) {
  */
 void mmu_register_area(struct mmu *mmu, LONG start, LONG size, struct mmu_area *area) {
   LONG i;
-  LONG start_bank,end_bank;
-  start_bank = start >> 8;
-  end_bank = (start+size) >> 8;
-  if(end_bank > 0xffff) {
-    FATAL("END BANK outside memory area");
-  }
-  for(i=start_bank;i<end_bank;i++) {
+  
+  for(i=start;i<start+size;i++) {
     mmu->areas[i] = area;
   }
 }
@@ -68,6 +77,7 @@ struct mmu *mmu_setup(struct hw **hws) {
 
   mmu = (struct mmu *)ostis_alloc(sizeof(struct mmu));
   mmu->cpu = hws[HW_CPU]->data;
+  mmu->cpu->mmu = mmu;
   mmu->hws = hws;
 
   return mmu;
