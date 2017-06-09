@@ -44,6 +44,7 @@ struct mmu {
 };
 
 struct mmu *mmu_setup(struct hw **);
+struct mmu_area *mmu_create_area(void *, void *, void *, void *, void *);
 void mmu_register_area(struct mmu *, LONG, LONG, struct mmu_area *);
 void mmu_read_byte(struct mmu *);
 void mmu_read_word(struct mmu *);

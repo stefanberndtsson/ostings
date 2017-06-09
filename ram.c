@@ -5,6 +5,7 @@
 #define RAMSTART 0x00000008
 #define RAMSIZE 4*1048576-8
 
+/* TODO: Remove when properly handling things */
 static void dummy_fill_ram(struct ram *ram) {
   int i;
   for(i=0;i<10000;i++) {
@@ -43,13 +44,7 @@ struct ram *ram_setup(struct hw **hws) {
 
   dummy_fill_ram(ram);
 
-  area = (struct mmu_area *)ostis_alloc(sizeof(struct mmu_area));
-  area->read_byte = (read_byte_t *)ram_read_byte;
-  area->read_word = (read_word_t *)ram_read_word;
-  area->write_byte = (write_byte_t *)ram_write_byte;
-  area->write_word = (write_word_t *)ram_write_word;
-  area->data = ram;
-  
+  area = mmu_create_area(ram_read_byte, ram_read_word, ram_write_byte, ram_write_word, ram);
   mmu_register_area(hws[HW_MMU]->data, ram->start, ram->size, area);
   
   return ram;

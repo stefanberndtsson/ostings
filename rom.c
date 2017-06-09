@@ -43,13 +43,7 @@ struct rom *rom_setup(struct hw **hws) {
 
   dummy_fill_rom(rom);
   
-  area = (struct mmu_area *)ostis_alloc(sizeof(struct mmu_area));
-  area->read_byte = (read_byte_t *)rom_read_byte;
-  area->read_word = (read_word_t *)rom_read_word;
-  area->write_byte = (write_byte_t *)rom_write_byte;
-  area->write_word = (write_word_t *)rom_write_word;
-  area->data = rom;
-  
+  area = mmu_create_area(rom_read_byte, rom_read_word, rom_write_byte, rom_write_word, rom);
   mmu_register_area(hws[HW_MMU]->data, rom->start, rom->size, area);
   
   return rom;

@@ -15,6 +15,21 @@ void mmu_register_area(struct mmu *mmu, LONG start, LONG size, struct mmu_area *
   }
 }
 
+struct mmu_area *mmu_create_area(void *read_byte, void *read_word,
+                                 void *write_byte, void *write_word,
+                                 void *data) {
+  struct mmu_area *area;
+  
+  area = (struct mmu_area *)ostis_alloc(sizeof(struct mmu_area));
+  area->read_byte = (read_byte_t *)read_byte;
+  area->read_word = (read_word_t *)read_word;
+  area->write_byte = (write_byte_t *)write_byte;
+  area->write_word = (write_word_t *)write_word;
+  area->data = data;
+
+  return area;
+}
+
 struct mmu *mmu_setup(struct hw **hws) {
   struct mmu *mmu;
 
