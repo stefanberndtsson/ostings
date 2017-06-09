@@ -29,6 +29,8 @@ void mmu_read_word(struct mmu *mmu) {
   
   if(area->mmu_protected == MMU_NOT_PROTECTED) {
     mmu->cpu->external->data_available = 1;
+  } else {
+    mmu->read_in_progress = 1;
   }
   
   printf("DEBUG: Read Word from $%08x\n", addr);
@@ -79,6 +81,8 @@ struct mmu *mmu_setup(struct hw **hws) {
   mmu->cpu = hws[HW_CPU]->data;
   mmu->cpu->mmu = mmu;
   mmu->hws = hws;
+  mmu->read_in_progress = 0;
+  mmu->write_in_progress = 0;
 
   return mmu;
 }

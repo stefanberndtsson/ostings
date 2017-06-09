@@ -38,7 +38,6 @@ struct cpu_exec {
   int uops_data_pos;
   LONG uops_data[MAX_UOPS_PARAMS];
   uint32_t cycles;
-  int flag;
 };
 
 #endif /* OSTIS_CPU_EXEC_H */

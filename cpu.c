@@ -69,7 +69,6 @@ struct cpu *cpu_setup(struct hw **hws) {
   cpu->exec->instr = instr_boot_setup(cpu);
   cpu->exec->uops_pos = 0;
   cpu->exec->cycles = 0;
-  cpu->exec->flag = 0;
   cpu->external->data_available = 0;
 
   cpu->hws = hws;
@@ -84,7 +83,6 @@ void cpu_initiate_next_instruction(struct cpu *cpu) {
   printf("DEBUG: New instruction: %04X %p\n", cpu->internal->ird, cpu->exec->instr);
   cpu->exec->uops_pos = 0;
   cpu->exec->cycles = 0;
-  cpu->exec->flag = 0;
   cpu->external->data_available = 0;
 }
 

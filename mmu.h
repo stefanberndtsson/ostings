@@ -52,6 +52,8 @@ struct mmu {
   struct mmu_area *areas[MAX_AREAS];
   struct hw **hws;
   struct cpu *cpu;
+  int read_in_progress;
+  int write_in_progress;
 };
 
 void mmu_tick(struct hw *);
