@@ -1,6 +1,10 @@
 #include "common.h"
 #include "hw.h"
 #include "cpu.h"
+#include "mmu.h"
+#include "ram.h"
+#include "rom.h"
+#include "bootrom.h"
 
 static struct hw **hw_initialize() {
   int i;
@@ -17,14 +21,22 @@ static struct hw **hw_initialize() {
   return hws;
 }
 
+void hw_register(struct hw **hws, enum hw_components id, tick *tick, void *data) {
+  hws[id]->id = id;
+  hws[id]->tick = tick;
+  hws[id]->data = data;
+}
+
 struct hw **hw_setup() {
   struct hw **hws;
 
   hws = hw_initialize();
 
-  hws[HW_CPU]->id = HW_CPU;
-  hws[HW_CPU]->tick = cpu_tick;
-  hws[HW_CPU]->data = cpu_setup();
+  hw_register(hws, HW_CPU, cpu_tick, cpu_setup(hws));
+  hw_register(hws, HW_MMU, NULL, mmu_setup(hws));
+  hw_register(hws, HW_RAM, NULL, ram_setup(hws));
+  hw_register(hws, HW_ROM, NULL, rom_setup(hws));
+  hw_register(hws, HW_BOOTROM, NULL, bootrom_setup(hws));
 
   return hws;
 }

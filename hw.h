@@ -11,6 +11,9 @@ enum hw_components {
   HW_GLUE,
   HW_MMU,
   HW_PSG,
+  HW_RAM,
+  HW_ROM,
+  HW_BOOTROM,
   HW_COUNT
 };
 

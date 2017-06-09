@@ -17,7 +17,7 @@ struct cpu {
 };
 
 void cpu_tick(struct hw *);
-struct cpu *cpu_setup();
+struct cpu *cpu_setup(struct hw **);
 void cpu_set_reset_pin(struct cpu *);
 void cpu_clr_reset_pin(struct cpu *);
 
