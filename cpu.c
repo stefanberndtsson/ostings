@@ -90,7 +90,7 @@ void cpu_step_instr(struct cpu *cpu) {
   int pos;
 
   /* uOPs all consume 2 cycles */
-  if(cpu->internal->cycles & 1) {
+  if((cpu->internal->cycles & 1) == 0) {
     pos = cpu->exec->uops_pos;
     /* Check if previous instruction has ended */
     if(cpu->exec->instr->uops_types[pos] == INSTR_UOP_END) {
