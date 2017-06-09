@@ -33,7 +33,7 @@ enum op_types {
  * Op Type:        Type of operation (READ, WRITE)
  * Data Part:      Part of data lines used for operation (LOW, HIGH, WORD)
  * Data Available: Signal from MMU indicating that data is available for reading or writing (DTACK)
- * Halt:           CPU is halted
+ * Halt:           CPU is halted by external influence. Sets internal state to HALT
  */
 
 struct cpu_external {

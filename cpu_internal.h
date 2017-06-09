@@ -2,6 +2,21 @@
 #define OSTIS_CPU_INTERNAL_H
 
 #include "common.h"
+#include "instr.h"
+
+/* enum cpu_main_states:
+ * States the CPU can be in
+ *
+ * RESET:   After RESET instruction or BOOT, do initialisation sequence
+ * HALT:    CPU is halted, do nothing until released
+ * RUNNING: Normal operation
+ */
+
+enum cpu_main_states {
+  CPU_RESET,
+  CPU_HALT,
+  CPU_RUNNING
+};
 
 /* struct cpu_internal:
  * Bits internal to the CPU
@@ -18,8 +33,9 @@
  * IRD:  Instruction Register Decoder (Prefetch Stage 3)
  *
  * Other stored values:
- * Cycles:        Total amount of CPU cycles executed so far
- * ICycle:        Cycles used by the last executed instruction
+ * Cycles:     Total amount of CPU cycles executed so far
+ * ICycle:     Cycles used by the last executed instruction
+ * Main state: Overall state of CPU (RESET, HALT, RUNNING)
  */
 
 struct cpu_internal {
@@ -37,6 +53,9 @@ struct cpu_internal {
   /* Other values */
   uint64_t cycles;
   uint32_t icycle;
+  enum cpu_main_states main_state;
+
+  struct instr *instr[65536];
 };
 
 #endif /* OSTIS_CPU_INTERNAL_H */
