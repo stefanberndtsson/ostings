@@ -4,16 +4,14 @@
 
 #define BOOTROMSTART 0x00000000
 #define BOOTROMSIZE 8
+#define BOOTROMFILE "tos.img"
 
 static void dummy_fill_bootrom(struct bootrom *bootrom) {
-  bootrom->memory[0] = 0x60;
-  bootrom->memory[1] = 0x2e;
-  bootrom->memory[2] = 0x01;
-  bootrom->memory[3] = 0x02;
-  bootrom->memory[4] = 0x00;
-  bootrom->memory[5] = 0xfc;
-  bootrom->memory[6] = 0x00;
-  bootrom->memory[7] = 0x30;
+  FILE *fp;
+
+  fp = fopen(BOOTROMFILE, "rb");
+  fread(bootrom->memory, 1, BOOTROMSIZE, fp);
+  fclose(fp);
 }
 
 static BYTE bootrom_read_byte(struct bootrom *bootrom, LONG address) {

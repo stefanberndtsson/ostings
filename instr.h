@@ -54,6 +54,7 @@ struct instr {
 };
 
 struct instr *instr_boot_setup(struct cpu *);
+struct instr *instr_unimplemented_setup(struct cpu *);
 struct instr *instr_nop_setup(struct cpu *);
 struct instr *instr_reset_setup(struct cpu *);
 

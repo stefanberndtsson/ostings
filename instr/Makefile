@@ -1,7 +1,7 @@
 include ../common.mk
 
 CFLAGS := $(CFLAGS) -I..
-SRC=boot.c nop.c reset.c uop.c
+SRC=unimplemented.c boot.c nop.c reset.c uop.c
 OBJ=$(SRC:.c=.o)
 
 LIBINSTR=libinstr.a

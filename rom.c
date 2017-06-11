@@ -4,13 +4,14 @@
 
 #define ROMSTART 0x00fc0000
 #define ROMSIZE 196608
+#define ROMFILE "tos.img"
 
 static void dummy_fill_rom(struct rom *rom) {
-  int i;
-  for(i=0;i<10000;i++) {
-    rom->memory[i*2+0] = 0x4e;
-    rom->memory[i*2+1] = 0x71;
-  }
+  FILE *fp;
+
+  fp = fopen(ROMFILE, "rb");
+  fread(rom->memory, 1, ROMSIZE, fp);
+  fclose(fp);
 }
 
 static BYTE rom_read_byte(struct rom *rom, LONG address) {

@@ -23,5 +23,6 @@ struct cpu *cpu_setup(struct hw **);
 void cpu_set_reset_pin(struct cpu *);
 void cpu_clr_reset_pin(struct cpu *);
 void cpu_instr_register(struct cpu *, WORD, WORD, struct instr *);
+void cpu_debug_info(struct cpu *);
 
 #endif /* OSTIS_CPU_H */

@@ -73,12 +73,16 @@ struct cpu *cpu_setup(struct hw **hws) {
 
   cpu->hws = hws;
 
+  /* Unimplemented is a fallback instruction reporting the missing op-code and exiting */
+  instr_unimplemented_setup(cpu);
   instr_nop_setup(cpu);
+  instr_reset_setup(cpu);
   
   return cpu;
 }
 
 void cpu_initiate_next_instruction(struct cpu *cpu) {
+  cpu->exec->op = cpu->internal->ird;
   cpu->exec->instr = cpu->internal->instr[cpu->internal->ird];
   printf("DEBUG: New instruction: %04X %p\n", cpu->internal->ird, cpu->exec->instr);
   cpu->exec->uops_pos = 0;
