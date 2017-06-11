@@ -24,15 +24,6 @@ static WORD bootrom_read_word(struct bootrom *bootrom, LONG address) {
   return (bootrom_read_byte(bootrom, address)<<8)|bootrom_read_byte(bootrom, address+1);
 }
 
-static void bootrom_write_byte(struct bootrom *bootrom, LONG address, BYTE value) {
-  bootrom->memory[address-BOOTROMSTART] = value;
-}
-
-static void bootrom_write_word(struct bootrom *bootrom, LONG address, WORD value) {
-  bootrom_write_byte(bootrom, address, value>>8);
-  bootrom_write_byte(bootrom, address, value&0xff);
-}
-
 struct bootrom *bootrom_setup(struct hw **hws) {
   struct bootrom *bootrom;
   struct mmu_area *area;
@@ -47,7 +38,7 @@ struct bootrom *bootrom_setup(struct hw **hws) {
   dummy_fill_bootrom(bootrom);
   
   area = mmu_create_area(bootrom_read_byte, bootrom_read_word,
-                         bootrom_write_byte, bootrom_write_word,
+                         NULL, NULL, 
                          bootrom, MMU_NOT_PROTECTED);
   mmu_register_area(hws[HW_MMU]->data, bootrom->start, bootrom->size, area);
   

@@ -21,15 +21,6 @@ static WORD rom_read_word(struct rom *rom, LONG address) {
   return (rom_read_byte(rom, address)<<8)|rom_read_byte(rom, address+1);
 }
 
-static void rom_write_byte(struct rom *rom, LONG address, BYTE value) {
-  rom->memory[address-ROMSTART] = value;
-}
-
-static void rom_write_word(struct rom *rom, LONG address, WORD value) {
-  rom_write_byte(rom, address, value>>8);
-  rom_write_byte(rom, address, value&0xff);
-}
-
 struct rom *rom_setup(struct hw **hws) {
   struct rom *rom;
   struct mmu_area *area;
@@ -44,7 +35,7 @@ struct rom *rom_setup(struct hw **hws) {
   dummy_fill_rom(rom);
   
   area = mmu_create_area(rom_read_byte, rom_read_word,
-                         rom_write_byte, rom_write_word,
+                         NULL, NULL,
                          rom, MMU_NOT_PROTECTED);
   mmu_register_area(hws[HW_MMU]->data, rom->start, rom->size, area);
   
