@@ -1,11 +1,12 @@
 include common.mk
 
-SRC=main.c cpu.c clock.c hw.c common.c mmu.c ram.c rom.c bootrom.c
+SRC=main.c cpu.c clock.c hw.c common.c mmu.c ram.c rom.c bootrom.c mnemonics.c
 OBJ=$(SRC:.c=.o)
 
 LIBINSTR=instr/libinstr.a
+LIBMNEMONICS=mnemonics/libmnemonics.a
 
-LIB=$(LIBINSTR)
+LIB=$(LIBINSTR) $(LIBMNEMONICS)
 PRG=ostings
 
 all: default
@@ -15,13 +16,17 @@ all: default
 
 default:	$(PRG)
 
-$(PRG):	$(OBJ) $(LIBINSTR)
+$(PRG):	$(OBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LIB)
 
 $(LIBINSTR):
 	make -C instr
 
+$(LIBMNEMONICS):
+	make -C mnemonics
+
 clean:
 	rm -f $(OBJ) $(PRG) *~ core
 	make -C instr clean
+	make -C mnemonics clean
 

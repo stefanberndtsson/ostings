@@ -7,6 +7,20 @@
 
 struct instr;
 typedef void instr_uop(struct cpu *);
+typedef char *mnemonics_t(struct cpu *);
+
+/* enum instr_sizes:
+ * Instruction sizes
+ * BYTE:   Well, BYTE size :)
+ * WORD:   Get it already?
+ * LONG:   Really? LONG? Yay, finally!
+ */
+
+enum instr_sizes {
+  INSTR_BYTE=0,
+  INSTR_WORD,
+  INSTR_LONG
+};
 
 /* enum instr_micro_ops:
  * Micro operations available for an instruction
@@ -51,6 +65,7 @@ struct instr {
   struct cpu *cpu;
   enum instr_uops uops_types[MAX_UOPS];
   instr_uop *uops[MAX_UOPS];
+  mnemonics_t *mnemonic;
 };
 
 struct instr *instr_boot_setup(struct cpu *);

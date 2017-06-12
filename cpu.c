@@ -1,6 +1,7 @@
 #include "common.h"
 #include "cpu.h"
 #include "instr.h"
+#include "mnemonics.h"
 
 static char *uops_names[INSTR_UOP_MAX_COUNT] = {
   "END",
@@ -77,14 +78,21 @@ struct cpu *cpu_setup(struct hw **hws) {
   instr_unimplemented_setup(cpu);
   instr_nop_setup(cpu);
   instr_reset_setup(cpu);
+
+  /* TODO: This will probably move into the the setup of each instruction eventually,
+   * but to make it possible for unimplemented instructions to have correct mnemonics
+   * it's done here for now
+   */
+  mnemonics_setup(cpu);
   
+  printf("DEBUG-New Instruction: %s\n", cpu->exec->instr->mnemonic(cpu));
   return cpu;
 }
 
 void cpu_initiate_next_instruction(struct cpu *cpu) {
   cpu->exec->op = cpu->internal->ird;
   cpu->exec->instr = cpu->internal->instr[cpu->internal->ird];
-  printf("DEBUG: New instruction: %04X %p\n", cpu->internal->ird, cpu->exec->instr);
+  printf("DEBUG-New Instruction: %04X %s\n", cpu->exec->op, cpu->exec->instr->mnemonic(cpu));
   cpu->exec->uops_pos = 0;
   cpu->exec->cycles = 0;
   cpu->external->data_available = 0;
@@ -113,7 +121,6 @@ void cpu_tick(struct hw *hw) {
   //  struct cpu *cpu;
   //  cpu = (struct cpu *)hw->data;
   cpu_step_instr(hw->data);
-  cpu_debug_info(hw->data);
 }
 
 void cpu_instr_register(struct cpu *cpu, WORD op, WORD op_mask, struct instr *instr) {

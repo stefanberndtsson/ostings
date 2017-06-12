@@ -66,5 +66,6 @@ void mmu_read_byte(struct mmu *);
 void mmu_read_word(struct mmu *);
 void mmu_write_byte(struct mmu *);
 void mmu_write_word(struct mmu *);
+WORD mmu_peek_word(struct mmu *, LONG);
 
 #endif /* OSTIS_MMU_H */
