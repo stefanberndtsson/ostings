@@ -14,12 +14,16 @@ static void dummy_fill_bootrom(struct bootrom *bootrom) {
   fclose(fp);
 }
 
-static BYTE bootrom_read_byte(struct bootrom *bootrom, LONG address) {
-  return bootrom->memory[address-BOOTROMSTART];
+static BYTE bootrom_read_byte(struct bootrom *bootrom, LONG addr) {
+  return bootrom->memory[addr-BOOTROMSTART];
 }
 
-static WORD bootrom_read_word(struct bootrom *bootrom, LONG address) {
-  return (bootrom_read_byte(bootrom, address)<<8)|bootrom_read_byte(bootrom, address+1);
+static WORD bootrom_read_word(struct bootrom *bootrom, LONG addr) {
+  return (bootrom_read_byte(bootrom, addr)<<8)|bootrom_read_byte(bootrom, addr+1);
+}
+
+static WORD bootrom_peek_word(struct bootrom *bootrom, LONG addr) {
+  return bootrom_read_word(bootrom, addr);
 }
 
 struct bootrom *bootrom_setup(struct hw **hws) {
@@ -36,7 +40,8 @@ struct bootrom *bootrom_setup(struct hw **hws) {
   dummy_fill_bootrom(bootrom);
   
   area = mmu_create_area(bootrom_read_byte, bootrom_read_word,
-                         NULL, NULL, 
+                         NULL, NULL,
+                         bootrom_peek_word,
                          bootrom, MMU_NOT_PROTECTED);
   mmu_register_area(hws[HW_MMU]->data, bootrom->start, bootrom->size, area);
   

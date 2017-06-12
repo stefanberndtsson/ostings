@@ -14,12 +14,16 @@ static void dummy_fill_rom(struct rom *rom) {
   fclose(fp);
 }
 
-static BYTE rom_read_byte(struct rom *rom, LONG address) {
-  return rom->memory[address-ROMSTART];
+static BYTE rom_read_byte(struct rom *rom, LONG addr) {
+  return rom->memory[addr-ROMSTART];
 }
 
-static WORD rom_read_word(struct rom *rom, LONG address) {
-  return (rom_read_byte(rom, address)<<8)|rom_read_byte(rom, address+1);
+static WORD rom_read_word(struct rom *rom, LONG addr) {
+  return (rom_read_byte(rom, addr)<<8)|rom_read_byte(rom, addr+1);
+}
+
+static WORD rom_peek_word(struct rom *rom, LONG addr) {
+  return rom_read_word(rom, addr);
 }
 
 struct rom *rom_setup(struct hw **hws) {
@@ -37,6 +41,7 @@ struct rom *rom_setup(struct hw **hws) {
   
   area = mmu_create_area(rom_read_byte, rom_read_word,
                          NULL, NULL,
+                         rom_peek_word,
                          rom, MMU_NOT_PROTECTED);
   mmu_register_area(hws[HW_MMU]->data, rom->start, rom->size, area);
   

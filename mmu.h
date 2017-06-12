@@ -31,6 +31,7 @@ enum mmu_protection {
  * Read Word:     Read WORD from area
  * Write Byte:    Write BYTE to area
  * Write Word:    Write WORD to area
+ * Peek Word:     Look at a WORD from area without triggering exceptions and other side effects
  */
 struct mmu_area {
   int mmu_protected;
@@ -40,6 +41,7 @@ struct mmu_area {
   read_word_t *read_word;
   write_byte_t *write_byte;
   write_word_t *write_word;
+  read_word_t *peek_word;
 };
 
 /* struct mmu:
@@ -58,7 +60,7 @@ struct mmu {
 
 void mmu_tick(struct hw *);
 struct mmu *mmu_setup(struct hw **);
-struct mmu_area *mmu_create_area(void *, void *, void *, void *, void *, enum mmu_protection);
+struct mmu_area *mmu_create_area(void *, void *, void *, void *, void *, void *, enum mmu_protection);
 void mmu_register_area(struct mmu *, LONG, LONG, struct mmu_area *);
 void mmu_read_byte(struct mmu *);
 void mmu_read_word(struct mmu *);

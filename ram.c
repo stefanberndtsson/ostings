@@ -14,21 +14,25 @@ static void dummy_fill_ram(struct ram *ram) {
   }
 }
 
-static BYTE ram_read_byte(struct ram *ram, LONG address) {
-  return ram->memory[address-RAMSTART];
+static BYTE ram_read_byte(struct ram *ram, LONG addr) {
+  return ram->memory[addr-RAMSTART];
 }
 
-static WORD ram_read_word(struct ram *ram, LONG address) {
-  return (ram_read_byte(ram, address)<<8)|ram_read_byte(ram, address+1);
+static WORD ram_read_word(struct ram *ram, LONG addr) {
+  return (ram_read_byte(ram, addr)<<8)|ram_read_byte(ram, addr+1);
 }
 
-static void ram_write_byte(struct ram *ram, LONG address, BYTE value) {
-  ram->memory[address-RAMSTART] = value;
+static void ram_write_byte(struct ram *ram, LONG addr, BYTE value) {
+  ram->memory[addr-RAMSTART] = value;
 }
 
-static void ram_write_word(struct ram *ram, LONG address, WORD value) {
-  ram_write_byte(ram, address, value>>8);
-  ram_write_byte(ram, address, value&0xff);
+static void ram_write_word(struct ram *ram, LONG addr, WORD value) {
+  ram_write_byte(ram, addr, value>>8);
+  ram_write_byte(ram, addr, value&0xff);
+}
+
+static WORD ram_peek_word(struct ram *ram, LONG addr) {
+  return ram_read_word(ram, addr);
 }
 
 struct ram *ram_setup(struct hw **hws) {
@@ -46,6 +50,7 @@ struct ram *ram_setup(struct hw **hws) {
 
   area = mmu_create_area(ram_read_byte, ram_read_word,
                          ram_write_byte, ram_write_word,
+                         ram_peek_word,
                          ram, MMU_PROTECTED);
   mmu_register_area(hws[HW_MMU]->data, ram->start, ram->size, area);
   
