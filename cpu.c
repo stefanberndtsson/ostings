@@ -38,6 +38,7 @@ void cpu_debug_info(struct cpu *cpu) {
   printf("Cycles: %ld\n", cpu->internal->cycles);
   printf("ICycle: %d (%d)\n", cpu->internal->icycle, cpu->exec->cycles);
   printf("Current uOP: %s (%d)\n", uops_names[cpu->exec->instr->uops_types[cpu->exec->uops_pos]], cpu->exec->uops_pos);
+  printf("Current Instruction Address: $%08X\n", cpu->exec->instr_addr);
   printf("State: %s\n", states[cpu->internal->main_state]);
   printf("External: %08x %04x %d\n", cpu->external->address, cpu->external->data, cpu->external->data_available);
   printf("\n");
@@ -70,6 +71,7 @@ struct cpu *cpu_setup(struct hw **hws) {
   cpu->exec->instr = instr_boot_setup(cpu);
   cpu->exec->uops_pos = 0;
   cpu->exec->cycles = 0;
+  cpu->exec->instr_addr = 0;
   cpu->external->data_available = 0;
 
   cpu->hws = hws;
@@ -92,7 +94,9 @@ struct cpu *cpu_setup(struct hw **hws) {
 void cpu_initiate_next_instruction(struct cpu *cpu) {
   cpu->exec->op = cpu->internal->ird;
   cpu->exec->instr = cpu->internal->instr[cpu->internal->ird];
-  printf("DEBUG-New Instruction: %04X %s\n", cpu->exec->op, cpu->exec->instr->mnemonic(cpu));
+  /* PC has advanced by 2 bytes once the instruction has been fetched */
+  cpu->exec->instr_addr = cpu->internal->pc - 2;
+  printf("DEBUG-New Instruction: %08X %04X %s\n", cpu->exec->instr_addr, cpu->exec->op, cpu->exec->instr->mnemonic(cpu));
   cpu->exec->uops_pos = 0;
   cpu->exec->cycles = 0;
   cpu->external->data_available = 0;

@@ -88,7 +88,7 @@ static char *ea_mem_offset(struct cpu *cpu, int ea_reg) {
   char *ea;
   int32_t offset;
 
-  offset = sign_extend_word(mmu_peek_word(cpu->mmu, cpu->internal->pc));
+  offset = sign_extend_word(mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2));
   
   ea = (char *)ostis_alloc(11);
   snprintf(ea, 11, "%d(A%d)", offset, ea_reg);
@@ -103,7 +103,7 @@ static char *ea_mem_offset_reg(struct cpu *cpu, int ea_reg) {
   char offset_reg_type;
   char offset_reg_size;
 
-  extension = mmu_peek_word(cpu->mmu, cpu->internal->pc);
+  extension = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2);
   offset = sign_extend_byte(extension & 0xff);
   offset_reg = (extension & 0x7000)>>12;
   offset_reg_type = extension&0x8000 ? 'A' : 'D';
@@ -118,7 +118,7 @@ static char *ea_short(struct cpu *cpu) {
   char *ea;
   WORD offset;
 
-  offset = mmu_peek_word(cpu->mmu, cpu->internal->pc);
+  offset = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2);
   
   ea = (char *)ostis_alloc(8);
   snprintf(ea, 8, "$%04X.W", offset);
@@ -129,9 +129,9 @@ static char *ea_long(struct cpu *cpu) {
   char *ea;
   LONG offset;
 
-  offset = mmu_peek_word(cpu->mmu, cpu->internal->pc);
+  offset = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2);
   offset <<= 16;
-  offset |= mmu_peek_word(cpu->mmu, cpu->internal->pc+2);
+  offset |= mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+4);
   
   ea = (char *)ostis_alloc(12);
   snprintf(ea, 12, "$%08X.L", offset);
@@ -142,7 +142,7 @@ static char *ea_pc_offset(struct cpu *cpu) {
   char *ea;
   int32_t offset;
 
-  offset = sign_extend_word(mmu_peek_word(cpu->mmu, cpu->internal->pc));
+  offset = sign_extend_word(mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2));
   
   ea = (char *)ostis_alloc(11);
   snprintf(ea, 11, "%d(PC)", offset);
@@ -157,7 +157,7 @@ static char *ea_pc_offset_reg(struct cpu *cpu) {
   char offset_reg_type;
   char offset_reg_size;
 
-  extension = mmu_peek_word(cpu->mmu, cpu->internal->pc);
+  extension = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2);
   offset = sign_extend_byte(extension & 0xff);
   offset_reg = (extension & 0x7000)>>12;
   offset_reg_type = extension&0x8000 ? 'A' : 'D';
@@ -172,10 +172,10 @@ static char *ea_immediate(struct cpu *cpu, enum instr_sizes size) {
   char *ea;
   LONG value;
 
-  value = mmu_peek_word(cpu->mmu, cpu->internal->pc);
+  value = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2);
   if(size == INSTR_LONG) {
     value <<= 16;
-    value |= mmu_peek_word(cpu->mmu, cpu->internal->pc+2);
+    value |= mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+4);
   }
   
   ea = (char *)ostis_alloc(8);

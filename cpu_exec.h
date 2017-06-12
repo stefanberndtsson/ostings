@@ -37,6 +37,7 @@ struct cpu_exec {
   int uops_pos;
   int uops_data_pos;
   LONG uops_data[MAX_UOPS_PARAMS];
+  LONG instr_addr;
   uint32_t cycles;
 };
 
