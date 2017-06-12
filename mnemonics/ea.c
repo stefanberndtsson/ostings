@@ -3,6 +3,7 @@
 #include "mmu.h"
 #include "instr.h"
 
+/* TODO: Duplication with instruction */
 /* Main */
 #define EA_DN 0
 #define EA_AN 1

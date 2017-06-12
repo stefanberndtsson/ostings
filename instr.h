@@ -1,26 +1,26 @@
 #ifndef OSTIS_INSTR_H
 #define OSTIS_INSTR_H
 
+/* enum instr_sizes:
+ * Instruction sizes
+ * UNSPECIFIED: There probably is a size, but when used with this enum, it's not relevant
+ * BYTE:        Well, BYTE size :)
+ * WORD:        Get it already?
+ * LONG:        Really? LONG? Yay, finally!
+ */
+enum instr_sizes {
+  INSTR_UNSPECIFIED=0,
+  INSTR_BYTE,
+  INSTR_WORD,
+  INSTR_LONG,
+};
+
 #include "cpu.h"
 
 #define MAX_UOPS 512
 
 struct instr;
 typedef void instr_uop(struct cpu *);
-typedef char *mnemonics_t(struct cpu *);
-
-/* enum instr_sizes:
- * Instruction sizes
- * BYTE:   Well, BYTE size :)
- * WORD:   Get it already?
- * LONG:   Really? LONG? Yay, finally!
- */
-
-enum instr_sizes {
-  INSTR_BYTE=0,
-  INSTR_WORD,
-  INSTR_LONG
-};
 
 /* enum instr_micro_ops:
  * Micro operations available for an instruction
@@ -57,20 +57,24 @@ enum instr_uops {
 /* struct instr:
  * Instruction specific data
  *
- * cpu:  Pointer to the CPU state
- * uops: Array of pointers to uop structs
+ * cpu:        Pointer to the CPU state
+ * uops_types: Type-codes for uOPs
+ * uops:       Array of uop functions
+ * mnemonic:   Function for returning mnemonic string of instruction
+ * size:       Size of instruction (BYTE/WORD/LONG)
  *
  */
 struct instr {
   struct cpu *cpu;
   enum instr_uops uops_types[MAX_UOPS];
   instr_uop *uops[MAX_UOPS];
-  mnemonics_t *mnemonic;
+  LONG uop_data[MAX_UOPS];
 };
 
 struct instr *instr_boot_setup(struct cpu *);
 struct instr *instr_unimplemented_setup(struct cpu *);
 struct instr *instr_nop_setup(struct cpu *);
 struct instr *instr_reset_setup(struct cpu *);
+struct instr *instr_move_to_sr_setup(struct cpu *);
 
 #endif /* OSTIS_INSTR_H */

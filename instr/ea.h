@@ -1,5 +1,5 @@
-#ifndef OSTIS_MNEMONICS_EA_H
-#define OSTIS_MNEMONICS_EA_H
+#ifndef OSTIS_INSTR_EA_H
+#define OSTIS_INSTR_EA_H
 
 #include "cpu.h"
 
@@ -8,4 +8,4 @@
 
 char *mnemonics_ea(struct cpu *, enum instr_sizes, int, int);
 
-#endif /* OSTIS_MNEMONICS_EA_H */
+#endif /* OSTIS_INSTR_EA_H */

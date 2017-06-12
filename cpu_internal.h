@@ -4,6 +4,8 @@
 #include "common.h"
 #include "instr.h"
 
+typedef char *mnemonics_t(struct cpu *);
+
 /* enum cpu_main_states:
  * States the CPU can be in
  *
@@ -58,6 +60,7 @@ struct cpu_internal {
   enum cpu_main_states main_state;
 
   struct instr *instr[65536];
+  mnemonics_t *mnemonics[65536];
 };
 
 #endif /* OSTIS_CPU_INTERNAL_H */

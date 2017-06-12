@@ -2,6 +2,8 @@
 #define OSTIS_CPU_EXEC_H
 
 #include "common.h"
+#include "cpu.h"
+#include "instr.h"
 
 #define MAX_UOPS_PARAMS 512
 
@@ -24,6 +26,9 @@ enum exec_states {
  * OP:            Opcode of the currently active instruction
  * Instr:         The instruction object of the executed instruction
  * State:         State of the current instruction
+ * Data In:       Input data from EA or similar
+ * Data Out:      Input data from EA or similar
+ * Size:          Size of operation (BYTE/WORD/LONG)
  * uOPs Data Pos: Position within the uOPs Data
  * uOPs Data:     Data used by uOPs
  * Cycles:        Cycles consumed so far by the instruction
@@ -33,12 +38,13 @@ enum exec_states {
 struct cpu_exec {
   WORD op;
   struct instr *instr;
+  mnemonics_t *mnemonic;
   enum exec_states state;
   int uops_pos;
-  int uops_data_pos;
-  LONG uops_data[MAX_UOPS_PARAMS];
   LONG instr_addr;
   uint32_t cycles;
+  WORD value_w;
+  LONG value_l;
 };
 
 #endif /* OSTIS_CPU_EXEC_H */

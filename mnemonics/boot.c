@@ -10,5 +10,5 @@ static char *mnemonics_boot(struct cpu *cpu) {
 }
 
 void mnemonics_boot_setup(struct cpu *cpu) {
-  cpu->exec->instr->mnemonic = mnemonics_boot;
+  cpu->exec->mnemonic = mnemonics_boot;
 }

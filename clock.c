@@ -29,7 +29,7 @@ void clock_run(struct hw **hw) {
       send_tick(hw[HW_CPU]);
     }
     clock++;
-    //    usleep(250000);
+    //usleep(250000);
   }
 }
 

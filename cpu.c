@@ -38,7 +38,7 @@ void cpu_debug_info(struct cpu *cpu) {
   printf("Cycles: %ld\n", cpu->internal->cycles);
   printf("ICycle: %d (%d)\n", cpu->internal->icycle, cpu->exec->cycles);
   printf("Current uOP: %s (%d)\n", uops_names[cpu->exec->instr->uops_types[cpu->exec->uops_pos]], cpu->exec->uops_pos);
-  printf("Current Instruction Address: $%08X\n", cpu->exec->instr_addr);
+  printf("Current Instruction: $%08X %04X %s\n", cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu));
   printf("State: %s\n", states[cpu->internal->main_state]);
   printf("External: %08x %04x %d\n", cpu->external->address, cpu->external->data, cpu->external->data_available);
   printf("\n");
@@ -80,6 +80,7 @@ struct cpu *cpu_setup(struct hw **hws) {
   instr_unimplemented_setup(cpu);
   instr_nop_setup(cpu);
   instr_reset_setup(cpu);
+  instr_move_to_sr_setup(cpu);
 
   /* TODO: This will probably move into the the setup of each instruction eventually,
    * but to make it possible for unimplemented instructions to have correct mnemonics
@@ -87,16 +88,17 @@ struct cpu *cpu_setup(struct hw **hws) {
    */
   mnemonics_setup(cpu);
   
-  printf("DEBUG-New Instruction: %s\n", cpu->exec->instr->mnemonic(cpu));
+  printf("DEBUG-New Instruction: %s\n", cpu->exec->mnemonic(cpu));
   return cpu;
 }
 
 void cpu_initiate_next_instruction(struct cpu *cpu) {
   cpu->exec->op = cpu->internal->ird;
   cpu->exec->instr = cpu->internal->instr[cpu->internal->ird];
-  /* PC has advanced by 2 bytes once the instruction has been fetched */
-  cpu->exec->instr_addr = cpu->internal->pc - 2;
-  printf("DEBUG-New Instruction: %08X %04X %s\n", cpu->exec->instr_addr, cpu->exec->op, cpu->exec->instr->mnemonic(cpu));
+  cpu->exec->mnemonic = cpu->internal->mnemonics[cpu->internal->ird];
+  cpu->exec->instr_addr = cpu->internal->pc-4;
+  printf("\n\n===========================================\n");
+  printf("DEBUG-New Instruction: %08X %04X %s\n", cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu));
   cpu->exec->uops_pos = 0;
   cpu->exec->cycles = 0;
   cpu->external->data_available = 0;
@@ -125,6 +127,7 @@ void cpu_tick(struct hw *hw) {
   //  struct cpu *cpu;
   //  cpu = (struct cpu *)hw->data;
   cpu_step_instr(hw->data);
+  cpu_debug_info(hw->data);
 }
 
 void cpu_instr_register(struct cpu *cpu, WORD op, WORD op_mask, struct instr *instr) {

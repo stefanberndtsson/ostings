@@ -12,6 +12,7 @@ void uop_boot_prefetch(struct cpu *cpu) {
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
+    cpu->internal->pc += 2;
     cpu->internal->irc = cpu->external->data;
     cpu->exec->uops_pos++;
   }
@@ -30,8 +31,13 @@ void uop_prog_read(struct cpu *cpu) {
     cpu->internal->ird = cpu->internal->ir;
     cpu->exec->uops_pos++;
   }
-
+  
   return;
+}
+
+void uop_assemble_immediate_word(struct cpu *cpu) {
+  cpu->exec->value_w = cpu->internal->ird;
+  cpu->exec->uops_pos++;
 }
 
 void uop_read_word(struct cpu *cpu) {

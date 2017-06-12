@@ -13,7 +13,7 @@ void mnemonics_register(struct cpu *cpu, WORD op, WORD op_mask, mnemonics_t *mne
   int i;
   for(i=0;i<65536;i++) {
     if((i&op_mask) == (op&op_mask)) {
-      cpu->internal->instr[i]->mnemonic = mnemonic;
+      cpu->internal->mnemonics[i] = mnemonic;
     }
   }
 }

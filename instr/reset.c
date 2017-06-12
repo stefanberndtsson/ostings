@@ -24,10 +24,12 @@
 
 static void set_reset_pin(struct cpu *cpu) {
   cpu_set_reset_pin(cpu);
+  cpu->exec->uops_pos++;
 }
 
 static void clr_reset_pin(struct cpu *cpu) {
   cpu_clr_reset_pin(cpu);
+  cpu->exec->uops_pos++;
 }
 
 struct instr *instr_reset_setup(struct cpu *cpu) {
@@ -50,7 +52,9 @@ struct instr *instr_reset_setup(struct cpu *cpu) {
   instr->uops_types[RESET_UOPS+3] = INSTR_UOP_UNOP;
   instr->uops[RESET_UOPS+4] = uop_prog_read;
   instr->uops_types[RESET_UOPS+4] = INSTR_UOP_PROG_READ;
-
+  instr->uops[RESET_UOPS+5] = uop_end;
+  instr->uops_types[RESET_UOPS+5] = INSTR_UOP_END;
+  
   cpu_instr_register(cpu, OP, OP_MASK, instr);
   
   return instr;
