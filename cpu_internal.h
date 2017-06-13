@@ -4,7 +4,7 @@
 #include "common.h"
 #include "instr.h"
 
-typedef char *mnemonics_t(struct cpu *);
+typedef char *mnemonics_t(struct cpu *, LONG addr);
 
 /* enum cpu_main_states:
  * States the CPU can be in

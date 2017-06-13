@@ -5,7 +5,7 @@
 #define OP 0x0000
 #define OP_MASK 0x0000
 
-static char *mnemonics_unimplemented(struct cpu *cpu) {
+static char *mnemonics_unimplemented(struct cpu *cpu, LONG addr) {
   char *mnemonic;
 
   mnemonic = ostis_alloc(34);

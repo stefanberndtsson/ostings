@@ -1,5 +1,12 @@
 #include "cpu.h"
+#include "mmu.h"
 #include "mnemonics.h"
+
+char *mnemonics_at(struct cpu *cpu, LONG addr) {
+  WORD op;
+  op = mmu_peek_word(cpu->mmu, addr);
+  return cpu->internal->mnemonics[op](cpu, addr);
+}
 
 void mnemonics_setup(struct cpu *cpu) {
   mnemonics_unimplemented_setup(cpu);

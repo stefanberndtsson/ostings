@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <memory.h>
 #include "cpu.h"
+#include "mnemonics.h"
 #include "uop.h"
 
 /* UNIMPLEMENTED */
@@ -17,6 +18,9 @@
 static void unimplemented_halt(struct cpu *cpu) {
   printf("\n\n\n\nUnimplemented OP: %04X\n", cpu->exec->op);
   cpu_debug_info(cpu);
+  printf("DEBUG: %s\n", mnemonics_at(cpu, 0xfc0020));
+  printf("DEBUG: %s\n", mnemonics_at(cpu, 0xfc0024));
+  printf("DEBUG: %s\n", mnemonics_at(cpu, 0xfc0026));
   exit(-97);
 }
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "cpu.h"
 
-static char *mnemonics_boot(struct cpu *cpu) {
+static char *mnemonics_boot(struct cpu *cpu, LONG addr) {
   char *mnemonic;
 
   mnemonic = ostis_alloc(14);

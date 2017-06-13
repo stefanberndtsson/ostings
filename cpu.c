@@ -38,7 +38,8 @@ void cpu_debug_info(struct cpu *cpu) {
   printf("Cycles: %ld\n", cpu->internal->cycles);
   printf("ICycle: %d (%d)\n", cpu->internal->icycle, cpu->exec->cycles);
   printf("Current uOP: %s (%d)\n", uops_names[cpu->exec->instr->uops_types[cpu->exec->uops_pos]], cpu->exec->uops_pos);
-  printf("Current Instruction: $%08X %04X %s\n", cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu));
+  printf("Current Instruction: $%08X %04X %s\n",
+         cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu, cpu->exec->instr_addr));
   printf("State: %s\n", states[cpu->internal->main_state]);
   printf("External: %08x %04x %d\n", cpu->external->address, cpu->external->data, cpu->external->data_available);
   printf("\n");
@@ -88,7 +89,7 @@ struct cpu *cpu_setup(struct hw **hws) {
    */
   mnemonics_setup(cpu);
   
-  printf("DEBUG-New Instruction: %s\n", cpu->exec->mnemonic(cpu));
+  printf("DEBUG-New Instruction: %s\n", cpu->exec->mnemonic(cpu, cpu->exec->instr_addr));
   return cpu;
 }
 
@@ -98,7 +99,8 @@ void cpu_initiate_next_instruction(struct cpu *cpu) {
   cpu->exec->mnemonic = cpu->internal->mnemonics[cpu->internal->ird];
   cpu->exec->instr_addr = cpu->internal->pc-4;
   printf("\n\n===========================================\n");
-  printf("DEBUG-New Instruction: %08X %04X %s\n", cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu));
+  printf("DEBUG-New Instruction: %08X %04X %s\n",
+         cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu, cpu->exec->instr_addr));
   cpu->exec->uops_pos = 0;
   cpu->exec->cycles = 0;
   cpu->external->data_available = 0;

@@ -3,6 +3,7 @@
 
 #include "cpu.h"
 
+char *mnemonics_at(struct cpu *, LONG);
 void mnemonics_setup(struct cpu *);
 void mnemonics_register(struct cpu *, WORD, WORD, mnemonics_t *);
 

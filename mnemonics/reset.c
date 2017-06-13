@@ -5,7 +5,7 @@
 #define OP 0x4e70
 #define OP_MASK 0xffff
 
-static char *mnemonics_reset(struct cpu *cpu) {
+static char *mnemonics_reset(struct cpu *cpu, LONG addr) {
   char *mnemonic;
 
   mnemonic = ostis_alloc(6);
