@@ -46,7 +46,10 @@ void instr_uop_push(struct instr *instr, enum instr_uops code, LONG data) {
   case INSTR_UOP_WRITE_NEXT_WORD:
     instr_uop_push_full(instr, uop_write_next_word, code, data);
     break;
-  case INSTR_UOP_SPEC:
+  case INSTR_UOP_SPEC: /* Should never be called */
+    instr_uop_push_full(instr, uop_spec, code, data);
+    break;
+  case INSTR_UOP_SPEC_EA: /* Should never be called */
     instr_uop_push_full(instr, uop_spec, code, data);
     break;
   case INSTR_UOP_BOOT_PREFETCH:
@@ -73,35 +76,65 @@ void instr_uop_push(struct instr *instr, enum instr_uops code, LONG data) {
   case INSTR_UOP_VALUE0_SWAP:
     instr_uop_push_full(instr, uop_value0_swap, code, data);
     break;
-  case INSTR_UOP_VALUE0_TO_REG_BYTE:
-    instr_uop_push_full(instr, uop_value0_to_reg_byte, code, data);
+  case INSTR_UOP_VALUE0_TO_DREG_BYTE:
+    instr_uop_push_full(instr, uop_value0_to_dreg_byte, code, data);
     break;
-  case INSTR_UOP_VALUE0_TO_REG_WORD:
-    instr_uop_push_full(instr, uop_value0_to_reg_word, code, data);
+  case INSTR_UOP_VALUE0_TO_DREG_WORD:
+    instr_uop_push_full(instr, uop_value0_to_dreg_word, code, data);
     break;
-  case INSTR_UOP_VALUE0_TO_REG_LONG:
-    instr_uop_push_full(instr, uop_value0_to_reg_long, code, data);
+  case INSTR_UOP_VALUE0_TO_DREG_LONG:
+    instr_uop_push_full(instr, uop_value0_to_dreg_long, code, data);
     break;
-  case INSTR_UOP_VALUE0_TO_REG_BYTE_SEXT:
-    instr_uop_push_full(instr, uop_value0_to_reg_byte_sext, code, data);
+  case INSTR_UOP_VALUE0_TO_DREG_BYTE_SEXT:
+    instr_uop_push_full(instr, uop_value0_to_dreg_byte_sext, code, data);
     break;
-  case INSTR_UOP_VALUE0_TO_REG_WORD_SEXT:
-    instr_uop_push_full(instr, uop_value0_to_reg_word_sext, code, data);
+  case INSTR_UOP_VALUE0_TO_DREG_WORD_SEXT:
+    instr_uop_push_full(instr, uop_value0_to_dreg_word_sext, code, data);
     break;
-  case INSTR_UOP_REG_TO_VALUE0_BYTE:
-    instr_uop_push_full(instr, uop_reg_to_value0_byte, code, data);
+  case INSTR_UOP_VALUE0_TO_AREG_BYTE:
+    instr_uop_push_full(instr, uop_value0_to_areg_byte, code, data);
     break;
-  case INSTR_UOP_REG_TO_VALUE0_WORD:
-    instr_uop_push_full(instr, uop_reg_to_value0_word, code, data);
+  case INSTR_UOP_VALUE0_TO_AREG_WORD:
+    instr_uop_push_full(instr, uop_value0_to_areg_word, code, data);
     break;
-  case INSTR_UOP_REG_TO_VALUE0_LONG:
-    instr_uop_push_full(instr, uop_reg_to_value0_long, code, data);
+  case INSTR_UOP_VALUE0_TO_AREG_LONG:
+    instr_uop_push_full(instr, uop_value0_to_areg_long, code, data);
     break;
-  case INSTR_UOP_REG_TO_VALUE0_BYTE_SEXT:
-    instr_uop_push_full(instr, uop_reg_to_value0_byte_sext, code, data);
+  case INSTR_UOP_VALUE0_TO_AREG_BYTE_SEXT:
+    instr_uop_push_full(instr, uop_value0_to_areg_byte_sext, code, data);
     break;
-  case INSTR_UOP_REG_TO_VALUE0_WORD_SEXT:
-    instr_uop_push_full(instr, uop_reg_to_value0_word_sext, code, data);
+  case INSTR_UOP_VALUE0_TO_AREG_WORD_SEXT:
+    instr_uop_push_full(instr, uop_value0_to_areg_word_sext, code, data);
+    break;
+  case INSTR_UOP_DREG_TO_VALUE0_BYTE:
+    instr_uop_push_full(instr, uop_dreg_to_value0_byte, code, data);
+    break;
+  case INSTR_UOP_DREG_TO_VALUE0_WORD:
+    instr_uop_push_full(instr, uop_dreg_to_value0_word, code, data);
+    break;
+  case INSTR_UOP_DREG_TO_VALUE0_LONG:
+    instr_uop_push_full(instr, uop_dreg_to_value0_long, code, data);
+    break;
+  case INSTR_UOP_DREG_TO_VALUE0_BYTE_SEXT:
+    instr_uop_push_full(instr, uop_dreg_to_value0_byte_sext, code, data);
+    break;
+  case INSTR_UOP_DREG_TO_VALUE0_WORD_SEXT:
+    instr_uop_push_full(instr, uop_dreg_to_value0_word_sext, code, data);
+    break;
+  case INSTR_UOP_AREG_TO_VALUE0_BYTE:
+    instr_uop_push_full(instr, uop_areg_to_value0_byte, code, data);
+    break;
+  case INSTR_UOP_AREG_TO_VALUE0_WORD:
+    instr_uop_push_full(instr, uop_areg_to_value0_word, code, data);
+    break;
+  case INSTR_UOP_AREG_TO_VALUE0_LONG:
+    instr_uop_push_full(instr, uop_areg_to_value0_long, code, data);
+    break;
+  case INSTR_UOP_AREG_TO_VALUE0_BYTE_SEXT:
+    instr_uop_push_full(instr, uop_areg_to_value0_byte_sext, code, data);
+    break;
+  case INSTR_UOP_AREG_TO_VALUE0_WORD_SEXT:
+    instr_uop_push_full(instr, uop_areg_to_value0_word_sext, code, data);
     break;
   case INSTR_UOP_MAX_COUNT:
     break;

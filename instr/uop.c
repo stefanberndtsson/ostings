@@ -161,61 +161,121 @@ void uop_value0_swap(struct cpu *cpu, LONG data) {
 }
 
 /* TODO: Unimplemented */
-void uop_value0_to_reg_byte(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_reg_byte");
+void uop_value0_to_dreg_byte(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_dreg_byte");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_value0_to_reg_word(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_reg_word");
+void uop_value0_to_dreg_word(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_dreg_word");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_value0_to_reg_long(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_reg_long");
+void uop_value0_to_dreg_long(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_dreg_long");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_value0_to_reg_byte_sext(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_reg_byte_sext");
+void uop_value0_to_dreg_byte_sext(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_dreg_byte_sext");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_value0_to_reg_word_sext(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_reg_word_sext");
+void uop_value0_to_dreg_word_sext(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_dreg_word_sext");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_reg_to_value0_byte(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_reg_to_value0_byte");
+void uop_value0_to_areg_byte(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_areg_byte");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_reg_to_value0_word(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_reg_to_value0_word");
+void uop_value0_to_areg_word(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_areg_word");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_reg_to_value0_long(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_reg_to_value0_long");
+void uop_value0_to_areg_long(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_areg_long");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_reg_to_value0_byte_sext(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_reg_to_value0_byte_sext");
+void uop_value0_to_areg_byte_sext(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_areg_byte_sext");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_reg_to_value0_word_sext(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_reg_to_value0_word_sext");
+void uop_value0_to_areg_word_sext(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_value0_to_areg_word_sext");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_dreg_to_value0_byte(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_dreg_to_value0_byte");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_dreg_to_value0_word(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_dreg_to_value0_word");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_dreg_to_value0_long(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_dreg_to_value0_long");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_dreg_to_value0_byte_sext(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_dreg_to_value0_byte_sext");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_dreg_to_value0_word_sext(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_dreg_to_value0_word_sext");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_areg_to_value0_byte(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_areg_to_value0_byte");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_areg_to_value0_word(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_areg_to_value0_word");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_areg_to_value0_long(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_areg_to_value0_long");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_areg_to_value0_byte_sext(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_areg_to_value0_byte_sext");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_areg_to_value0_word_sext(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_areg_to_value0_word_sext");
   exit(-100);
 }

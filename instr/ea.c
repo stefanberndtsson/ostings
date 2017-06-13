@@ -1,6 +1,12 @@
 #include "instr.h"
 
 /* TODO: Duplication with Mnemonics */
+
+#define DREG_TO_IDX(reg) (reg)
+#define AREG_TO_IDX(reg) (reg+8)
+#define IDX_TO_DREG(reg) (reg)
+#define IDX_TO_AREG(reg) (reg-8)
+
 /* Main */
 #define EA_DN 0
 #define EA_AN 1
@@ -18,6 +24,76 @@
 #define EA_PC_OFFSET_REG 3
 #define EA_IMMEDIATE 4
 
+/* Specialised uOPs for use in EA */
+static void ea_uop_areg_to_value0_postinc_word(struct cpu *cpu, LONG reg_num) {
+  cpu->exec->value[0] = cpu->internal->a[reg_num];
+  cpu->internal->a[reg_num] += 2;
+  cpu->exec->uops_pos++;
+}
+
+static void ea_uop_areg_to_value0_postinc_long(struct cpu *cpu, LONG reg_num) {
+  cpu->exec->value[0] = cpu->internal->a[reg_num];
+  cpu->internal->a[reg_num] += 4;
+  cpu->exec->uops_pos++;
+}
+
+static void ea_uop_areg_dec_word(struct cpu *cpu, LONG reg_num) {
+  cpu->internal->a[reg_num] -= 2;
+  cpu->exec->uops_pos++;
+}
+
+static void ea_uop_areg_dec_long(struct cpu *cpu, LONG reg_num) {
+  cpu->internal->a[reg_num] -= 4;
+  cpu->exec->uops_pos++;
+}
+
+/* EA Read
+ *
+ * Address will be written to VALUE[0]
+ * If BYTE/WORD, result will be in external->data
+ * If LONG, (VALUE[1]&0xFFFF0000)|external->data will combine into result
+ * 
+ */
+
+void ea_read_uop_mem_word(struct instr *instr, int ea_reg) {
+  instr_uop_push(instr, INSTR_UOP_AREG_TO_VALUE0_LONG, ea_reg);
+  instr_uop_push(instr, INSTR_UOP_READ_WORD, 0);
+}
+
+void ea_read_uop_mem_long(struct instr *instr, int ea_reg) {
+  instr_uop_push(instr, INSTR_UOP_AREG_TO_VALUE0_LONG, ea_reg);
+  instr_uop_push(instr, INSTR_UOP_READ_WORD, 0);
+  instr_uop_push(instr, INSTR_UOP_DATA_TO_VALUE_HIGH, 1);
+  instr_uop_push(instr, INSTR_UOP_READ_NEXT_WORD, 0);
+}
+
+void ea_read_uop_mem_inc_word(struct instr *instr, int ea_reg) {
+  instr_uop_push_full(instr, ea_uop_areg_to_value0_postinc_word, INSTR_UOP_SPEC_EA, ea_reg);
+  instr_uop_push(instr, INSTR_UOP_READ_WORD, 0);
+}
+
+void ea_read_uop_mem_inc_long(struct instr *instr, int ea_reg) {
+  instr_uop_push_full(instr, ea_uop_areg_to_value0_postinc_long, INSTR_UOP_SPEC_EA, AREG_TO_IDX(ea_reg));
+  instr_uop_push(instr, INSTR_UOP_READ_WORD, 0);
+  instr_uop_push(instr, INSTR_UOP_DATA_TO_VALUE_HIGH, 1);
+  instr_uop_push(instr, INSTR_UOP_READ_NEXT_WORD, 0);
+}
+
+void ea_read_uop_mem_dec_word(struct instr *instr, int ea_reg) {
+  instr_uop_push_full(instr, ea_uop_areg_dec_word, INSTR_UOP_SPEC_EA, ea_reg);
+  instr_uop_push(instr, INSTR_UOP_AREG_TO_VALUE0_LONG, ea_reg);
+  instr_uop_push(instr, INSTR_UOP_READ_WORD, 0);
+}
+
+void ea_read_uop_mem_dec_long(struct instr *instr, int ea_reg) {
+  instr_uop_push_full(instr, ea_uop_areg_dec_long, INSTR_UOP_SPEC_EA, ea_reg);
+  instr_uop_push(instr, INSTR_UOP_AREG_TO_VALUE0_LONG, ea_reg);
+  instr_uop_push(instr, INSTR_UOP_READ_WORD, 0);
+  instr_uop_push(instr, INSTR_UOP_DATA_TO_VALUE_HIGH, 1);
+  instr_uop_push(instr, INSTR_UOP_READ_NEXT_WORD, 0);
+}
+
+#if 0
 /* Dn will never cause an extra uOP */
 static int ea_dn(int ea_reg) {
   return 0;
@@ -163,3 +239,4 @@ int ea_uops_instr(int ea_mode, int ea_reg, struct instr *instr) {
   for(i=0,uops_count=0;instr->uops_types[i] != INSTR_UOP_END;i++,uops_count++);
   return ea_uops(ea_mode, ea_reg, instr->size, uops_count, instr->uops, instr->uops_types);
 }
+#endif
