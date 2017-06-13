@@ -60,7 +60,8 @@ struct mmu {
 
 void mmu_tick(struct hw *);
 struct mmu *mmu_setup(struct hw **);
-struct mmu_area *mmu_create_area(void *, void *, void *, void *, void *, void *, enum mmu_protection);
+// struct mmu_area *mmu_create_area(void *, void *, void *, void *, void *, void *, enum mmu_protection);
+struct mmu_area *mmu_create_area(read_byte_t *, read_word_t *, write_byte_t *, write_word_t *, read_word_t *, void *, enum mmu_protection);
 void mmu_register_area(struct mmu *, LONG, LONG, struct mmu_area *);
 void mmu_read_byte(struct mmu *);
 void mmu_read_word(struct mmu *);

@@ -39,9 +39,10 @@ struct rom *rom_setup(struct hw **hws) {
 
   dummy_fill_rom(rom);
   
-  area = mmu_create_area(rom_read_byte, rom_read_word,
+  area = mmu_create_area((read_byte_t *)rom_read_byte,
+                         (read_word_t *)rom_read_word,
                          NULL, NULL,
-                         rom_peek_word,
+                         (read_word_t *)rom_peek_word,
                          rom, MMU_NOT_PROTECTED);
   mmu_register_area(hws[HW_MMU]->data, rom->start, rom->size, area);
   

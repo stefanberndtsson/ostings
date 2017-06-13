@@ -39,9 +39,10 @@ struct bootrom *bootrom_setup(struct hw **hws) {
 
   dummy_fill_bootrom(bootrom);
   
-  area = mmu_create_area(bootrom_read_byte, bootrom_read_word,
+  area = mmu_create_area((read_byte_t *)bootrom_read_byte,
+                         (read_word_t *)bootrom_read_word,
                          NULL, NULL,
-                         bootrom_peek_word,
+                         (read_word_t *)bootrom_peek_word,
                          bootrom, MMU_NOT_PROTECTED);
   mmu_register_area(hws[HW_MMU]->data, bootrom->start, bootrom->size, area);
   
