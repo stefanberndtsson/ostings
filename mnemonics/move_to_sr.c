@@ -10,11 +10,12 @@
 static char *mnemonics_move_to_sr(struct cpu *cpu) {
   char *mnemonic;
   char *ea_string;
-  int ea_mode, ea_reg;
+  int ea_mode, ea_reg, ea_offset;
 
+  ea_offset = 0;
   ea_mode = EA_MODE(cpu->exec->op);
   ea_reg = EA_REG(cpu->exec->op);
-  ea_string = mnemonics_ea(cpu, INSTR_WORD, ea_mode, ea_reg);
+  ea_string = mnemonics_ea(cpu, INSTR_WORD, ea_mode, ea_reg, ea_offset);
   
   mnemonic = ostis_alloc(9+strlen(ea_string));
   snprintf(mnemonic, 9+strlen(ea_string), "MOVE %s,SR", ea_string);

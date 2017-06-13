@@ -9,10 +9,9 @@
  * LONG:        Really? LONG? Yay, finally!
  */
 enum instr_sizes {
-  INSTR_UNSPECIFIED=0,
-  INSTR_BYTE,
-  INSTR_WORD,
-  INSTR_LONG,
+  INSTR_BYTE=0,
+  INSTR_WORD=1,
+  INSTR_LONG=2,
 };
 
 #include "cpu.h"

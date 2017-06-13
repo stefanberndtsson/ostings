@@ -85,18 +85,18 @@ static char *ea_mem_dec(int ea_reg) {
   return ea;
 }
 
-static char *ea_mem_offset(struct cpu *cpu, int ea_reg) {
+static char *ea_mem_offset(struct cpu *cpu, int ea_reg, int ea_offset) {
   char *ea;
   int32_t offset;
 
-  offset = sign_extend_word(mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2));
+  offset = sign_extend_word(mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2+ea_offset));
   
   ea = (char *)ostis_alloc(11);
   snprintf(ea, 11, "%d(A%d)", offset, ea_reg);
   return ea;
 }
 
-static char *ea_mem_offset_reg(struct cpu *cpu, int ea_reg) {
+static char *ea_mem_offset_reg(struct cpu *cpu, int ea_reg, int ea_offset) {
   char *ea;
   WORD extension;
   int offset;
@@ -104,7 +104,7 @@ static char *ea_mem_offset_reg(struct cpu *cpu, int ea_reg) {
   char offset_reg_type;
   char offset_reg_size;
 
-  extension = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2);
+  extension = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2+ea_offset);
   offset = sign_extend_byte(extension & 0xff);
   offset_reg = (extension & 0x7000)>>12;
   offset_reg_type = extension&0x8000 ? 'A' : 'D';
@@ -115,42 +115,42 @@ static char *ea_mem_offset_reg(struct cpu *cpu, int ea_reg) {
   return ea;
 }
 
-static char *ea_short(struct cpu *cpu) {
+static char *ea_short(struct cpu *cpu, int ea_offset) {
   char *ea;
   WORD offset;
 
-  offset = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2);
+  offset = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2+ea_offset);
   
   ea = (char *)ostis_alloc(8);
-  snprintf(ea, 8, "$%04X.W", offset);
+  snprintf(ea, 8, "$%X.W", offset);
   return ea;
 }
 
-static char *ea_long(struct cpu *cpu) {
+static char *ea_long(struct cpu *cpu, int ea_offset) {
   char *ea;
   LONG offset;
 
-  offset = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2);
+  offset = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2+ea_offset);
   offset <<= 16;
-  offset |= mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+4);
+  offset |= mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+4+ea_offset);
   
   ea = (char *)ostis_alloc(12);
-  snprintf(ea, 12, "$%08X.L", offset);
+  snprintf(ea, 12, "$%X.L", offset);
   return ea;
 }
 
-static char *ea_pc_offset(struct cpu *cpu) {
+static char *ea_pc_offset(struct cpu *cpu, int ea_offset) {
   char *ea;
   int32_t offset;
 
-  offset = sign_extend_word(mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2));
+  offset = sign_extend_word(mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2+ea_offset));
   
   ea = (char *)ostis_alloc(11);
   snprintf(ea, 11, "%d(PC)", offset);
   return ea;
 }
 
-static char *ea_pc_offset_reg(struct cpu *cpu) {
+static char *ea_pc_offset_reg(struct cpu *cpu, int ea_offset) {
   char *ea;
   WORD extension;
   int offset;
@@ -158,7 +158,7 @@ static char *ea_pc_offset_reg(struct cpu *cpu) {
   char offset_reg_type;
   char offset_reg_size;
 
-  extension = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2);
+  extension = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2+ea_offset);
   offset = sign_extend_byte(extension & 0xff);
   offset_reg = (extension & 0x7000)>>12;
   offset_reg_type = extension&0x8000 ? 'A' : 'D';
@@ -169,26 +169,26 @@ static char *ea_pc_offset_reg(struct cpu *cpu) {
   return ea;
 }
 
-static char *ea_immediate(struct cpu *cpu, enum instr_sizes size) {
+static char *ea_immediate(struct cpu *cpu, enum instr_sizes size, int ea_offset) {
   char *ea;
   LONG value;
 
-  value = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2);
+  value = mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+2+ea_offset);
   if(size == INSTR_LONG) {
     value <<= 16;
-    value |= mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+4);
+    value |= mmu_peek_word(cpu->mmu, cpu->exec->instr_addr+4+ea_offset);
   }
   
   ea = (char *)ostis_alloc(8);
   if(size == INSTR_WORD) {
-    snprintf(ea, 7, "#$%04X", value&0xffff);
+    snprintf(ea, 7, "#$%X", value&0xffff);
   } else {
-    snprintf(ea, 7, "#$%08X", value);
+    snprintf(ea, 7, "#$%X", value);
   }
   return ea;
 }
 
-char *mnemonics_ea(struct cpu *cpu, enum instr_sizes size, int ea_mode, int ea_reg) {
+char *mnemonics_ea(struct cpu *cpu, enum instr_sizes size, int ea_mode, int ea_reg, int ea_offset) {
   switch(ea_mode) {
   case EA_DN:
     return ea_dn(ea_reg);
@@ -201,21 +201,21 @@ char *mnemonics_ea(struct cpu *cpu, enum instr_sizes size, int ea_mode, int ea_r
   case EA_MEM_DEC:
     return ea_mem_dec(ea_reg);
   case EA_MEM_OFFSET:
-    return ea_mem_offset(cpu, ea_reg);
+    return ea_mem_offset(cpu, ea_reg, ea_offset);
   case EA_MEM_OFFSET_REG:
-    return ea_mem_offset_reg(cpu, ea_reg);
+    return ea_mem_offset_reg(cpu, ea_reg, ea_offset);
   case EA_EXTENDED:
     switch(ea_reg) {
     case EA_SHORT:
-      return ea_short(cpu);
+      return ea_short(cpu, ea_offset);
     case EA_LONG:
-      return ea_long(cpu);
+      return ea_long(cpu, ea_offset);
     case EA_PC_OFFSET:
-      return ea_pc_offset(cpu);
+      return ea_pc_offset(cpu, ea_offset);
     case EA_PC_OFFSET_REG:
-      return ea_pc_offset_reg(cpu);
+      return ea_pc_offset_reg(cpu, ea_offset);
     case EA_IMMEDIATE:
-      return ea_immediate(cpu, size);
+      return ea_immediate(cpu, size, ea_offset);
     }
   }
   /* TODO: Better error handling! */
