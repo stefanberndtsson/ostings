@@ -4,7 +4,7 @@
 void *ostis_alloc(size_t size) {
   void *ptr;
 
-  ptr = malloc(size);
+  ptr = calloc(size, 1);
   if(!ptr) {
     FATAL("Unable to allocate");
     exit(-99);

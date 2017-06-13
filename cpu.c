@@ -6,16 +6,33 @@
 static char *uops_names[INSTR_UOP_MAX_COUNT] = {
   "END",
   "UNOP",
-  "UNOP-CNT",
-  "PROGRAM-READ",
-  "READ_LOW_BYTE",
-  "READ_HIGH_BYTE",
+  "UNOPCNT",
+  "PROG_READ",
+  "READ_BYTE",
   "READ_WORD",
-  "WRITE_LOW_BYTE",
-  "WRITE_HIGH_BYTE",
+  "READ_NEXT_WORD",
+  "WRITE_BYTE",
   "WRITE_WORD",
-  "EXECUTE",
-  "BOOT_PREFETCH"
+  "WRITE_NEXT_WORD",
+  "SPEC",
+  "BOOT_PREFETCH",
+  "DATA_TO_VALUE_LOW",
+  "DATA_TO_VALUE_HIGH",
+  "VALUE_LOW_TO_DATA",
+  "VALUE_HIGH_TO_DATA",
+  "IRD_TO_VALUE_LOW",
+  "IRD_TO_VALUE_HIGH",
+  "VALUE0_SWAP",
+  "VALUE0_TO_REG_BYTE",
+  "VALUE0_TO_REG_WORD",
+  "VALUE0_TO_REG_LONG",
+  "VALUE0_TO_REG_BYTE_SEXT",
+  "VALUE0_TO_REG_WORD_SEXT",
+  "REG_TO_VALUE0_BYTE",
+  "REG_TO_VALUE0_WORD",
+  "REG_TO_VALUE0_LONG",
+  "REG_TO_VALUE0_BYTE_SEXT",
+  "REG_TO_VALUE0_WORD_SEXT"
 };
 
 static char *states[3] = {
@@ -37,10 +54,11 @@ void cpu_debug_info(struct cpu *cpu) {
   printf("Prefetch: %04X %04X %04X\n", cpu->internal->irc, cpu->internal->ir, cpu->internal->ird);
   printf("Cycles: %ld\n", cpu->internal->cycles);
   printf("ICycle: %d (%d)\n", cpu->internal->icycle, cpu->exec->cycles);
-  printf("Current uOP: %s (%d)\n", uops_names[cpu->exec->instr->uops_types[cpu->exec->uops_pos]], cpu->exec->uops_pos);
+  printf("Current uOP: %s (%d)\n", uops_names[cpu->exec->instr->uops[cpu->exec->uops_pos]->code], cpu->exec->uops_pos);
   printf("Current Instruction: $%08X %04X %s\n",
          cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu, cpu->exec->instr_addr));
   printf("State: %s\n", states[cpu->internal->main_state]);
+  printf("Values: %08X %08X %08X\n", cpu->exec->value[0], cpu->exec->value[1], cpu->exec->value[2]);
   printf("External: %08x %04x %d\n", cpu->external->address, cpu->external->data, cpu->external->data_available);
   printf("\n");
 }
@@ -82,6 +100,7 @@ struct cpu *cpu_setup(struct hw **hws) {
   instr_nop_setup(cpu);
   instr_reset_setup(cpu);
   instr_move_to_sr_setup(cpu);
+  instr_cmpi_setup(cpu);
 
   /* TODO: This will probably move into the the setup of each instruction eventually,
    * but to make it possible for unimplemented instructions to have correct mnemonics
@@ -108,18 +127,21 @@ void cpu_initiate_next_instruction(struct cpu *cpu) {
 
 void cpu_step_instr(struct cpu *cpu) {
   int pos;
+  struct uop *uop;
 
   /* uOPs all consume 2 cycles */
   if((cpu->internal->cycles & 1) == 0) {
     pos = cpu->exec->uops_pos;
     /* Check if previous instruction has ended */
-    if(cpu->exec->instr->uops_types[pos] == INSTR_UOP_END) {
+    if(cpu->exec->instr->uops[pos]->code == INSTR_UOP_END) {
       cpu->internal->icycle = cpu->exec->cycles;
       cpu_initiate_next_instruction(cpu);
       pos = cpu->exec->uops_pos;
     }
     printf("DEBUG: pos == %d\n", pos);
-    cpu->exec->instr->uops[pos](cpu);
+    uop = cpu->exec->instr->uops[pos];
+    uop->uop(cpu, uop->data);
+    cpu_debug_info(cpu);
   }
   cpu->internal->cycles++;
   cpu->exec->cycles++;
@@ -129,7 +151,6 @@ void cpu_tick(struct hw *hw) {
   //  struct cpu *cpu;
   //  cpu = (struct cpu *)hw->data;
   cpu_step_instr(hw->data);
-  cpu_debug_info(hw->data);
 }
 
 void cpu_instr_register(struct cpu *cpu, WORD op, WORD op_mask, struct instr *instr) {

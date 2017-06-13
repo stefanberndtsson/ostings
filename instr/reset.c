@@ -22,12 +22,12 @@
 #define RESET_DELAY 124
 #define RESET_UOPS ((RESET_DELAY/2)-1)
 
-static void set_reset_pin(struct cpu *cpu) {
+static void set_reset_pin(struct cpu *cpu, LONG data) {
   cpu_set_reset_pin(cpu);
   cpu->exec->uops_pos++;
 }
 
-static void clr_reset_pin(struct cpu *cpu) {
+static void clr_reset_pin(struct cpu *cpu, LONG data) {
   cpu_clr_reset_pin(cpu);
   cpu->exec->uops_pos++;
 }
@@ -38,22 +38,15 @@ struct instr *instr_reset_setup(struct cpu *cpu) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
-  instr->uops[0] = uop_unop;
-  instr->uops_types[0] = INSTR_UOP_UNOP;
-  instr->uops[1] = uop_unop;
-  instr->uops_types[1] = INSTR_UOP_UNOP;
-  instr->uops[2] = set_reset_pin;
-  instr->uops_types[2] = INSTR_UOP_UNOP;
+  instr_uop_push_unop(instr);
+  instr_uop_push_unop(instr);
+  instr_uop_push_full(instr, set_reset_pin, INSTR_UOP_SPEC, 0);
   for(i=0;i<RESET_UOPS;i++) {
-    instr->uops[i+3] = uop_unop;
-    instr->uops_types[i+3] = INSTR_UOP_UNOP;
+    instr_uop_push_unop(instr);
   }
-  instr->uops[RESET_UOPS+3] = clr_reset_pin;
-  instr->uops_types[RESET_UOPS+3] = INSTR_UOP_UNOP;
-  instr->uops[RESET_UOPS+4] = uop_prog_read;
-  instr->uops_types[RESET_UOPS+4] = INSTR_UOP_PROG_READ;
-  instr->uops[RESET_UOPS+5] = uop_end;
-  instr->uops_types[RESET_UOPS+5] = INSTR_UOP_END;
+  instr_uop_push_full(instr, clr_reset_pin, INSTR_UOP_SPEC, 0);
+  instr_uop_push_prog_read(instr);
+  instr_uop_push_end(instr);
   
   cpu_instr_register(cpu, OP, OP_MASK, instr);
   

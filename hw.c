@@ -5,6 +5,7 @@
 #include "ram.h"
 #include "rom.h"
 #include "bootrom.h"
+#include "cart.h"
 
 static struct hw **hw_initialize() {
   int i;
@@ -37,6 +38,7 @@ struct hw **hw_setup() {
   hw_register(hws, HW_RAM, NULL, ram_setup(hws));
   hw_register(hws, HW_ROM, NULL, rom_setup(hws));
   hw_register(hws, HW_BOOTROM, NULL, bootrom_setup(hws));
+  hw_register(hws, HW_CART, NULL, cart_setup(hws));
 
   return hws;
 }

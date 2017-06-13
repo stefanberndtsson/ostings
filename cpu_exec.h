@@ -20,6 +20,7 @@ enum exec_states {
   EXEC_END
 };
 
+#define MAX_VALUES 10
 /* struct cpu_exec:
  * Current instruction being executed
  *
@@ -43,8 +44,7 @@ struct cpu_exec {
   int uops_pos;
   LONG instr_addr;
   uint32_t cycles;
-  WORD value_w;
-  LONG value_l;
+  LONG value[MAX_VALUES];
 };
 
 #endif /* OSTIS_CPU_EXEC_H */

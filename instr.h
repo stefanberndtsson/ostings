@@ -19,7 +19,7 @@ enum instr_sizes {
 #define MAX_UOPS 512
 
 struct instr;
-typedef void instr_uop(struct cpu *);
+typedef void instr_uop(struct cpu *, LONG);
 
 /* enum instr_micro_ops:
  * Micro operations available for an instruction
@@ -39,41 +39,73 @@ typedef void instr_uop(struct cpu *);
  */
 enum instr_uops {
   INSTR_UOP_END=0,
-  INSTR_UOP_UNOP=1,
-  INSTR_UOP_UNOPCNT=2,
-  INSTR_UOP_PROG_READ=3,
-  INSTR_UOP_READ_LOW=4,
-  INSTR_UOP_READ_HIGH=5,
-  INSTR_UOP_READ_WORD=6,
-  INSTR_UOP_WRITE_LOW=7,
-  INSTR_UOP_WRITE_HIGH=8,
-  INSTR_UOP_WRITE_WORD=9,
-  INSTR_UOP_EXECUTE=10,
-  INSTR_UOP_BOOT_PREFETCH=11,
+  INSTR_UOP_UNOP,
+  INSTR_UOP_UNOPCNT,
+  INSTR_UOP_PROG_READ,
+  INSTR_UOP_READ_BYTE,
+  INSTR_UOP_READ_WORD,
+  INSTR_UOP_READ_NEXT_WORD,
+  INSTR_UOP_WRITE_BYTE,
+  INSTR_UOP_WRITE_WORD,
+  INSTR_UOP_WRITE_NEXT_WORD,
+  INSTR_UOP_SPEC,
+  INSTR_UOP_BOOT_PREFETCH,
+  INSTR_UOP_DATA_TO_VALUE_LOW,
+  INSTR_UOP_DATA_TO_VALUE_HIGH,
+  INSTR_UOP_VALUE_LOW_TO_DATA,
+  INSTR_UOP_VALUE_HIGH_TO_DATA,
+  INSTR_UOP_IRD_TO_VALUE_LOW,
+  INSTR_UOP_IRD_TO_VALUE_HIGH,
+  INSTR_UOP_VALUE0_SWAP,
+  INSTR_UOP_VALUE0_TO_REG_BYTE,
+  INSTR_UOP_VALUE0_TO_REG_WORD,
+  INSTR_UOP_VALUE0_TO_REG_LONG,
+  INSTR_UOP_VALUE0_TO_REG_BYTE_SEXT,
+  INSTR_UOP_VALUE0_TO_REG_WORD_SEXT,
+  INSTR_UOP_REG_TO_VALUE0_BYTE,
+  INSTR_UOP_REG_TO_VALUE0_WORD,
+  INSTR_UOP_REG_TO_VALUE0_LONG,
+  INSTR_UOP_REG_TO_VALUE0_BYTE_SEXT,
+  INSTR_UOP_REG_TO_VALUE0_WORD_SEXT,
   INSTR_UOP_MAX_COUNT
+};
+
+/* struct uop:
+ * Micro operation and its data
+ *
+ * uop:  Function for the micro-op
+ * data: Each micro-op can have one data value, like register number or value-field
+ * code: Code for the micro operation
+ */
+struct uop {
+  instr_uop *uop;
+  LONG data;
+  enum instr_uops code;
 };
 
 /* struct instr:
  * Instruction specific data
  *
  * cpu:        Pointer to the CPU state
- * uops_types: Type-codes for uOPs
  * uops:       Array of uop functions
- * mnemonic:   Function for returning mnemonic string of instruction
- * size:       Size of instruction (BYTE/WORD/LONG)
  *
  */
 struct instr {
   struct cpu *cpu;
-  enum instr_uops uops_types[MAX_UOPS];
-  instr_uop *uops[MAX_UOPS];
-  LONG uop_data[MAX_UOPS];
+  struct uop *uops[MAX_UOPS];
+  int uops_count;
 };
 
+void instr_uop_push_full(struct instr *, instr_uop *, enum instr_uops, LONG);
+void instr_uop_push(struct instr *, enum instr_uops, LONG);
+void instr_uop_push_unop(struct instr *);
+void instr_uop_push_prog_read(struct instr *);
+void instr_uop_push_end(struct instr *);
 struct instr *instr_boot_setup(struct cpu *);
 struct instr *instr_unimplemented_setup(struct cpu *);
 struct instr *instr_nop_setup(struct cpu *);
 struct instr *instr_reset_setup(struct cpu *);
 struct instr *instr_move_to_sr_setup(struct cpu *);
+struct instr *instr_cmpi_setup(struct cpu *);
 
 #endif /* OSTIS_INSTR_H */

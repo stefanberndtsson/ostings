@@ -14,6 +14,7 @@ enum hw_components {
   HW_RAM,
   HW_ROM,
   HW_BOOTROM,
+  HW_CART,
   HW_COUNT
 };
 

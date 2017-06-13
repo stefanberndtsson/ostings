@@ -15,7 +15,7 @@
  *
  */
 
-static void unimplemented_halt(struct cpu *cpu) {
+static void unimplemented_halt(struct cpu *cpu, LONG data) {
   printf("\n\n\n\nUnimplemented OP: %04X\n", cpu->exec->op);
   cpu_debug_info(cpu);
   printf("DEBUG: %s\n", mnemonics_at(cpu, 0xfc0020));
@@ -26,17 +26,11 @@ static void unimplemented_halt(struct cpu *cpu) {
 
 struct instr *instr_unimplemented_setup(struct cpu *cpu) {
   struct instr *instr;
-  instr_uop *uops[1] = {
-    unimplemented_halt
-  };
-  enum instr_uops types[3] = {
-    INSTR_UOP_UNOP
-  };
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
-  memcpy(instr->uops, uops, sizeof(uops));
-  memcpy(instr->uops_types, types, sizeof(types));
+  instr_uop_push_full(instr, unimplemented_halt, INSTR_UOP_SPEC, 0);
+  instr_uop_push_end(instr);
 
   cpu_instr_register(cpu, OP, OP_MASK, instr);
   

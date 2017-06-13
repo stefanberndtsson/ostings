@@ -1,6 +1,6 @@
 include common.mk
 
-SRC=main.c cpu.c clock.c hw.c common.c mmu.c ram.c rom.c bootrom.c mnemonics.c
+SRC=main.c cpu.c clock.c hw.c common.c mmu.c ram.c rom.c bootrom.c mnemonics.c cart.c instr.c
 OBJ=$(SRC:.c=.o)
 
 LIBINSTR=instr/libinstr.a

@@ -25,6 +25,8 @@ void mmu_read_word(struct mmu *mmu) {
   addr = mmu->cpu->external->address;
   area = mmu->areas[addr];
 
+  printf("DEBUG-MMU: READ_WORD(%08X)\n", addr);
+  
   mmu->cpu->external->data = area->read_word(area->data, addr);
   
   if(area->mmu_protected == MMU_NOT_PROTECTED) {
