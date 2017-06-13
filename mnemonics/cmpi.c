@@ -16,9 +16,8 @@ static char *mnemonics_cmpi(struct cpu *cpu, LONG addr) {
   enum instr_sizes size;
   LONG value;
 
-  size = (cpu->exec->op&0xc0)>>6;
-
   op = mmu_peek_word(cpu->mmu, addr);
+  size = (op&0xc0)>>6;
   value = mmu_peek_word(cpu->mmu, addr + 2);
   if(size == INSTR_LONG) {
     value <<= 16;
