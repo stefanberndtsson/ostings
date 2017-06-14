@@ -22,13 +22,13 @@
  */
 
 static void set_stack_pointer(struct cpu *cpu, LONG value_num) {
-  cpu->internal->a[7] = cpu->exec->value[value_num];
-  cpu->internal->ssp = cpu->internal->a[7];
+  cpu->internal->r.a[7] = cpu->exec->value[value_num];
+  cpu->internal->r.ssp = cpu->internal->r.a[7];
   cpu->exec->uops_pos++;
 }
 
 static void set_program_counter(struct cpu *cpu, LONG value_num) {
-  cpu->internal->pc = cpu->exec->value[value_num];
+  cpu->internal->r.pc = cpu->exec->value[value_num];
   cpu->exec->uops_pos++;
 }
 

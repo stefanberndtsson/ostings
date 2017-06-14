@@ -22,7 +22,7 @@
  */
 
 static void set_sr(struct cpu *cpu, LONG data) {
-  cpu->internal->sr = cpu->exec->value[0]&0xffff;
+  cpu->internal->r.sr = cpu->exec->value[0]&0xffff;
   cpu->exec->uops_pos++;
 }
 

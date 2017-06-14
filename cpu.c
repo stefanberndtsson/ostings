@@ -56,13 +56,13 @@ void cpu_debug_info(struct cpu *cpu) {
   int i;
   printf("-----------------------------------------------------------------------\n");
   for(i=0;i<8;i++) {
-    printf("D%d: %08X %-20s A%d: %08X\n", i, cpu->internal->d[i], "", i, cpu->internal->a[i]);
+    printf("D%d: %08X %-20s A%d: %08X\n", i, cpu->internal->r.d[i], "", i, cpu->internal->r.a[i]);
   }
-  printf("PC: %08X\n", cpu->internal->pc);
-  printf("SR: %04X\n", cpu->internal->sr);
-  printf("SSP: %08X\n", cpu->internal->ssp);
-  printf("USP: %08X\n", cpu->internal->usp);
-  printf("Prefetch: %04X %04X %04X\n", cpu->internal->irc, cpu->internal->ir, cpu->internal->ird);
+  printf("PC: %08X\n", cpu->internal->r.pc);
+  printf("SR: %04X\n", cpu->internal->r.sr);
+  printf("SSP: %08X\n", cpu->internal->r.ssp);
+  printf("USP: %08X\n", cpu->internal->r.usp);
+  printf("Prefetch: %04X %04X %04X\n", cpu->internal->r.irc, cpu->internal->r.ir, cpu->internal->r.ird);
   printf("Cycles: %ld\n", cpu->internal->cycles);
   printf("ICycle: %d (%d)\n", cpu->internal->icycle, cpu->exec->cycles);
   printf("Current uOP: %s (%d)\n", uops_names[cpu->exec->instr->uops[cpu->exec->uops_pos]->code], cpu->exec->uops_pos);
@@ -124,10 +124,10 @@ struct cpu *cpu_setup(struct hw **hws) {
 }
 
 void cpu_initiate_next_instruction(struct cpu *cpu) {
-  cpu->exec->op = cpu->internal->ird;
-  cpu->exec->instr = cpu->internal->instr[cpu->internal->ird];
-  cpu->exec->mnemonic = cpu->internal->mnemonics[cpu->internal->ird];
-  cpu->exec->instr_addr = cpu->internal->pc-4;
+  cpu->exec->op = cpu->internal->r.ird;
+  cpu->exec->instr = cpu->internal->instr[cpu->internal->r.ird];
+  cpu->exec->mnemonic = cpu->internal->mnemonics[cpu->internal->r.ird];
+  cpu->exec->instr_addr = cpu->internal->r.pc-4;
   printf("\n\n===========================================\n");
   printf("DEBUG-New Instruction: %08X %04X %s\n",
          cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu, cpu->exec->instr_addr));

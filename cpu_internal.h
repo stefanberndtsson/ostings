@@ -44,15 +44,22 @@ enum cpu_main_states {
 
 struct cpu_internal {
   /* Registers */
-  LONG a[8];
-  LONG d[8];
-  LONG usp;
-  LONG ssp;
-  LONG pc;
-  WORD sr;
-  WORD irc;
-  WORD ir;
-  WORD ird;
+  union {
+    struct registers {
+      LONG a[8];
+      LONG d[8];
+      LONG usp;
+      LONG ssp;
+      LONG pc;
+      LONG value[8];
+      WORD sr;
+      WORD irc;
+      WORD ir;
+      WORD ird;
+    } r;
+    WORD w[2*(8+8+1+1+1+8)+1+1+1+1];
+    LONG l[8+8+1+1+1+8+2];
+  };
 
   /* Other values */
   uint64_t cycles;

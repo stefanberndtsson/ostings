@@ -26,24 +26,24 @@
 
 /* Specialised uOPs for use in EA */
 static void ea_uop_areg_to_value0_postinc_word(struct cpu *cpu, LONG reg_num) {
-  cpu->exec->value[0] = cpu->internal->a[reg_num];
-  cpu->internal->a[reg_num] += 2;
+  cpu->exec->value[0] = cpu->internal->r.a[reg_num];
+  cpu->internal->r.a[reg_num] += 2;
   cpu->exec->uops_pos++;
 }
 
 static void ea_uop_areg_to_value0_postinc_long(struct cpu *cpu, LONG reg_num) {
-  cpu->exec->value[0] = cpu->internal->a[reg_num];
-  cpu->internal->a[reg_num] += 4;
+  cpu->exec->value[0] = cpu->internal->r.a[reg_num];
+  cpu->internal->r.a[reg_num] += 4;
   cpu->exec->uops_pos++;
 }
 
 static void ea_uop_areg_dec_word(struct cpu *cpu, LONG reg_num) {
-  cpu->internal->a[reg_num] -= 2;
+  cpu->internal->r.a[reg_num] -= 2;
   cpu->exec->uops_pos++;
 }
 
 static void ea_uop_areg_dec_long(struct cpu *cpu, LONG reg_num) {
-  cpu->internal->a[reg_num] -= 4;
+  cpu->internal->r.a[reg_num] -= 4;
   cpu->exec->uops_pos++;
 }
 

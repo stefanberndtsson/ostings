@@ -8,12 +8,12 @@ void uop_unop(struct cpu *cpu, LONG data) {
 
 void uop_boot_prefetch(struct cpu *cpu, LONG data) {
   if(!cpu->mmu->read_in_progress) {
-    cpu->external->address = cpu->internal->pc;
+    cpu->external->address = cpu->internal->r.pc;
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
-    cpu->internal->pc += 2;
-    cpu->internal->irc = cpu->external->data;
+    cpu->internal->r.pc += 2;
+    cpu->internal->r.irc = cpu->external->data;
     cpu->exec->uops_pos++;
   }
   return;
@@ -21,14 +21,14 @@ void uop_boot_prefetch(struct cpu *cpu, LONG data) {
 
 void uop_prog_read(struct cpu *cpu, LONG data) {
   if(!cpu->mmu->read_in_progress) {
-    cpu->external->address = cpu->internal->pc;
-    cpu->internal->ir = cpu->internal->irc;
+    cpu->external->address = cpu->internal->r.pc;
+    cpu->internal->r.ir = cpu->internal->r.irc;
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
-    cpu->internal->pc += 2;
-    cpu->internal->irc = cpu->external->data;
-    cpu->internal->ird = cpu->internal->ir;
+    cpu->internal->r.pc += 2;
+    cpu->internal->r.irc = cpu->external->data;
+    cpu->internal->r.ird = cpu->internal->r.ir;
     cpu->exec->uops_pos++;
   }
   
@@ -36,12 +36,12 @@ void uop_prog_read(struct cpu *cpu, LONG data) {
 }
 
 void uop_ird_to_value_low(struct cpu *cpu, LONG value_num) {
-  cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff0000) | cpu->internal->ird;
+  cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff0000) | cpu->internal->r.ird;
   cpu->exec->uops_pos++;
 }
 
 void uop_ird_to_value_high(struct cpu *cpu, LONG value_num) {
-  cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff) | (cpu->internal->ird << 16);
+  cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff) | (cpu->internal->r.ird << 16);
   cpu->exec->uops_pos++;
 }
 
