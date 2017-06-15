@@ -2,6 +2,7 @@
 #define OSTIS_COMMON_H
 
 #include <stdint.h>
+#include "unused.h"
 #include "logger.h"
 
 #define SIGN_EXT_WORD(x) ((x&0x8000) ? ((uint32_t)(x))|0xffff0000 : x)

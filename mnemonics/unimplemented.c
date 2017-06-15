@@ -8,6 +8,8 @@
 static char *mnemonics_unimplemented(struct cpu *cpu, LONG addr) {
   char *mnemonic;
 
+  unused(addr);
+  
   mnemonic = ostis_alloc(34);
   snprintf(mnemonic, 34, "Unimplemented instruction: $%04X", cpu->exec->op);
   return mnemonic;

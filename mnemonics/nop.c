@@ -8,6 +8,9 @@
 static char *mnemonics_nop(struct cpu *cpu, LONG addr) {
   char *mnemonic;
 
+  unused(cpu);
+  unused(addr);
+  
   mnemonic = ostis_alloc(4);
   snprintf(mnemonic, 4, "NOP");
   return mnemonic;

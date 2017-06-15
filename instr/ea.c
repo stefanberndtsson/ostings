@@ -7,6 +7,8 @@
  * same value-register.
  */
 void ea_read_abs_long(struct instr *instr, LONG intermediate_value_num, LONG value_reg_num, enum instr_sizes size) {
+  unused(size);
+  
   /* Fetch LONG address from prefetch queue */
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch_into(instr, REG_VALUE_H_TO_REG_W(intermediate_value_num));

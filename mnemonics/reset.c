@@ -8,6 +8,9 @@
 static char *mnemonics_reset(struct cpu *cpu, LONG addr) {
   char *mnemonic;
 
+  unused(cpu);
+  unused(addr);
+
   mnemonic = ostis_alloc(6);
   snprintf(mnemonic, 6, "RESET");
   return mnemonic;

@@ -4,6 +4,9 @@
 static char *mnemonics_boot(struct cpu *cpu, LONG addr) {
   char *mnemonic;
 
+  unused(cpu);
+  unused(addr);
+  
   mnemonic = ostis_alloc(14);
   snprintf(mnemonic, 14, "BOOT-SEQUENCE");
   return mnemonic;

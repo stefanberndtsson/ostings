@@ -4,6 +4,7 @@
 
 /* Do nothing for one period */
 void uop_nop(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
   cpu->exec->uops_pos++;
   return;
 }
@@ -24,6 +25,7 @@ void uop_nopcnt(struct uop *uop, struct cpu *cpu) {
 
 /* Only executed at boot. Prefetch a WORD to IRC */
 void uop_boot_prefetch(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
   if(!cpu->mmu->read_in_progress) {
     cpu->external->address = cpu->internal->r.pc;
     mmu_read_word(cpu->mmu);
@@ -142,54 +144,72 @@ void uop_reg_swap(struct uop *uop, struct cpu *cpu) {
 
 
 void uop_end(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
+  unused(cpu);
   return;
 }
 
 
 /* TODO: Unimplemented */
-void uop_special(struct cpu *cpu, LONG data) {
+void uop_special(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
+  unused(cpu);
   printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_special");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_ea_special(struct cpu *cpu, LONG data) {
+void uop_ea_special(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
+  unused(cpu);
   printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_ea_special");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_predec_reg(struct cpu *cpu, LONG data) {
+void uop_predec_reg(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
+  unused(cpu);
   printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_predec_reg");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_postinc_reg(struct cpu *cpu, LONG data) {
+void uop_postinc_reg(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
+  unused(cpu);
   printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_postinc_reg");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_read_byte(struct cpu *cpu, LONG data) {
+void uop_read_byte(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
+  unused(cpu);
   printf("DEBUG-UOP: Unimplemented: %s\n", "uop_read_byte");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_write_byte(struct cpu *cpu, LONG data) {
+void uop_write_byte(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
+  unused(cpu);
   printf("DEBUG-UOP: Unimplemented: %s\n", "uop_write_byte");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_write_word(struct cpu *cpu, LONG data) {
+void uop_write_word(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
+  unused(cpu);
   printf("DEBUG-UOP: Unimplemented: %s\n", "uop_write_word");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_write_next_word(struct cpu *cpu, LONG data) {
+void uop_write_next_word(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
+  unused(cpu);
   printf("DEBUG-UOP: Unimplemented: %s\n", "uop_write_next_word");
   exit(-100);
 }

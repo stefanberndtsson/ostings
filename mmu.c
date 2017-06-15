@@ -15,6 +15,7 @@
  * and data_available is set right away.
  */
 void mmu_read_byte(struct mmu *mmu) {
+  unused(mmu);
   /* TODO: All */
 }
 
@@ -39,10 +40,12 @@ void mmu_read_word(struct mmu *mmu) {
 }
 
 void mmu_write_byte(struct mmu *mmu) {
+  unused(mmu);
   /* TODO: All */
 }
 
 void mmu_write_word(struct mmu *mmu) {
+  unused(mmu);
   /* TODO: All */
 }
 
@@ -69,6 +72,8 @@ void mmu_register_area(struct mmu *mmu, LONG start, LONG size, struct mmu_area *
  * This function must never cause an error, so it just returns a static value.
  */
 static WORD mmu_fallback_peek_word(void *data, LONG addr) {
+  unused(data);
+  unused(addr);
   return 0x2a2a;
 }
 
@@ -114,7 +119,6 @@ struct mmu *mmu_setup(struct hw **hws) {
 }
 
 void mmu_tick(struct hw *hw) {
-  //  struct mmu *mmu;
-  //  mmu = (struct mmu *)hw->data;
+  unused(hw);
   printf("DEBUG: Ticking MMU...\n");
 }

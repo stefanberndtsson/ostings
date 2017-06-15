@@ -36,6 +36,8 @@ static void determine_short_jump(struct uop *uop, struct cpu *cpu) {
   int z_flag;
   int condition;
 
+  unused(uop);
+  
   z_flag = (cpu->internal->r.sr&0x04)>>2;
   condition = (cpu->exec->op&0xf00)>>8;
 
@@ -78,15 +80,15 @@ static struct instr *instr_bcc_short_setup(struct cpu *cpu) {
 }
 
 /* TODO: Unimplemented */
-static struct instr *instr_bcc_long_setup(struct cpu *cpu) {
-  struct instr *instr;
-
-  instr = (struct instr *)ostis_alloc(sizeof(struct instr));
-  instr->cpu = cpu;
-
-  instr_uop_push_end(instr);
-  return instr;
-}
+//static struct instr *instr_bcc_long_setup(struct cpu *cpu) {
+//  struct instr *instr;
+//
+//  instr = (struct instr *)ostis_alloc(sizeof(struct instr));
+//  instr->cpu = cpu;
+//
+//  instr_uop_push_end(instr);
+//  return instr;
+//}
 
 struct instr *instr_bcc_setup(struct cpu *cpu) {
   struct instr *instr;
@@ -94,7 +96,7 @@ struct instr *instr_bcc_setup(struct cpu *cpu) {
   instr = instr_bcc_short_setup(cpu);
   
   cpu_instr_register(cpu, SHORT_OP, SHORT_OP_MASK, instr);
-  
+
   return instr;
 }
 

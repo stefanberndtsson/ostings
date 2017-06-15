@@ -22,6 +22,7 @@
  */
 
 static void set_addresses(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
   cpu->internal->r.value[0] = 0x00000000;
   cpu->internal->r.value[2] = 0x00000004;
   cpu->internal->main_state = CPU_RUNNING;
