@@ -16,7 +16,7 @@ static char *mnemonics_lea(struct cpu *cpu, LONG addr) {
   int reg;
 
   op = mmu_peek_word(cpu->mmu, addr);
-  reg = (op&0xe00)>>9;
+  reg = EA_HIGH_REG(op);
   ea_offset = 0;
   ea_mode = EA_MODE(op);
   ea_reg = EA_REG(op);
