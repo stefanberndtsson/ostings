@@ -9,6 +9,8 @@ static char *uops_names[INSTR_UOP_MAX_COUNT] = {
   "NOPCNT",
   "BOOT_PREFETCH",
   "PREFETCH",
+  "PREFETCH_INTO",
+  "PREFETCH_NEXT_INTO",
   "READ_BYTE",
   "READ_WORD",
   "READ_NEXT_WORD",

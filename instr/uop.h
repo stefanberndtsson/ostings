@@ -31,6 +31,15 @@ void uop_boot_prefetch(struct uop *, struct cpu *);
 void uop_prefetch(struct uop *, struct cpu *);
 
 
+/* Same as prefetch, except also store WORD in a register */
+void uop_prefetch_into(struct uop *, struct cpu *);
+
+
+/* PREFETCH_INTO and PREFETCH_NEXT_INTO is similar to READ_WORD and READ_NEXT_WORD
+ * except for prefetch operations rather than read.
+ */
+void uop_prefetch_next_into(struct uop *, struct cpu *);
+
 /* 
  * READ/WRITE
  *

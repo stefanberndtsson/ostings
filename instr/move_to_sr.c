@@ -28,8 +28,7 @@ struct instr *instr_move_to_sr_setup(struct cpu *cpu) {
   instr->cpu = cpu;
 
   /* Fetch immediate word */
-  instr_uop_push_nop(instr);
-  instr_uop_push_prefetch(instr);
+  ea_read_immediate(instr, REG_VALUE_L_TO_REG_W(0), INSTR_WORD);
 
   /* Write to SR */
   instr_uop_push_nop(instr);

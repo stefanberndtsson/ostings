@@ -47,6 +47,8 @@ enum instr_uops {
   INSTR_UOP_NOPCNT,
   INSTR_UOP_BOOT_PREFETCH,
   INSTR_UOP_PREFETCH,
+  INSTR_UOP_PREFETCH_INTO,
+  INSTR_UOP_PREFETCH_NEXT_INTO,
   INSTR_UOP_READ_BYTE,
   INSTR_UOP_READ_WORD,
   INSTR_UOP_READ_NEXT_WORD,
@@ -100,6 +102,8 @@ void instr_uop_push(struct instr *, enum instr_uops, LONG, LONG, enum instr_size
 void instr_uop_push_nop(struct instr *);
 void instr_uop_push_boot_prefetch(struct instr *);
 void instr_uop_push_prefetch(struct instr *);
+void instr_uop_push_prefetch_into(struct instr *, LONG);
+void instr_uop_push_prefetch_next_into(struct instr *, LONG);
 void instr_uop_push_end(struct instr *);
 struct instr *instr_boot_setup(struct cpu *);
 struct instr *instr_unimplemented_setup(struct cpu *);
