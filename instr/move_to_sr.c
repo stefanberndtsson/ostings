@@ -32,7 +32,7 @@ struct instr *instr_move_to_sr_setup(struct cpu *cpu) {
 
   /* Write to SR */
   instr_uop_push_nop(instr);
-  instr_uop_push(instr, INSTR_UOP_REG_COPY, REG_IRD_TO_REG_W, REG_SR_TO_REG_W, INSTR_WORD, EXT_NONE);
+  instr_uop_push_reg_copy_word(instr, REG_IRD_TO_REG_W, REG_SR_TO_REG_W);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
 

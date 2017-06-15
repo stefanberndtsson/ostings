@@ -15,9 +15,9 @@ void ea_read_abs_long(struct instr *instr, LONG intermediate_value_num, LONG val
 
   /* Now fetch value of right size from that address */
   instr_uop_push_nop(instr);
-  instr_uop_push(instr, INSTR_UOP_READ_WORD, REG_VALUE_TO_REG_L(intermediate_value_num), value_reg_num, size, EXT_NONE);
+  instr_uop_push_read_word(instr, REG_VALUE_TO_REG_L(intermediate_value_num), value_reg_num);
   instr_uop_push_nop(instr);
-  instr_uop_push(instr, INSTR_UOP_READ_NEXT_WORD, REG_VALUE_TO_REG_L(intermediate_value_num), value_reg_num, size, EXT_NONE);
+  instr_uop_push_read_next_word(instr, REG_VALUE_TO_REG_L(intermediate_value_num), value_reg_num);
 }
 
 void ea_read_immediate(struct instr *instr, LONG reg_num, enum instr_sizes size) {
