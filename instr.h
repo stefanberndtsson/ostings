@@ -115,5 +115,6 @@ struct instr *instr_nop_setup(struct cpu *);
 struct instr *instr_reset_setup(struct cpu *);
 struct instr *instr_move_to_sr_setup(struct cpu *);
 struct instr *instr_cmpi_setup(struct cpu *);
+struct instr *instr_bcc_setup(struct cpu *);
 
 #endif /* OSTIS_INSTR_H */

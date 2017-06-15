@@ -15,6 +15,7 @@ void mnemonics_setup(struct cpu *cpu) {
   mnemonics_nop_setup(cpu);
   mnemonics_move_to_sr_setup(cpu);
   mnemonics_cmpi_setup(cpu);
+  mnemonics_bcc_setup(cpu);
 }
 
 void mnemonics_register(struct cpu *cpu, WORD op, WORD op_mask, mnemonics_t *mnemonic) {
