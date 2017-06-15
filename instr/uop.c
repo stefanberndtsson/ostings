@@ -1,12 +1,26 @@
+#include "common.h"
 #include "instr.h"
 #include "mmu.h"
 
-void uop_unop(struct cpu *cpu, LONG data) {
+void uop_nop(struct uop *uop, struct cpu *cpu) {
   cpu->exec->uops_pos++;
   return;
 }
 
-void uop_boot_prefetch(struct cpu *cpu, LONG data) {
+void uop_nopcnt(struct uop *uop, struct cpu *cpu) {
+  if(cpu->exec->counter == -1) {
+    cpu->exec->counter = uop->data1;
+  }
+
+  if(cpu->exec->counter > 0) {
+    cpu->exec->counter--;
+  } else {
+    cpu->exec->uops_pos++;
+  }
+  return;
+}
+
+void uop_boot_prefetch(struct uop *uop, struct cpu *cpu) {
   if(!cpu->mmu->read_in_progress) {
     cpu->external->address = cpu->internal->r.pc;
     mmu_read_word(cpu->mmu);
@@ -19,7 +33,7 @@ void uop_boot_prefetch(struct cpu *cpu, LONG data) {
   return;
 }
 
-void uop_prog_read(struct cpu *cpu, LONG data) {
+void uop_prefetch(struct uop *uop, struct cpu *cpu) {
   if(!cpu->mmu->read_in_progress) {
     cpu->external->address = cpu->internal->r.pc;
     cpu->internal->r.ir = cpu->internal->r.irc;
@@ -35,26 +49,26 @@ void uop_prog_read(struct cpu *cpu, LONG data) {
   return;
 }
 
-void uop_ird_to_value_low(struct cpu *cpu, LONG value_num) {
-  cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff0000) | cpu->internal->r.ird;
-  cpu->exec->uops_pos++;
-}
-
-void uop_ird_to_value_high(struct cpu *cpu, LONG value_num) {
-  cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff) | (cpu->internal->r.ird << 16);
-  cpu->exec->uops_pos++;
-}
-
-void uop_data_to_value_low(struct cpu *cpu, LONG value_num) {
-  cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff0000) | cpu->external->data;
-  cpu->exec->uops_pos++;
-}
-
-void uop_data_to_value_high(struct cpu *cpu, LONG value_num) {
-  cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff) | (cpu->external->data << 16);
-  cpu->exec->uops_pos++;
-}
-
+// void uop_ird_to_value_low(struct cpu *cpu, LONG value_num) {
+//   cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff0000) | cpu->internal->r.ird;
+//   cpu->exec->uops_pos++;
+// }
+// 
+// void uop_ird_to_value_high(struct cpu *cpu, LONG value_num) {
+//   cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff) | (cpu->internal->r.ird << 16);
+//   cpu->exec->uops_pos++;
+// }
+// 
+// void uop_data_to_value_low(struct cpu *cpu, LONG value_num) {
+//   cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff0000) | cpu->external->data;
+//   cpu->exec->uops_pos++;
+// }
+// 
+// void uop_data_to_value_high(struct cpu *cpu, LONG value_num) {
+//   cpu->exec->value[value_num] = (cpu->exec->value[value_num]&0xffff) | (cpu->external->data << 16);
+//   cpu->exec->uops_pos++;
+// }
+// 
 /* TODO: Clean up this bit with value0-2 */
 //void uop_assemble_value0(struct cpu *cpu) {
 //  printf("DEBUG-UOP: assemble-0: %04X %04X\n", cpu->internal->irc, cpu->internal->ird);
@@ -77,44 +91,86 @@ void uop_data_to_value_high(struct cpu *cpu, LONG value_num) {
 //  cpu->exec->uops_pos++;
 //}
 
-void uop_read_word(struct cpu *cpu, LONG value_num) {
+/* TODO: Sign extend? */
+void uop_read_word(struct uop *uop, struct cpu *cpu) {
   if(!cpu->mmu->read_in_progress) {
     cpu->external->data_available = 0;
-    cpu->external->address = cpu->exec->value[value_num];
+    cpu->external->address = cpu->internal->l[uop->data1];
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
+    cpu->internal->w[uop->data2] = cpu->external->data;
     cpu->exec->uops_pos++;
   }
   return;
 }
 
-void uop_read_next_word(struct cpu *cpu, LONG value_num) {
+/* TODO: Properly handle BIG_ENDIAN */
+void uop_read_next_word(struct uop *uop, struct cpu *cpu) {
   if(!cpu->mmu->read_in_progress) {
     cpu->external->data_available = 0;
-    cpu->external->address = cpu->exec->value[value_num] + 2;
+    cpu->external->address = cpu->internal->l[uop->data1] + 2;
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
+    cpu->internal->w[uop->data2-1] = cpu->external->data;
     cpu->exec->uops_pos++;
   }
   return;
 }
 
-void uop_end(struct cpu *cpu, LONG data) {
+/* TODO: Sign extend */
+void uop_reg_copy(struct uop *uop, struct cpu *cpu) {
+  if(uop->size == INSTR_LONG) {
+    cpu->internal->l[uop->data2] = cpu->internal->l[uop->data1];
+  } else {
+    cpu->internal->w[uop->data2] = cpu->internal->w[uop->data1];
+  }
+  cpu->exec->uops_pos++;
+}
+
+/* TODO: Sign extend */
+void uop_reg_swap(struct uop *uop, struct cpu *cpu) {
+  LONG tmp1;
+  WORD tmp2;
+  if(uop->size == INSTR_LONG) {
+    tmp1 = cpu->internal->l[uop->data2];
+    cpu->internal->l[uop->data2] = cpu->internal->l[uop->data1];
+    cpu->internal->l[uop->data1] = tmp1;
+  } else {
+    tmp2 = cpu->internal->w[uop->data2];
+    cpu->internal->w[uop->data2] = cpu->internal->w[uop->data1];
+    cpu->internal->w[uop->data1] = tmp2;
+  }
+  cpu->exec->uops_pos++;
+}
+
+void uop_end(struct uop *uop, struct cpu *cpu) {
   return;
 }
 
 
 /* TODO: Unimplemented */
-void uop_spec(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_spec");
+void uop_special(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_special");
   exit(-100);
 }
 
 /* TODO: Unimplemented */
-void uop_unopcnt(struct cpu *cpu, LONG data) {
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_unopcnt");
+void uop_ea_special(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_ea_special");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_predec_reg(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_predec_reg");
+  exit(-100);
+}
+
+/* TODO: Unimplemented */
+void uop_postinc_reg(struct cpu *cpu, LONG data) {
+  printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_postinc_reg");
   exit(-100);
 }
 

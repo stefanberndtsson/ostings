@@ -5,45 +5,22 @@
 
 static char *uops_names[INSTR_UOP_MAX_COUNT] = {
   "END",
-  "UNOP",
-  "UNOPCNT",
-  "PROG_READ",
+  "NOP",
+  "NOPCNT",
+  "BOOT_PREFETCH",
+  "PREFETCH",
   "READ_BYTE",
   "READ_WORD",
   "READ_NEXT_WORD",
   "WRITE_BYTE",
   "WRITE_WORD",
   "WRITE_NEXT_WORD",
-  "SPEC",
-  "SPEC_EA",
-  "BOOT_PREFETCH",
-  "DATA_TO_VALUE_LOW",
-  "DATA_TO_VALUE_HIGH",
-  "VALUE_LOW_TO_DATA",
-  "VALUE_HIGH_TO_DATA",
-  "IRD_TO_VALUE_LOW",
-  "IRD_TO_VALUE_HIGH",
-  "VALUE0_SWAP",
-  "VALUE0_TO_DREG_BYTE",
-  "VALUE0_TO_DREG_WORD",
-  "VALUE0_TO_DREG_LONG",
-  "VALUE0_TO_DREG_BYTE_SEXT",
-  "VALUE0_TO_DREG_WORD_SEXT",
-  "VALUE0_TO_AREG_BYTE",
-  "VALUE0_TO_AREG_WORD",
-  "VALUE0_TO_AREG_LONG",
-  "VALUE0_TO_AREG_BYTE_SEXT",
-  "VALUE0_TO_AREG_WORD_SEXT",
-  "DREG_TO_VALUE0_BYTE",
-  "DREG_TO_VALUE0_WORD",
-  "DREG_TO_VALUE0_LONG",
-  "DREG_TO_VALUE0_BYTE_SEXT",
-  "DREG_TO_VALUE0_WORD_SEXT",
-  "AREG_TO_VALUE0_BYTE",
-  "AREG_TO_VALUE0_WORD",
-  "AREG_TO_VALUE0_LONG",
-  "AREG_TO_VALUE0_BYTE_SEXT",
-  "AREG_TO_VALUE0_WORD_SEXT"
+  "REG_COPY",
+  "REG_SWAP",
+  "SPECIAL",
+  "EA_SPECIAL",
+  "PREDEC_REG",
+  "POSTINC_REG"
 };
 
 static char *states[3] = {
@@ -69,7 +46,7 @@ void cpu_debug_info(struct cpu *cpu) {
   printf("Current Instruction: $%08X %04X %s\n",
          cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu, cpu->exec->instr_addr));
   printf("State: %s\n", states[cpu->internal->main_state]);
-  printf("Values: %08X %08X %08X\n", cpu->exec->value[0], cpu->exec->value[1], cpu->exec->value[2]);
+  printf("Values: %08X %08X %08X\n", cpu->internal->r.value[0], cpu->internal->r.value[1], cpu->internal->r.value[2]);
   printf("External: %08x %04x %d\n", cpu->external->address, cpu->external->data, cpu->external->data_available);
   printf("\n");
 }
@@ -133,6 +110,7 @@ void cpu_initiate_next_instruction(struct cpu *cpu) {
          cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu, cpu->exec->instr_addr));
   cpu->exec->uops_pos = 0;
   cpu->exec->cycles = 0;
+  cpu->exec->counter = -1;
   cpu->external->data_available = 0;
 }
 
@@ -151,8 +129,8 @@ void cpu_step_instr(struct cpu *cpu) {
     }
     printf("DEBUG: pos == %d\n", pos);
     uop = cpu->exec->instr->uops[pos];
-    uop->uop(cpu, uop->data);
     cpu_debug_info(cpu);
+    uop->uop(uop, cpu);
   }
   cpu->internal->cycles++;
   cpu->exec->cycles++;

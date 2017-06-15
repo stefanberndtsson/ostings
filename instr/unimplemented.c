@@ -15,7 +15,7 @@
  *
  */
 
-static void unimplemented_halt(struct cpu *cpu, LONG data) {
+static void unimplemented_halt(struct uop *uop, struct cpu *cpu) {
   printf("\n\n\n\nUnimplemented OP: %04X\n", cpu->exec->op);
   cpu_debug_info(cpu);
   printf("DEBUG: %s\n", mnemonics_at(cpu, 0xfc0020));
@@ -29,7 +29,7 @@ struct instr *instr_unimplemented_setup(struct cpu *cpu) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
-  instr_uop_push_full(instr, unimplemented_halt, INSTR_UOP_SPEC, 0);
+  instr_uop_push_short(instr, unimplemented_halt, INSTR_UOP_SPECIAL);
   instr_uop_push_end(instr);
 
   cpu_instr_register(cpu, OP, OP_MASK, instr);

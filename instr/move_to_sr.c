@@ -12,33 +12,34 @@
 
 /*
  * uOPs:
- * EA (UNOP, PROG_READ)
- * UNOP (Assemble immediate)
- * UNOP (Set SR)
- * UNOP
- * PROG_READ
- * UNOP
- * PROG_READ
+ * EA (NOP, PROG_READ)
+ * NOP (Assemble immediate)
+ * NOP (Set SR)
+ * NOP
+ * PREFETCH
+ * NOP
+ * PREFETCH
  */
-
-static void set_sr(struct cpu *cpu, LONG data) {
-  cpu->internal->r.sr = cpu->exec->value[0]&0xffff;
-  cpu->exec->uops_pos++;
-}
 
 struct instr *instr_move_to_sr_setup(struct cpu *cpu) {
   struct instr *instr;
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
-  instr_uop_push_unop(instr);
-  instr_uop_push_prog_read(instr);
-  instr_uop_push(instr, INSTR_UOP_IRD_TO_VALUE_LOW, 0);
-  instr_uop_push_full(instr, set_sr, INSTR_UOP_SPEC, 0);
-  instr_uop_push_unop(instr);
-  instr_uop_push_unop(instr);
-  instr_uop_push_unop(instr);
-  instr_uop_push_prog_read(instr);
+
+  /* Fetch immediate word */
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+
+  /* Write to SR */
+  instr_uop_push_nop(instr);
+  instr_uop_push(instr, INSTR_UOP_REG_COPY, REG_IRD_TO_REG_W, REG_SR_TO_REG_W, INSTR_WORD, EXT_NONE);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+
+  /* Remaining Prefetch */
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);
   
   cpu_instr_register(cpu, OP, OP_MASK, instr);

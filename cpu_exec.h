@@ -44,7 +44,7 @@ struct cpu_exec {
   int uops_pos;
   LONG instr_addr;
   uint32_t cycles;
-  LONG value[MAX_VALUES];
+  int counter;
 };
 
 #endif /* OSTIS_CPU_EXEC_H */

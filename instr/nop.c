@@ -11,7 +11,7 @@
 /*
  * uOPs:
  * UNOP
- * PROG_READ
+ * PREFETCH
  */
 
 struct instr *instr_nop_setup(struct cpu *cpu) {
@@ -19,8 +19,8 @@ struct instr *instr_nop_setup(struct cpu *cpu) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
-  instr_uop_push_unop(instr);
-  instr_uop_push_prog_read(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
 
   cpu_instr_register(cpu, OP, OP_MASK, instr);
   

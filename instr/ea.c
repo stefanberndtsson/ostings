@@ -1,5 +1,6 @@
 #include "instr.h"
 
+#if 0
 /* TODO: Duplication with Mnemonics */
 
 #define DREG_TO_IDX(reg) (reg)
@@ -239,4 +240,5 @@ int ea_uops_instr(int ea_mode, int ea_reg, struct instr *instr) {
   for(i=0,uops_count=0;instr->uops_types[i] != INSTR_UOP_END;i++,uops_count++);
   return ea_uops(ea_mode, ea_reg, instr->size, uops_count, instr->uops, instr->uops_types);
 }
+#endif
 #endif
