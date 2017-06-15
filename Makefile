@@ -9,7 +9,9 @@ LIBMNEMONICS=mnemonics/libmnemonics.a
 LIB=$(LIBINSTR) $(LIBMNEMONICS)
 PRG=ostings
 
-all: default
+.SUFFIXES:
+
+all:: default
 
 %.o:	%.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -25,8 +27,9 @@ $(LIBINSTR):
 $(LIBMNEMONICS):
 	make -C mnemonics
 
-clean:
+clean::
 	rm -f $(OBJ) $(PRG) *~ core
 	make -C instr clean
 	make -C mnemonics clean
 
+include test.mk
