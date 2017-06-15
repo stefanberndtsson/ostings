@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "unused.h"
 #include "clock.h"
+#include "unused.h"
 #include "hw.h"
 
 int main(int argc, char *argv[]) {

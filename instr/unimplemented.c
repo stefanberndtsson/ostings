@@ -16,6 +16,7 @@
  */
 
 static void unimplemented_halt(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
   printf("\n\n\n\nUnimplemented OP: %04X\n", cpu->exec->op);
   cpu_debug_info(cpu);
   printf("DEBUG: %s\n", mnemonics_at(cpu, 0xfc0020));

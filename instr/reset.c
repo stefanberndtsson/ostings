@@ -23,11 +23,13 @@
 #define RESET_UOPS ((RESET_DELAY/2)-1)
 
 static void set_reset_pin(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
   cpu_set_reset_pin(cpu);
   cpu->exec->uops_pos++;
 }
 
 static void clr_reset_pin(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
   cpu_clr_reset_pin(cpu);
   cpu->exec->uops_pos++;
 }

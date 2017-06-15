@@ -54,11 +54,13 @@ void cpu_debug_info(struct cpu *cpu) {
 }
 
 void cpu_set_reset_pin(struct cpu *cpu) {
+  unused(cpu);
   /* TODO: All */
   return;
 }
 
 void cpu_clr_reset_pin(struct cpu *cpu) {
+  unused(cpu);
   /* TODO: All */
   return;
 }
