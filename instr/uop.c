@@ -36,12 +36,7 @@ void uop_boot_prefetch(struct uop *uop, struct cpu *cpu) {
   return;
 }
 
-/* Prefetch cycle:
- * Copy IRC to IR
- * Fetch new WORD to IRC
- * Copy IR to IRD
- */
-void uop_prefetch(struct uop *uop, struct cpu *cpu) {
+void uop_prefetch_generic(struct uop *uop, struct cpu *cpu) {
   if(!cpu->mmu->read_in_progress) {
     cpu->external->address = cpu->internal->r.pc;
     cpu->internal->r.ir = cpu->internal->r.irc;
@@ -51,10 +46,22 @@ void uop_prefetch(struct uop *uop, struct cpu *cpu) {
     cpu->internal->r.pc += 2;
     cpu->internal->r.irc = cpu->external->data;
     cpu->internal->r.ird = cpu->internal->r.ir;
+    if(uop->code == INSTR_UOP_PREFETCH_INTO) {
+      cpu->internal->w[uop->data1] = cpu->internal->r.ird;
+    } else if(uop->code == INSTR_UOP_PREFETCH_NEXT_INTO) {
+      cpu->internal->w[uop->data1-1] = cpu->internal->r.ird;
+    }
     cpu->exec->uops_pos++;
   }
-  
-  return;
+}
+
+/* Prefetch cycle:
+ * Copy IRC to IR
+ * Fetch new WORD to IRC
+ * Copy IR to IRD
+ */
+void uop_prefetch(struct uop *uop, struct cpu *cpu) {
+  uop_prefetch_generic(uop, cpu);
 }
 
 
@@ -62,20 +69,7 @@ void uop_prefetch(struct uop *uop, struct cpu *cpu) {
  * into another register
  */
 void uop_prefetch_into(struct uop *uop, struct cpu *cpu) {
-  if(!cpu->mmu->read_in_progress) {
-    cpu->external->address = cpu->internal->r.pc;
-    cpu->internal->r.ir = cpu->internal->r.irc;
-    mmu_read_word(cpu->mmu);
-  }
-  if(cpu->external->data_available) {
-    cpu->internal->r.pc += 2;
-    cpu->internal->r.irc = cpu->external->data;
-    cpu->internal->r.ird = cpu->internal->r.ir;
-    cpu->internal->w[uop->data1] = cpu->internal->r.ird;
-    cpu->exec->uops_pos++;
-  }
-  
-  return;
+  uop_prefetch_generic(uop, cpu);
 }
 
 
@@ -85,20 +79,7 @@ void uop_prefetch_into(struct uop *uop, struct cpu *cpu) {
  * TODO: Handle BIG_ENDIAN
  */
 void uop_prefetch_next_into(struct uop *uop, struct cpu *cpu) {
-  if(!cpu->mmu->read_in_progress) {
-    cpu->external->address = cpu->internal->r.pc;
-    cpu->internal->r.ir = cpu->internal->r.irc;
-    mmu_read_word(cpu->mmu);
-  }
-  if(cpu->external->data_available) {
-    cpu->internal->r.pc += 2;
-    cpu->internal->r.irc = cpu->external->data;
-    cpu->internal->r.ird = cpu->internal->r.ir;
-    cpu->internal->w[uop->data1-1] = cpu->internal->r.ird;
-    cpu->exec->uops_pos++;
-  }
-  
-  return;
+  uop_prefetch_generic(uop, cpu);
 }
 
 
