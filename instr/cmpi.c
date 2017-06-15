@@ -27,8 +27,49 @@
  * PROG_READ
  */
 
-/* TODO: Implement comparison */
+static void set_flags_cmp(struct cpu *cpu, int src_masked, int dst_masked, int result_masked, int result) {
+  int n,z,v,c;
+  n = z = v = c = 0;
+  
+  /* Negative? */
+  if(result_masked) {
+    n = 1;
+  }
+
+  /* Zero? */
+  if(result==0) {
+    z = 1;
+  }
+
+  /* oVerflow? */
+  if((!src_masked && dst_masked && !result_masked) || (src_masked && !dst_masked && result_masked)) {
+    v = 1;
+  }
+  
+  /* Carry? */
+  if((src_masked && !dst_masked) || (result_masked && !dst_masked) || (src_masked && result_masked)) {
+    c = 1;
+  }
+  cpu->internal->r.sr = (cpu->internal->r.sr & 0xff00) | (n<<3) | (z<<2) | (v<<1) | (c<<0);
+}
+
+/* Compare what's in VALUE[0] (immediate) with VALUE[2] (EA-fetched)
+ */
 static void compare(struct uop *uop, struct cpu *cpu) {
+  LONG immediate, fetched;
+  LONG size_mask;
+  LONG result;
+
+  immediate = cpu->internal->r.value[0];
+  fetched = cpu->internal->r.value[2];
+
+  result = fetched - immediate;
+  if(uop->size == INSTR_BYTE) { size_mask = 0x80; }
+  if(uop->size == INSTR_WORD) { size_mask = 0x8000; }
+  if(uop->size == INSTR_LONG) { size_mask = 0x80000000; }
+  
+  set_flags_cmp(cpu, immediate&size_mask, fetched&size_mask, result&size_mask, result);
+  
   cpu->exec->uops_pos++;
 }
 

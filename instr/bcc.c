@@ -27,10 +27,28 @@
  *
  */
 
-/* If jump not taken, skip over one uOP (prefetch) */
+/* If jump not taken, skip over one uOP (prefetch)
+ * TODO: Only checking for EQ/NE right now...
+ */
 static void determine_short_jump(struct uop *uop, struct cpu *cpu) {
-  int taken = 1;
+  int taken = 0;
   uint32_t jmp_distance;
+  int z_flag;
+  int condition;
+
+  z_flag = (cpu->internal->r.sr&0x04)>>2;
+  condition = (cpu->exec->op&0xf00)>>8;
+
+  /* Zero flag set? TRUE => Jump on BEQ, FALSE => Jump on BNE */
+  if(z_flag && (condition == 7)) {
+    /* BEQ and Z set */
+    taken = 1;
+  }
+
+  if(!z_flag && (condition == 6)) {
+    /* BNE and Z clr */
+    taken = 1;
+  }
 
   if(taken) {
     /* Do not skip next uOP */
