@@ -11,7 +11,7 @@ PRG=ostings
 
 .SUFFIXES:
 
-all:: default
+all: clean default
 
 %.o:	%.c
 	$(CC) $(CFLAGS) -c $< -o $@
