@@ -28,15 +28,15 @@ static char *mnemonics_cmpi(struct cpu *cpu, LONG addr) {
   ea_reg = EA_REG(op);
   ea_string = mnemonics_ea(cpu, addr, size, ea_mode, ea_reg, ea_offset);
   
-  mnemonic = ostis_alloc(17+strlen(ea_string));
+  mnemonic = ostis_alloc(19+strlen(ea_string));
   if(size == INSTR_BYTE) {
-    snprintf(mnemonic, 17+strlen(ea_string), "CMPI #$%02X,%s", value&0xff, ea_string);
+    snprintf(mnemonic, 19+strlen(ea_string), "CMPI.B #$%02X,%s", value&0xff, ea_string);
   }
   if(size == INSTR_WORD) {
-    snprintf(mnemonic, 17+strlen(ea_string), "CMPI #$%04X,%s", value&0xffff, ea_string);
+    snprintf(mnemonic, 19+strlen(ea_string), "CMPI.W #$%04X,%s", value&0xffff, ea_string);
   }
   if(size == INSTR_LONG) {
-    snprintf(mnemonic, 17+strlen(ea_string), "CMPI #$%08X,%s", value, ea_string);
+    snprintf(mnemonic, 19+strlen(ea_string), "CMPI.L #$%08X,%s", value, ea_string);
   }
   return mnemonic;
 }
