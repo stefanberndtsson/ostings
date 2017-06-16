@@ -135,7 +135,7 @@ static char *ea_long(struct cpu *cpu, LONG addr, int ea_offset) {
   offset |= mmu_peek_word(cpu->mmu, addr+4+ea_offset);
   
   ea = (char *)ostis_alloc(12);
-  snprintf(ea, 12, "$%X.L", offset);
+  snprintf(ea, 12, "$%X", offset);
   return ea;
 }
 
