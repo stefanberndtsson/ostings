@@ -127,3 +127,7 @@ void instr_uop_push_reg_copy_word(struct instr *instr, LONG src_reg, LONG target
 void instr_uop_push_reg_copy_long(struct instr *instr, LONG src_reg, LONG target_reg) {
   instr_uop_push(instr, INSTR_UOP_REG_COPY, src_reg, target_reg, INSTR_LONG, EXT_NONE);
 }
+
+void instr_uop_push_predec_reg(struct instr *instr, LONG reg, enum instr_sizes size) {
+  instr_uop_push(instr, INSTR_UOP_PREDEC_REG, reg, 0, size, EXT_NONE);
+}
