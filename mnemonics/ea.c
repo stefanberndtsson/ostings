@@ -144,9 +144,10 @@ static char *ea_pc_offset(struct cpu *cpu, LONG addr, int ea_offset) {
   int32_t offset;
 
   offset = sign_extend_word(mmu_peek_word(cpu->mmu, addr+2+ea_offset));
+  offset += addr + 2;
   
-  ea = (char *)ostis_alloc(11);
-  snprintf(ea, 11, "%d(PC)", offset);
+  ea = (char *)ostis_alloc(13);
+  snprintf(ea, 13, "$%X(PC)", offset);
   return ea;
 }
 
@@ -163,9 +164,10 @@ static char *ea_pc_offset_reg(struct cpu *cpu, LONG addr, int ea_offset) {
   offset_reg = (extension & 0x7000)>>12;
   offset_reg_type = extension&0x8000 ? 'A' : 'D';
   offset_reg_size = extension&0x800 ? 'L' : 'W';
-
-  ea = (char *)ostis_alloc(14);
-  snprintf(ea, 14, "%d(PC,%c%d.%c)", offset, offset_reg_type, offset_reg, offset_reg_size);
+  offset += addr + 2;
+  
+  ea = (char *)ostis_alloc(16);
+  snprintf(ea, 16, "$%X(PC,%c%d.%c)", offset, offset_reg_type, offset_reg, offset_reg_size);
   return ea;
 }
 
