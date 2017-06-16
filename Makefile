@@ -9,7 +9,7 @@ LIBMNEMONICS=mnemonics/libmnemonics.a
 LIB=$(LIBINSTR) $(LIBMNEMONICS)
 PRG=ostings
 
-all: default
+all: clean default
 
 %.o:	%.c
 	$(CC) $(CFLAGS) -c $< -o $@
