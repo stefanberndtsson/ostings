@@ -109,6 +109,7 @@ void instr_uop_push_read_word(struct instr *, LONG, LONG);
 void instr_uop_push_read_next_word(struct instr *, LONG, LONG);
 void instr_uop_push_reg_copy_word(struct instr *, LONG, LONG);
 void instr_uop_push_reg_copy_long(struct instr *, LONG, LONG);
+void instr_uop_push_predec_reg(struct instr *, LONG, enum instr_sizes);
 struct instr *instr_boot_setup(struct cpu *);
 struct instr *instr_unimplemented_setup(struct cpu *);
 struct instr *instr_nop_setup(struct cpu *);
@@ -116,5 +117,6 @@ struct instr *instr_reset_setup(struct cpu *);
 struct instr *instr_move_to_sr_setup(struct cpu *);
 struct instr *instr_cmpi_setup(struct cpu *);
 struct instr *instr_bcc_setup(struct cpu *);
+struct instr *instr_lea_setup(struct cpu *);
 
 #endif /* OSTIS_INSTR_H */

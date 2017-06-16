@@ -142,6 +142,13 @@ void uop_reg_swap(struct uop *uop, struct cpu *cpu) {
   cpu->exec->uops_pos++;
 }
 
+void uop_predec_reg(struct uop *uop, struct cpu *cpu) {
+  if(uop->size == INSTR_BYTE) { cpu->internal->l[uop->data1] -= 1; }
+  if(uop->size == INSTR_WORD) { cpu->internal->l[uop->data1] -= 2; }
+  if(uop->size == INSTR_LONG) { cpu->internal->l[uop->data1] -= 4; }
+  cpu->exec->uops_pos++;
+}
+
 
 void uop_end(struct uop *uop, struct cpu *cpu) {
   unused(uop);
@@ -163,14 +170,6 @@ void uop_ea_special(struct uop *uop, struct cpu *cpu) {
   unused(uop);
   unused(cpu);
   printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_ea_special");
-  exit(-100);
-}
-
-/* TODO: Unimplemented */
-void uop_predec_reg(struct uop *uop, struct cpu *cpu) {
-  unused(uop);
-  unused(cpu);
-  printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_predec_reg");
   exit(-100);
 }
 
