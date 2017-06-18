@@ -29,5 +29,6 @@
 void ea_read_abs_long(struct instr *, LONG, LONG, enum instr_sizes);
 void ea_read_immediate(struct instr *, LONG, enum instr_sizes);
 void ea_addr(struct instr *, int, int, enum instr_sizes, LONG);
+void ea_read(struct instr *, int, int, enum instr_sizes, LONG, LONG);
 
 #endif /* OSTIS_INSTR_EA_H */

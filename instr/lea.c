@@ -26,7 +26,7 @@ static void add_variant(struct cpu *cpu, int reg, int ea_mode, int ea_reg) {
   cpu_instr_register(cpu, BUILD_OP(reg, ea_mode, ea_reg), 0xFFFF, instr);
 }
 
-struct instr *instr_lea_setup(struct cpu *cpu) {
+void instr_lea_setup(struct cpu *cpu) {
   int ea_reg;
   int reg;
   
@@ -52,7 +52,5 @@ struct instr *instr_lea_setup(struct cpu *cpu) {
     /* Add d8(PC,Rn.S),Ar */
     add_variant(cpu, reg, EA_EXTENDED, EA_PC_OFFSET_REG);
   }
-  
-  return NULL;
 }
 

@@ -73,7 +73,7 @@ static void compare(struct uop *uop, struct cpu *cpu) {
   cpu->exec->uops_pos++;
 }
 
-struct instr *instr_cmpi_setup(struct cpu *cpu) {
+void instr_cmpi_setup(struct cpu *cpu) {
   struct instr *instr;
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
@@ -93,7 +93,5 @@ struct instr *instr_cmpi_setup(struct cpu *cpu) {
   instr_uop_push_end(instr);
 
   cpu_instr_register(cpu, OP, OP_MASK, instr);
-  
-  return instr;
 }
 
