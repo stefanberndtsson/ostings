@@ -34,6 +34,7 @@ void uop_boot_prefetch(struct uop *uop, struct cpu *cpu) {
     cpu->internal->r.pc += 2;
     cpu->internal->r.irc = cpu->external->data;
     cpu->exec->uops_pos++;
+    mmu_clear_read_progress(cpu->mmu);
   }
   return;
 }
@@ -53,6 +54,7 @@ void uop_prefetch_generic(struct uop *uop, struct cpu *cpu) {
     } else if(uop->code == INSTR_UOP_PREFETCH_NEXT_INTO) {
       cpu->internal->w[uop->data1-1] = cpu->internal->r.ird;
     }
+    mmu_clear_read_progress(cpu->mmu);
     cpu->exec->uops_pos++;
   }
 }
