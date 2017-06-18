@@ -14,7 +14,7 @@
  * PREFETCH
  */
 
-struct instr *instr_nop_setup(struct cpu *cpu) {
+void instr_nop_setup(struct cpu *cpu) {
   struct instr *instr;
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
@@ -23,7 +23,5 @@ struct instr *instr_nop_setup(struct cpu *cpu) {
   instr_uop_push_prefetch(instr);
 
   cpu_instr_register(cpu, OP, OP_MASK, instr);
-  
-  return instr;
 }
 

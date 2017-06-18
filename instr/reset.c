@@ -34,7 +34,7 @@ static void clr_reset_pin(struct uop *uop, struct cpu *cpu) {
   cpu->exec->uops_pos++;
 }
 
-struct instr *instr_reset_setup(struct cpu *cpu) {
+void instr_reset_setup(struct cpu *cpu) {
   int i;
   struct instr *instr;
 
@@ -51,7 +51,5 @@ struct instr *instr_reset_setup(struct cpu *cpu) {
   instr_uop_push_end(instr);
   
   cpu_instr_register(cpu, OP, OP_MASK, instr);
-  
-  return instr;
 }
 

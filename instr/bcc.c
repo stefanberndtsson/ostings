@@ -148,13 +148,11 @@ static struct instr *instr_bcc_long_setup(struct cpu *cpu) {
   return instr;
 }
 
-struct instr *instr_bcc_setup(struct cpu *cpu) {
+void instr_bcc_setup(struct cpu *cpu) {
   struct instr *instr_short, *instr_long;
   instr_short = instr_bcc_short_setup(cpu);
   instr_long = instr_bcc_long_setup(cpu);
   
   cpu_instr_register(cpu, SHORT_OP, SHORT_OP_MASK, instr_short);
   cpu_instr_register(cpu, LONG_OP, LONG_OP_MASK, instr_long);
-
-  return NULL;
 }

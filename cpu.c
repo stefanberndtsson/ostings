@@ -95,6 +95,7 @@ struct cpu *cpu_setup(struct hw **hws) {
   instr_cmpi_setup(cpu);
   instr_bcc_setup(cpu);
   instr_lea_setup(cpu);
+  instr_suba_setup(cpu);
 
   /* TODO: This will probably move into the the setup of each instruction eventually,
    * but to make it possible for unimplemented instructions to have correct mnemonics

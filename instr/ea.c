@@ -162,3 +162,17 @@ void ea_addr(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes size
   /* TODO: Better error handling! */
   return;
 }
+
+void ea_read_from_addr(struct instr *instr, enum instr_sizes size, LONG address_value_reg, LONG target_reg) {
+  instr_uop_push_nop(instr);
+  instr_uop_push_read_word(instr, address_value_reg, target_reg);
+  if(size == INSTR_LONG) {
+    instr_uop_push_nop(instr);
+    instr_uop_push_read_next_word(instr, address_value_reg, target_reg);
+  }
+}
+
+void ea_read(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes size, LONG intermediate_value_reg, LONG target_reg) {
+  ea_addr(instr, ea_mode, ea_reg, size, intermediate_value_reg);
+  ea_read_from_addr(instr, size, intermediate_value_reg, target_reg);
+}
