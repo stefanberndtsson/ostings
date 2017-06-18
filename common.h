@@ -15,5 +15,7 @@ typedef uint32_t LONG;
 void *ostis_alloc(size_t);
 void ostis_free(void *ptr);
 
+extern int global_debug;
+
 #endif /* OSTIS_COMMON_H */
 

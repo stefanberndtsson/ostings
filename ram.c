@@ -12,6 +12,10 @@ static void dummy_fill_ram(struct ram *ram) {
     ram->memory[i*2+0] = 0x4e;
     ram->memory[i*2+1] = 0x71;
   }
+  ram->memory[0x420+0-RAMSTART] = 0x75;
+  ram->memory[0x420+1-RAMSTART] = 0x20;
+  ram->memory[0x420+2-RAMSTART] = 0x19;
+  ram->memory[0x420+3-RAMSTART] = 0xf3;
 }
 
 static BYTE ram_read_byte(struct ram *ram, LONG addr) {
