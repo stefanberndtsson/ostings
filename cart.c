@@ -9,10 +9,10 @@
 static void dummy_fill_cart(struct cart *cart) {
   FILE *fp;
 
-  //  cart->memory[0] = 0xFA;
-  //  cart->memory[1] = 0x52;
-  //  cart->memory[2] = 0x23;
-  //  cart->memory[3] = 0x5F;
+  //cart->memory[0] = 0xFA;
+  //cart->memory[1] = 0x52;
+  //cart->memory[2] = 0x23;
+  //cart->memory[3] = 0x5F;
   
   fp = fopen(CARTFILE, "rb");
   if(!fp) {

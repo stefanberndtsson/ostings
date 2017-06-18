@@ -8,23 +8,35 @@
 
 #define OP 0x0C00
 #define OP_MASK 0xff00
+#define BUILD_OP(size, ea_mode, ea_reg) (0x0C00|(size<<6)|(ea_mode<<3)|ea_reg)
+/* 0000 1100 1011 1001 */
 
 /*
- * uOPs (LONG):
- * UNOP (Assemble left value)
- * PROG_READ
- * UNOP (Assemble left value)
- * PROG_READ
- * UNOP (Assemble address)
- * PROG_READ (EA)
- * UNOP (Assemble address)
- * PROG_READ (EA)
- * UNOP
- * READ_WORD
- * UNOP (Assemble right value)
- * READ_WORD
- * UNOP (Assemble right value)
- * PROG_READ
+ * uOPs (fc0026):
+ *
+ * Get immediate:
+ * 0 NOP
+ * 1 Prefetch_into
+ * 2 NOP
+ * 3 Prefetch_next_into
+ * 
+ * Get EA-addr:
+ * 4 NOP
+ * 5 Prefetch_into
+ * 6 NOP
+ * 7 Prefetch_next_into
+ *
+ * Get EA-value:
+ * 8 NOP
+ * 9 Read_word
+ * 10 NOP
+ * 11 Read_next_word
+ *
+ * Compare:
+ * 12 Special
+ * 13 Prefetch
+ * End
+ *
  */
 
 static void set_flags_cmp(struct cpu *cpu, int src_masked, int dst_masked, int result_masked, int result) {
@@ -73,25 +85,35 @@ static void compare(struct uop *uop, struct cpu *cpu) {
   cpu->exec->uops_pos++;
 }
 
-void instr_cmpi_setup(struct cpu *cpu) {
+static void add_ea_variant(struct cpu *cpu, int size, int ea_mode, int ea_reg) {
   struct instr *instr;
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
 
-  /* Fetch LONG immediate value */
-  ea_read_immediate(instr, REG_VALUE_H_TO_REG_W(0), INSTR_LONG);
-
-  /* Fetch EA */
-  ea_read_abs_long(instr, 1, REG_VALUE_H_TO_REG_W(2), INSTR_LONG);
-
-  /* Do comparison between VALUE[0] and VALUE[2] */
-  instr_uop_push_full(instr, compare, INSTR_UOP_SPECIAL, REG_VALUE_TO_REG_L(1), REG_VALUE_TO_REG_L(2), INSTR_LONG, EXT_NONE);
-
-  /* End with prefetch */
+  ea_read_immediate(instr, REG_VALUE_H_TO_REG_W(0), size);
+  ea_read(instr, ea_mode, ea_reg, size, REG_VALUE_H_TO_REG_W(2));
+  instr_uop_push_full(instr, compare, INSTR_UOP_SPECIAL, REG_VALUE_TO_REG_L(1), REG_VALUE_TO_REG_L(2), size, EXT_NONE);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);
 
-  cpu_instr_register(cpu, OP, OP_MASK, instr);
+  cpu_instr_register(cpu, BUILD_OP(size, ea_mode, ea_reg), 0xffff, instr);
+}
+
+void instr_cmpi_setup(struct cpu *cpu) {
+  int size,ea_mode,ea_reg;
+
+  for(ea_mode=0;ea_mode<8;ea_mode++) {
+    for(ea_reg=0;ea_reg<8;ea_reg++) {
+      for(size=0;size<3;size++) {
+        if(BUILD_OP(size, ea_mode, ea_reg) == 0x0cad) {
+          global_debug = 1;
+        } else {
+          global_debug = 0;
+        }
+        add_ea_variant(cpu, size, ea_mode, ea_reg);
+      }
+    }
+  }
 }
 

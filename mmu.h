@@ -56,6 +56,7 @@ struct mmu {
   struct cpu *cpu;
   int read_in_progress;
   int write_in_progress;
+  int tick_alignment;
 };
 
 void mmu_tick(struct hw *);
@@ -68,5 +69,6 @@ void mmu_read_word(struct mmu *);
 void mmu_write_byte(struct mmu *);
 void mmu_write_word(struct mmu *);
 WORD mmu_peek_word(struct mmu *, LONG);
+void mmu_clear_read_progress(struct mmu *);
 
 #endif /* OSTIS_MMU_H */

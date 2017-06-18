@@ -48,7 +48,11 @@ void cpu_debug_info(struct cpu *cpu) {
   printf("Current Instruction: $%08X %04X %s\n",
          cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu, cpu->exec->instr_addr));
   printf("State: %s\n", states[cpu->internal->main_state]);
-  printf("Values: %08X %08X %08X\n", cpu->internal->r.value[0], cpu->internal->r.value[1], cpu->internal->r.value[2]);
+  printf("Values:");
+  for(i=0;i<8;i++) {
+    printf(" %08X", cpu->internal->r.value[i]);
+  }
+  printf("\n");
   printf("External: %08x %04x %d\n", cpu->external->address, cpu->external->data, cpu->external->data_available);
   printf("\n");
 }

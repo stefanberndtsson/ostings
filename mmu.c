@@ -114,11 +114,30 @@ struct mmu *mmu_setup(struct hw **hws) {
   mmu->hws = hws;
   mmu->read_in_progress = 0;
   mmu->write_in_progress = 0;
+  mmu->tick_alignment = 0;
 
   return mmu;
 }
 
+void mmu_clear_read_progress(struct mmu *mmu) {
+  mmu->read_in_progress = 0;
+}
+
 void mmu_tick(struct hw *hw) {
-  unused(hw);
+  struct mmu *mmu;
+  mmu = hw->data;
+
+  /* Check if there is a read in progress (waitstate)
+   * If so, check if MMU can allow CPU read to finish.
+   * TODO: Write stuff.
+   */
+  if(mmu->read_in_progress) {
+    if((mmu->tick_alignment % 16) < 8) {
+      printf("DEBUG: Making data available\n");
+      mmu->cpu->external->data_available = 1;
+    }
+  }
+  
+  mmu->tick_alignment++;
   printf("DEBUG: Ticking MMU...\n");
 }

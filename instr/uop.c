@@ -94,6 +94,7 @@ void uop_read_word(struct uop *uop, struct cpu *cpu) {
   }
   if(cpu->external->data_available) {
     cpu->internal->w[uop->data2] = cpu->external->data;
+    mmu_clear_read_progress(cpu->mmu);
     cpu->exec->uops_pos++;
   }
   return;
@@ -109,6 +110,7 @@ void uop_read_next_word(struct uop *uop, struct cpu *cpu) {
   }
   if(cpu->external->data_available) {
     cpu->internal->w[uop->data2-1] = cpu->external->data;
+    mmu_clear_read_progress(cpu->mmu);
     cpu->exec->uops_pos++;
   }
   return;

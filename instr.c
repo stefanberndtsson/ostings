@@ -16,6 +16,9 @@ void instr_uop_push_full(struct instr *instr, instr_uop *uop, enum instr_uops co
   new_uop->code = code;
   instr->uops[instr->uops_count] = new_uop;
   instr->uops_count++;
+  if(global_debug) {
+    printf("Adding Code: %d, Data1: %d, Data2: %d, Size: %d\n", code, data1, data2, size);
+  }
 }
 
 void instr_uop_push_short(struct instr *instr, instr_uop *uop, enum instr_uops code) {

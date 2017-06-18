@@ -37,13 +37,16 @@ static void ea_addr_mem_dec(struct instr *instr, int ea_reg, enum instr_sizes si
   instr_uop_push_prefetch(instr);
 }
 
-/* Address from d16(An) or d16(PC). Helper to copy and then increment. */
-static void ea_uop_add_word_to_addr(struct uop *uop, struct cpu *cpu) {
+/* Address from d16(An). Helper to copy and then increment. */
+static void ea_uop_add_irc_to_ea_reg(struct uop *uop, struct cpu *cpu) {
   LONG target_value;
   WORD offset;
 
-  offset = SIGN_EXT_WORD(cpu->internal->w[uop->data1]);
-  target_value = cpu->internal->l[uop->data2];
+  offset = SIGN_EXT_WORD(cpu->internal->r.irc);
+  target_value = cpu->internal->r.a[uop->data1];
+  printf("DEBUG: UOP-helper: %08X\n", offset);
+  printf("DEBUG: UOP-helper: %08X\n", target_value);
+  printf("DEBUG: UOP-helper: target-reg: %d\n", uop->data2);
 
   target_value += offset;
   
@@ -53,10 +56,8 @@ static void ea_uop_add_word_to_addr(struct uop *uop, struct cpu *cpu) {
 
 /* Address from d16(An). Copy An to target_reg, fetch d16 from prefetch, add d16 to target_reg */
 static void ea_addr_mem_offset(struct instr *instr, int ea_reg, LONG target_reg) {
-  instr_uop_push_reg_copy_long(instr, REG_AREG_TO_REG_L(ea_reg), target_reg);
-  instr_uop_push_prefetch(instr);
-  instr_uop_push_full(instr, ea_uop_add_word_to_addr, INSTR_UOP_EA_SPECIAL,
-                      REG_IRD_TO_REG_W, target_reg, INSTR_WORD, EXT_NONE);
+  instr_uop_push_full(instr, ea_uop_add_irc_to_ea_reg, INSTR_UOP_EA_SPECIAL,
+                      ea_reg, target_reg, INSTR_WORD, EXT_NONE);
   instr_uop_push_prefetch(instr);
 }
 
@@ -70,12 +71,29 @@ static void ea_addr_mem_offset_reg(struct instr *instr, int ea_reg, enum instr_s
   unused(target_reg);
 }
 
+/* Address from d16(PC). Helper to copy and then increment, subtract two, because of an earlier prefetch. */
+static void ea_uop_add_irc_to_pc(struct uop *uop, struct cpu *cpu) {
+  LONG target_value;
+  WORD offset;
+
+  offset = SIGN_EXT_WORD(cpu->internal->r.irc);
+  target_value = cpu->internal->r.pc;
+  printf("DEBUG: UOP-PC-helper: %08X\n", offset);
+  printf("DEBUG: UOP-PC-helper: %08X\n", target_value);
+  printf("DEBUG: UOP-PC-helper: target-reg: %d\n", uop->data1);
+
+  target_value += offset - 2;
+  
+  cpu->internal->l[uop->data1] = target_value;
+  cpu->exec->uops_pos++;
+}
+
 /* Address from d16(PC). Copy PC to target_reg, fetch d16 from prefetch, add d16 to target_reg */
 static void ea_addr_pc_offset(struct instr *instr, LONG target_reg) {
-  instr_uop_push_reg_copy_long(instr, REG_PC_TO_REG_L, target_reg);
-  instr_uop_push_prefetch(instr);
-  instr_uop_push_full(instr, ea_uop_add_word_to_addr, INSTR_UOP_EA_SPECIAL,
-                      REG_IRD_TO_REG_W, target_reg, INSTR_WORD, EXT_NONE);
+  //  instr_uop_push_reg_copy_long(instr, REG_PC_TO_REG_L, target_reg);
+  //  instr_uop_push_prefetch(instr);
+  instr_uop_push_full(instr, ea_uop_add_irc_to_pc, INSTR_UOP_EA_SPECIAL,
+                      target_reg, 0, INSTR_WORD, EXT_NONE);
   instr_uop_push_prefetch(instr);
 }
 
@@ -97,11 +115,12 @@ static void ea_addr_short(struct instr *instr, LONG target_reg) {
 }
 
 /* Address from $xxxxxxxx.L
- * TODO: Unimplemented.
  */
 static void ea_addr_long(struct instr *instr, LONG target_reg) {
-  unused(instr);
-  unused(target_reg);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch_into(instr, target_reg);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch_next_into(instr, target_reg);
 }
 
 /* OBS! Note that value_num is one of 0-7 denoting the cpu->internal->r.value[], not a cpu->internal->w reg num 
@@ -139,24 +158,33 @@ void ea_addr(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes size
   switch(ea_mode) {
   case EA_MEM:
     ea_addr_mem(instr, ea_reg, target_reg);
+    break;
   case EA_MEM_INC:
     ea_addr_mem_inc(instr, ea_reg, size, target_reg);
+    break;
   case EA_MEM_DEC:
     ea_addr_mem_dec(instr, ea_reg, size, target_reg);
+    break;
   case EA_MEM_OFFSET:
     ea_addr_mem_offset(instr, ea_reg, target_reg);
+    break;
   case EA_MEM_OFFSET_REG:
     ea_addr_mem_offset_reg(instr, ea_reg, size, target_reg);
+    break;
   case EA_EXTENDED:
     switch(ea_reg) {
     case EA_SHORT:
       ea_addr_short(instr, target_reg);
+      break;
     case EA_LONG:
       ea_addr_long(instr, target_reg);
+      break;
     case EA_PC_OFFSET:
       ea_addr_pc_offset(instr, target_reg);
+      break;
     case EA_PC_OFFSET_REG:
       ea_addr_pc_offset_reg(instr, size, target_reg);
+      break;
     }
   }
   /* TODO: Better error handling! */
@@ -172,7 +200,13 @@ void ea_read_from_addr(struct instr *instr, enum instr_sizes size, LONG address_
   }
 }
 
-void ea_read(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes size, LONG intermediate_value_reg, LONG target_reg) {
-  ea_addr(instr, ea_mode, ea_reg, size, intermediate_value_reg);
-  ea_read_from_addr(instr, size, intermediate_value_reg, target_reg);
+/* Destroys cpu->internal->r.value[7] */
+void ea_read(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes size, LONG target_reg) {
+  /* ea_addr_long differs from the others due to it reading two words, not one for the address */
+  if(ea_mode == EA_EXTENDED && ea_reg == EA_LONG) {
+    ea_addr(instr, ea_mode, ea_reg, size, REG_VALUE_H_TO_REG_W(7));
+  } else {
+    ea_addr(instr, ea_mode, ea_reg, size, REG_VALUE_TO_REG_L(7));
+  }
+  ea_read_from_addr(instr, size, REG_VALUE_TO_REG_L(7), target_reg);
 }

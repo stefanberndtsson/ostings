@@ -87,7 +87,7 @@ void add_ea_variant(struct cpu *cpu, int size, int ea_mode, int ea_reg) {
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
 
-  ea_read(instr, ea_mode, ea_reg, size, REG_VALUE_TO_REG_L(1), REG_VALUE_TO_REG_L(0));
+  ea_read(instr, ea_mode, ea_reg, size, REG_VALUE_TO_REG_L(0));
   
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
