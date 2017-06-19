@@ -123,5 +123,6 @@ void instr_cmpi_setup(struct cpu *);
 void instr_bcc_setup(struct cpu *);
 void instr_lea_setup(struct cpu *);
 void instr_suba_setup(struct cpu *);
+void instr_jmp_setup(struct cpu *);
 
 #endif /* OSTIS_INSTR_H */

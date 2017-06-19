@@ -25,6 +25,8 @@ static void unimplemented_halt(struct uop *uop, struct cpu *cpu) {
   printf("DEBUG: %s\n", mnemonics_at(cpu, 0xfc0030));
   printf("DEBUG: %s\n", mnemonics_at(cpu, 0xfc0032));
   printf("DEBUG: %s\n", mnemonics_at(cpu, 0xfc003c));
+  printf("DEBUG: %s\n", mnemonics_at(cpu, 0xfa0004));
+  printf("DEBUG: %s\n", mnemonics_at(cpu, 0xfa0006));
   exit(-97);
 }
 
