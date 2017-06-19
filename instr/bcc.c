@@ -121,7 +121,7 @@ static struct instr *instr_bcc_short_setup(struct cpu *cpu) {
 
   instr_uop_push_nop(instr);
   instr_uop_push_short(instr, determine_short_jump, INSTR_UOP_SPECIAL);
-  instr_uop_push_prefetch_into(instr, REG_VALUE_L_TO_REG_W(0));
+  instr_uop_push_prefetch(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);

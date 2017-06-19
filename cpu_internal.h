@@ -45,23 +45,29 @@ enum cpu_main_states {
  * Instr:      All possible op-codes, mapped to structs
  */
 
+#define LITTLE_ENDIAN 1
+
 struct cpu_internal {
   /* Registers */
   union {
     struct registers {
-      LONG a[8];       // 0    0
-      LONG d[8];       // 8   16
-      LONG usp;        // 16  32
-      LONG ssp;        // 17  34
-      LONG pc;         // 18  36
-      LONG value[8];   // 19  38  
-      WORD sr;         //  -  54
-      WORD irc;        //     55
-      WORD ir;         //     56
-      WORD ird;        //     57
+      LONG a[8];       // 0 (LONG offset from start)
+      LONG d[8];       // 8
+      LONG usp;        // 16
+      LONG ssp;        // 17
+      LONG pc;         // 18
+      LONG value[8];   // 19
+      WORD padding1;   // 27
+      WORD sr;         // 
+      WORD padding2;   // 28
+      WORD irc;        // 
+      WORD padding3;   // 29
+      WORD ir;         // 
+      WORD padding4;   // 30
+      WORD ird;        //
     } r;
-    WORD w[2*(8+8+1+1+1+8)+1+1+1+1];
-    LONG l[8+8+1+1+1+8+2];
+    WORD w[31*2];
+    LONG l[31];
   };
 
   /* Other values */
@@ -73,52 +79,57 @@ struct cpu_internal {
   mnemonics_t *mnemonics[65536];
 };
 
-#define LITTLE_ENDIAN 1
 
 #ifdef LITTLE_ENDIAN
-/* TODO: Properly handle BIG_ENDIAN */
+
+/* REG_xxx is the offset in the LONG array where the LONG version of the
+ * register is located.
+ * Therefor 2*REG_xxx is the LOW WORD (LITTLE ENDIAN) in the WORD array
+ * and 2*REG_xxx+1 is the HIGH WORD (LITTLE ENDIAN) in the WORD array
+ * For BIG ENDIAN, this is inverted.
+ *
+ * All registers are treated as LONG. If they are actually WORD, there is
+ * a padding WORD to make room for the full LONG.
+ */
 #define REG_AREG_OFFSET 0
-#define REG_AREG_H_TO_REG_W(reg_num) ((REG_AREG_OFFSET*2)+(reg_num*2+1))
-#define REG_AREG_L_TO_REG_W(reg_num) ((REG_AREG_OFFSET*2)+(reg_num*2))
-#define REG_AREG_TO_REG_L(reg_num) ((REG_AREG_OFFSET)+(reg_num))
+#define REG_AREG(x) (x+REG_AREG_OFFSET)
 
 #define REG_DREG_OFFSET (REG_AREG_OFFSET+8)
-#define REG_DREG_H_TO_REG_W(reg_num) ((REG_DREG_OFFSET*2)+(reg_num*2+1))
-#define REG_DREG_L_TO_REG_W(reg_num) ((REG_DREG_OFFSET*2)+(reg_num*2))
-#define REG_DREG_TO_REG_L(reg_num) ((REG_DREG_OFFSET)+(reg_num))
+#define REG_DREG(x) (x+REG_DREG_OFFSET)
 
 #define REG_USP_OFFSET (REG_DREG_OFFSET+8)
-#define REG_USP_H_TO_REG_W ((REG_USP_OFFSET*2)+1)
-#define REG_USP_L_TO_REG_W ((REG_USP_OFFSET*2))
-#define REG_USP_TO_REG_L (REG_USP_OFFSET)
+#define REG_USP (REG_USP_OFFSET)
 
 #define REG_SSP_OFFSET (REG_USP_OFFSET+1)
-#define REG_SSP_H_TO_REG_W ((REG_SSP_OFFSET*2)+1)
-#define REG_SSP_L_TO_REG_W ((REG_SSP_OFFSET*2))
-#define REG_SSP_TO_REG_L (REG_SSP_OFFSET)
+#define REG_SSP (REG_SSP_OFFSET)
 
 #define REG_PC_OFFSET (REG_SSP_OFFSET+1)
-#define REG_PC_H_TO_REG_W ((REG_PC_OFFSET*2)+1)
-#define REG_PC_L_TO_REG_W ((REG_PC_OFFSET*2))
-#define REG_PC_TO_REG_L (REG_PC_OFFSET)
+#define REG_PC (REG_PC_OFFSET)
 
 #define REG_VALUE_OFFSET (REG_PC_OFFSET+1)
-#define REG_VALUE_H_TO_REG_W(reg_num) ((REG_VALUE_OFFSET*2)+(reg_num*2+1))
-#define REG_VALUE_L_TO_REG_W(reg_num) ((REG_VALUE_OFFSET*2)+(reg_num*2))
-#define REG_VALUE_TO_REG_L(reg_num) ((REG_VALUE_OFFSET)+(reg_num))
+#define REG_VALUE(x) (x+REG_VALUE_OFFSET)
 
-#define REG_SR_OFFSET (((REG_VALUE_OFFSET+8)*2)) /* All before are LONG */
-#define REG_SR_TO_REG_W (REG_SR_OFFSET)
+#define REG_SR_OFFSET (REG_VALUE_OFFSET+8)
+#define REG_SR (REG_SR_OFFSET)
 
 #define REG_IRC_OFFSET (REG_SR_OFFSET+1)
-#define REG_IRC_TO_REG_W (REG_IRC_OFFSET)
+#define REG_IRC (REG_IRC_OFFSET)
 
 #define REG_IR_OFFSET (REG_IRC_OFFSET+1)
-#define REG_IR_TO_REG_W (REG_IR_OFFSET)
+#define REG_IR (REG_IR_OFFSET)
 
 #define REG_IRD_OFFSET (REG_IR_OFFSET+1)
-#define REG_IRD_TO_REG_W (REG_IRD_OFFSET)
+#define REG_IRD (REG_IRD_OFFSET)
 
+#define REG_WORD_HIGH(long_reg) (long_reg*2+1)
+#define REG_WORD_LOW(long_reg) (long_reg*2+0)
+
+#define REG_SR_W  REG_WORD_HIGH(REG_SR)
+#define REG_IRC_W REG_WORD_HIGH(REG_IRC)
+#define REG_IR_W  REG_WORD_HIGH(REG_IR)
+#define REG_IRD_W REG_WORD_HIGH(REG_IRD)
+
+/* TODO: Properly handle BIG_ENDIAN */
 #endif
 
 

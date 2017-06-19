@@ -33,8 +33,8 @@ static void add_variant(struct cpu *cpu, int ea_mode, int ea_reg) {
   if(ea_mode == EA_MEM_OFFSET_REG || (ea_mode == EA_EXTENDED && ea_reg == EA_PC_OFFSET_REG)) {
     instr_uop_push_nop(instr);
   }
-  ea_addr(instr, ea_mode, ea_reg, INSTR_LONG, REG_VALUE_H_TO_REG_W(0));
-  instr_uop_push_reg_copy_long(instr, REG_VALUE_TO_REG_L(0), REG_PC_TO_REG_L);
+  ea_addr(instr, ea_mode, ea_reg, INSTR_LONG, REG_VALUE(0));
+  instr_uop_push_reg_copy_long(instr, REG_VALUE(0), REG_PC);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);
   cpu_instr_register(cpu, BUILD_OP(ea_mode, ea_reg), 0xFFFF, instr);
@@ -52,7 +52,7 @@ static void add_special_long_variant(struct cpu *cpu) {
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
   instr_uop_push_nop(instr);
-  instr_uop_push_prefetch_into(instr, REG_VALUE_H_TO_REG_W(0));
+  instr_uop_push_prefetch_into(instr, REG_WORD_HIGH(REG_VALUE(0)));
   instr_uop_push_short(instr, construct_new_pc, INSTR_UOP_SPECIAL);
   instr_uop_push_prefetch(instr);
   instr_uop_push_nop(instr);

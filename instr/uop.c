@@ -52,7 +52,7 @@ void uop_prefetch_generic(struct uop *uop, struct cpu *cpu) {
     if(uop->code == INSTR_UOP_PREFETCH_INTO) {
       cpu->internal->w[uop->data1] = cpu->internal->r.ird;
     } else if(uop->code == INSTR_UOP_PREFETCH_NEXT_INTO) {
-      cpu->internal->w[uop->data1-1] = cpu->internal->r.ird;
+      cpu->internal->w[uop->data1] = cpu->internal->r.ird;
     }
     mmu_clear_read_progress(cpu->mmu);
     cpu->exec->uops_pos++;
@@ -111,7 +111,7 @@ void uop_read_next_word(struct uop *uop, struct cpu *cpu) {
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
-    cpu->internal->w[uop->data2-1] = cpu->external->data;
+    cpu->internal->w[uop->data2] = cpu->external->data;
     mmu_clear_read_progress(cpu->mmu);
     cpu->exec->uops_pos++;
   }

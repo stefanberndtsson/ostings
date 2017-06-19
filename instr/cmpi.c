@@ -76,9 +76,19 @@ static void compare(struct uop *uop, struct cpu *cpu) {
   fetched = cpu->internal->r.value[2];
 
   result = fetched - immediate;
-  if(uop->size == INSTR_BYTE) { size_mask = 0x80; }
-  if(uop->size == INSTR_WORD) { size_mask = 0x8000; }
-  if(uop->size == INSTR_LONG) { size_mask = 0x80000000; }
+  if(uop->size == INSTR_BYTE) {
+    immediate &= 0xff;
+    fetched &= 0xff;
+    size_mask = 0x80;
+  }
+  if(uop->size == INSTR_WORD) {
+    immediate &= 0xffff;
+    fetched &= 0xffff;
+    size_mask = 0x8000;
+  }
+  if(uop->size == INSTR_LONG) {
+    size_mask = 0x80000000;
+  }
   
   set_flags_cmp(cpu, immediate&size_mask, fetched&size_mask, result&size_mask, result);
   
@@ -91,9 +101,9 @@ static void add_ea_variant(struct cpu *cpu, int size, int ea_mode, int ea_reg) {
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
 
-  ea_read_immediate(instr, REG_VALUE_H_TO_REG_W(0), size);
-  ea_read(instr, ea_mode, ea_reg, size, REG_VALUE_H_TO_REG_W(2));
-  instr_uop_push_full(instr, compare, INSTR_UOP_SPECIAL, REG_VALUE_TO_REG_L(1), REG_VALUE_TO_REG_L(2), size, EXT_NONE);
+  ea_read_immediate(instr, REG_VALUE(0), size);
+  ea_read(instr, ea_mode, ea_reg, size, REG_VALUE(2));
+  instr_uop_push_full(instr, compare, INSTR_UOP_SPECIAL, REG_VALUE(1), REG_VALUE(2), size, EXT_NONE);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);
 
