@@ -21,6 +21,7 @@ void instr_nop_setup(struct cpu *cpu) {
   instr->cpu = cpu;
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
+  instr_uop_push_end(instr);
 
   cpu_instr_register(cpu, OP, OP_MASK, instr);
 }

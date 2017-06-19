@@ -132,7 +132,7 @@ void mmu_tick(struct hw *hw) {
    * TODO: Write stuff.
    */
   if(mmu->read_in_progress) {
-    if((mmu->tick_alignment % 16) < 8) {
+    if((mmu->tick_alignment % 8) < 4) {
       printf("DEBUG: Making data available\n");
       mmu->cpu->external->data_available = 1;
     }
