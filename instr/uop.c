@@ -46,7 +46,7 @@ void uop_prefetch_generic(struct uop *uop, struct cpu *cpu) {
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
-    /* Waitstate resolve can only occur on even cycles */
+    /* Waitstate resolve can only occur on odd cycles */
     if(!cpu->mmu->read_in_progress || (cpu->mmu->read_in_progress && (cpu->exec->cycles%2 == 1))) {
       cpu->internal->r.pc += 2;
       cpu->internal->r.irc = cpu->external->data;
@@ -98,7 +98,7 @@ void uop_read_word(struct uop *uop, struct cpu *cpu) {
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
-    /* Waitstate resolve can only occur on even cycles */
+    /* Waitstate resolve can only occur on odd cycles */
     if(!cpu->mmu->read_in_progress || (cpu->mmu->read_in_progress && (cpu->exec->cycles%2 == 1))) {
       cpu->internal->w[uop->data2] = cpu->external->data;
       mmu_clear_read_progress(cpu->mmu);
@@ -117,7 +117,7 @@ void uop_read_next_word(struct uop *uop, struct cpu *cpu) {
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
-    /* Waitstate resolve can only occur on even cycles */
+    /* Waitstate resolve can only occur on odd cycles */
     if(!cpu->mmu->read_in_progress || (cpu->mmu->read_in_progress && (cpu->exec->cycles%2 == 1))) {
       cpu->internal->w[uop->data2] = cpu->external->data;
       mmu_clear_read_progress(cpu->mmu);
