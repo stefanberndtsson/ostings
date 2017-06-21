@@ -59,8 +59,9 @@ enum instr_uops {
   INSTR_UOP_REG_SWAP,
   INSTR_UOP_SPECIAL=15,
   INSTR_UOP_EA_SPECIAL=16,
-  INSTR_UOP_PREDEC_REG,
-  INSTR_UOP_POSTINC_REG,
+  INSTR_UOP_DEC_REG,
+  INSTR_UOP_INC_REG,
+  INSTR_UOP_ADD,
   INSTR_UOP_MAX_COUNT
 };
 
@@ -109,7 +110,9 @@ void instr_uop_push_read_word(struct instr *, LONG, LONG);
 void instr_uop_push_read_next_word(struct instr *, LONG, LONG);
 void instr_uop_push_reg_copy_word(struct instr *, LONG, LONG);
 void instr_uop_push_reg_copy_long(struct instr *, LONG, LONG);
-void instr_uop_push_predec_reg(struct instr *, LONG, enum instr_sizes);
+void instr_uop_push_dec_reg(struct instr *, LONG, enum instr_sizes);
+void instr_uop_push_inc_reg(struct instr *, LONG, enum instr_sizes);
+void instr_uop_push_add_word_to_long(struct instr *, LONG, LONG);
 
 /* Very special boot instruction */
 struct instr *instr_boot_setup(struct cpu *);

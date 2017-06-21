@@ -20,54 +20,22 @@ static void ea_addr_mem(struct instr *instr, int ea_reg, LONG target_reg, int ju
   instr_uop_push_prefetch(instr);
 }
 
-/* Address from (An)+. Helper to copy and then increment. */
-static void ea_uop_reg_copy_and_inc(struct uop *uop, struct cpu *cpu) {
-  LONG value;
-
-  value = cpu->internal->l[uop->data1];
-  cpu->internal->l[uop->data2] = value;
-  if(uop->size == INSTR_BYTE) { value += 1; }
-  if(uop->size == INSTR_WORD) { value += 2; }
-  if(uop->size == INSTR_LONG) { value += 4; }
-
-  cpu->internal->l[uop->data1] = value;
-  cpu->exec->uops_pos++;
-}
-
 /* Address from (An)+. Put An into target_reg, then increment An as required */
 static void ea_addr_mem_inc(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
   instr_uop_push_nop(instr);
-  instr_uop_push_full(instr, ea_uop_reg_copy_and_inc, INSTR_UOP_EA_SPECIAL,
-                      REG_AREG(ea_reg), target_reg, size, EXT_NONE);
-  instr_uop_push_nop(instr);
+  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
+  instr_uop_push_inc_reg(instr, REG_AREG(ea_reg), size);
   instr_uop_push_prefetch(instr);
 }
 
 /* Address from -(An). This is easier, because there is an extra uOP for decrement available */
 static void ea_addr_mem_dec(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
   instr_uop_push_nop(instr);
-  instr_uop_push_predec_reg(instr, REG_AREG(ea_reg), size);
+  instr_uop_push_dec_reg(instr, REG_AREG(ea_reg), size);
   instr_uop_push_nop(instr);
   instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
-}
-
-/* Address from d16(An). Helper to copy and then increment. */
-static void ea_uop_add_irc_to_ea_reg(struct uop *uop, struct cpu *cpu) {
-  LONG target_value;
-  WORD offset;
-
-  offset = SIGN_EXT_WORD(cpu->internal->r.irc);
-  target_value = cpu->internal->r.a[uop->data1];
-  printf("DEBUG: UOP-helper: %08X\n", offset);
-  printf("DEBUG: UOP-helper: %08X\n", target_value);
-  printf("DEBUG: UOP-helper: target-reg: %d\n", uop->data2);
-
-  target_value += offset;
-  
-  cpu->internal->l[uop->data2] = target_value;
-  cpu->exec->uops_pos++;
 }
 
 /* Address from d16(An). Copy An to target_reg, fetch d16 from prefetch, add d16 to target_reg */
@@ -75,9 +43,8 @@ static void ea_addr_mem_offset(struct instr *instr, int ea_reg, LONG target_reg,
   if(jump_before_last_prefetch) {
     target_reg = REG_PC;
   }
-  instr_uop_push_nop(instr);
-  instr_uop_push_full(instr, ea_uop_add_irc_to_ea_reg, INSTR_UOP_EA_SPECIAL,
-                      ea_reg, target_reg, INSTR_WORD, EXT_NONE);
+  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
+  instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
 }
@@ -93,32 +60,14 @@ static void ea_addr_mem_offset_reg(struct instr *instr, int ea_reg, enum instr_s
   unused(jump_before_last_prefetch);
 }
 
-/* Address from d16(PC). Helper to copy and then increment, subtract two, because of an earlier prefetch. */
-static void ea_uop_add_irc_to_pc(struct uop *uop, struct cpu *cpu) {
-  LONG target_value;
-  WORD offset;
-
-  offset = SIGN_EXT_WORD(cpu->internal->r.irc);
-  target_value = cpu->internal->r.pc;
-  printf("DEBUG: UOP-PC-helper: %08X\n", offset);
-  printf("DEBUG: UOP-PC-helper: %08X\n", target_value);
-  printf("DEBUG: UOP-PC-helper: target-reg: %d\n", uop->data1);
-
-  target_value += offset - 2;
-  
-  cpu->internal->l[uop->data1] = target_value;
-  cpu->exec->uops_pos++;
-}
-
 /* Address from d16(PC). Copy PC to target_reg, fetch d16 from prefetch, add d16 to target_reg */
 static void ea_addr_pc_offset(struct instr *instr, LONG target_reg, int jump_before_last_prefetch) {
   if(jump_before_last_prefetch) {
     target_reg = REG_PC;
   }
-  instr_uop_push_nop(instr);
-  instr_uop_push_full(instr, ea_uop_add_irc_to_pc, INSTR_UOP_EA_SPECIAL,
-                      target_reg, 0, INSTR_WORD, EXT_NONE);
-  instr_uop_push_nop(instr);
+  instr_uop_push_reg_copy_long(instr, REG_PC, target_reg);
+  instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg);
+  instr_uop_push_dec_reg(instr, target_reg, INSTR_WORD);
   instr_uop_push_prefetch(instr);
 }
 

@@ -21,8 +21,9 @@ static char *uops_names[INSTR_UOP_MAX_COUNT] = {
   "REG_SWAP",
   "SPECIAL",
   "EA_SPECIAL",
-  "PREDEC_REG",
-  "POSTINC_REG"
+  "DEC_REG",
+  "INC_REG",
+  "ADD"
 };
 
 static char *states[3] = {

@@ -155,13 +155,78 @@ void uop_reg_swap(struct uop *uop, struct cpu *cpu) {
   cpu->exec->uops_pos++;
 }
 
-void uop_predec_reg(struct uop *uop, struct cpu *cpu) {
+void uop_dec_reg(struct uop *uop, struct cpu *cpu) {
   if(uop->size == INSTR_BYTE) { cpu->internal->l[uop->data1] -= 1; }
   if(uop->size == INSTR_WORD) { cpu->internal->l[uop->data1] -= 2; }
   if(uop->size == INSTR_LONG) { cpu->internal->l[uop->data1] -= 4; }
   cpu->exec->uops_pos++;
 }
 
+
+void uop_inc_reg(struct uop *uop, struct cpu *cpu) {
+  if(uop->size == INSTR_BYTE) { cpu->internal->l[uop->data1] += 1; }
+  if(uop->size == INSTR_WORD) { cpu->internal->l[uop->data1] += 2; }
+  if(uop->size == INSTR_LONG) { cpu->internal->l[uop->data1] += 4; }
+  cpu->exec->uops_pos++;
+}
+
+void uop_add(struct uop *uop, struct cpu *cpu) {
+  LONG src_reg, target_reg;
+  enum instr_sizes target_size;
+
+  /* src_reg size is uop->size */
+  /* target_reg size is uop->size, unless
+   * uop->ext is EXT_WORD or EXT_LONG,
+   * in which case target_reg size is either
+   * WORD or LONG respectively.
+   */
+
+  if(uop->size == INSTR_BYTE) {
+    src_reg = cpu->internal->w[uop->data1]&0xff;
+    if(uop->ext == EXT_LONG) {
+      src_reg = SIGN_EXT_WORD(SIGN_EXT_BYTE(src_reg));
+    } else if(uop->ext == EXT_WORD) {
+      src_reg = SIGN_EXT_BYTE(src_reg);
+    }
+  } else if(uop->size == INSTR_WORD) {
+    src_reg = cpu->internal->w[uop->data1];
+    if(uop->ext == EXT_LONG) {
+      src_reg = SIGN_EXT_WORD(src_reg);
+    }
+  } else if(uop->size == INSTR_LONG) {
+    src_reg = cpu->internal->l[uop->data1];
+  }
+
+  if(uop->ext == EXT_LONG) {
+    target_reg = cpu->internal->l[uop->data2];
+    target_size = INSTR_LONG;
+  } else if(uop->ext == EXT_WORD) {
+    target_reg = cpu->internal->w[uop->data2]&0xffff;
+    target_size = INSTR_WORD;
+  } else if(uop->ext == EXT_NONE) {
+    if(uop->size == INSTR_BYTE) {
+      target_reg = cpu->internal->w[uop->data2]&0xff;
+      target_size = INSTR_BYTE;
+    } else if(uop->size == INSTR_WORD) {
+      target_reg = cpu->internal->w[uop->data2];
+      target_size = INSTR_WORD;
+    } else if(uop->size == INSTR_LONG) {
+      target_reg = cpu->internal->l[uop->data2];
+      target_size = INSTR_LONG;
+    }
+  }
+
+  target_reg += src_reg;
+
+  if(target_size == INSTR_BYTE) {
+    cpu->internal->w[uop->data2] = (cpu->internal->w[uop->data2]&0xff00) | (target_reg&0xff);
+  } else if(target_size == INSTR_WORD) {
+    cpu->internal->w[uop->data2] = target_reg&0xffff;
+  } else if(target_size == INSTR_LONG) {
+    cpu->internal->l[uop->data2] = target_reg;
+  }
+  cpu->exec->uops_pos++;
+}
 
 void uop_end(struct uop *uop, struct cpu *cpu) {
   unused(uop);
@@ -183,14 +248,6 @@ void uop_ea_special(struct uop *uop, struct cpu *cpu) {
   unused(uop);
   unused(cpu);
   printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_ea_special");
-  exit(-100);
-}
-
-/* TODO: Unimplemented */
-void uop_postinc_reg(struct uop *uop, struct cpu *cpu) {
-  unused(uop);
-  unused(cpu);
-  printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_postinc_reg");
   exit(-100);
 }
 

@@ -120,54 +120,18 @@ void uop_ea_special(struct uop *, struct cpu *);
 
 
 /* Subtract size appropriate value from reg DATA1 */
-void uop_predec_reg(struct uop *, struct cpu *);
+void uop_dec_reg(struct uop *, struct cpu *);
 
 
 /* Add size appropriate value to reg DATA1 */
-void uop_postinc_reg(struct uop *, struct cpu *);
+void uop_inc_reg(struct uop *, struct cpu *);
+
+
+/* Add reg1 to reg2, sign extend if requested */
+void uop_add(struct uop *, struct cpu *);
 
 
 /* This is a dummy function */
 void uop_end(struct uop *, struct cpu *);
-
-// void uop_spec(struct uop *, struct cpu *);
-// void uop_unop(struct cpu *, LONG);
-// void uop_unopcnt(struct cpu *, LONG);
-// void uop_boot_prefetch(struct cpu *, LONG);
-// void uop_prog_read(struct cpu *, LONG);
-// void uop_read_byte(struct cpu *, LONG);
-// void uop_read_word(struct cpu *, LONG);
-// void uop_read_next_word(struct cpu *, LONG);
-// void uop_write_byte(struct cpu *, LONG);
-// void uop_write_word(struct cpu *, LONG);
-// void uop_write_next_word(struct cpu *, LONG);
-// void uop_data_to_value_low(struct cpu *, LONG);
-// void uop_data_to_value_high(struct cpu *, LONG);
-// void uop_value_low_to_data(struct cpu *, LONG);
-// void uop_value_high_to_data(struct cpu *, LONG);
-// void uop_ird_to_value_low(struct cpu *, LONG);
-// void uop_ird_to_value_high(struct cpu *, LONG);
-// void uop_value0_swap(struct cpu *, LONG);
-// void uop_value0_to_dreg_byte(struct cpu *, LONG);
-// void uop_value0_to_dreg_word(struct cpu *, LONG);
-// void uop_value0_to_dreg_long(struct cpu *, LONG);
-// void uop_value0_to_dreg_byte_sext(struct cpu *, LONG);
-// void uop_value0_to_dreg_word_sext(struct cpu *, LONG);
-// void uop_value0_to_areg_byte(struct cpu *, LONG);
-// void uop_value0_to_areg_word(struct cpu *, LONG);
-// void uop_value0_to_areg_long(struct cpu *, LONG);
-// void uop_value0_to_areg_byte_sext(struct cpu *, LONG);
-// void uop_value0_to_areg_word_sext(struct cpu *, LONG);
-// void uop_dreg_to_value0_byte(struct cpu *, LONG);
-// void uop_dreg_to_value0_word(struct cpu *, LONG);
-// void uop_dreg_to_value0_long(struct cpu *, LONG);
-// void uop_dreg_to_value0_byte_sext(struct cpu *, LONG);
-// void uop_dreg_to_value0_word_sext(struct cpu *, LONG);
-// void uop_areg_to_value0_byte(struct cpu *, LONG);
-// void uop_areg_to_value0_word(struct cpu *, LONG);
-// void uop_areg_to_value0_long(struct cpu *, LONG);
-// void uop_areg_to_value0_byte_sext(struct cpu *, LONG);
-// void uop_areg_to_value0_word_sext(struct cpu *, LONG);
-// void uop_end(struct cpu *, LONG);
 
 #endif /* OSTIS_UOPS_H */
