@@ -39,7 +39,13 @@ void uop_boot_prefetch(struct uop *uop, struct cpu *cpu) {
   return;
 }
 
-void uop_prefetch_generic(struct uop *uop, struct cpu *cpu) {
+/* Prefetch cycle:
+ * Copy IRC to IR
+ * Fetch new WORD to IRC
+ * Copy IR to IRD
+ */
+void uop_prefetch(struct uop *uop, struct cpu *cpu) {
+  unused(uop);
   if(!cpu->mmu->read_in_progress) {
     cpu->external->address = cpu->internal->r.pc;
     cpu->internal->r.ir = cpu->internal->r.irc;
@@ -51,44 +57,11 @@ void uop_prefetch_generic(struct uop *uop, struct cpu *cpu) {
       cpu->internal->r.pc += 2;
       cpu->internal->r.irc = cpu->external->data;
       cpu->internal->r.ird = cpu->internal->r.ir;
-      if(uop->code == INSTR_UOP_PREFETCH_INTO) {
-        cpu->internal->w[uop->data1] = cpu->internal->r.ird;
-      } else if(uop->code == INSTR_UOP_PREFETCH_NEXT_INTO) {
-        cpu->internal->w[uop->data1] = cpu->internal->r.ird;
-      }
       mmu_clear_read_progress(cpu->mmu);
       cpu->exec->uops_pos++;
     }
   }
 }
-
-/* Prefetch cycle:
- * Copy IRC to IR
- * Fetch new WORD to IRC
- * Copy IR to IRD
- */
-void uop_prefetch(struct uop *uop, struct cpu *cpu) {
-  uop_prefetch_generic(uop, cpu);
-}
-
-
-/* Prefetch like normal, but also store WORD ending up in IRD
- * into another register
- */
-void uop_prefetch_into(struct uop *uop, struct cpu *cpu) {
-  uop_prefetch_generic(uop, cpu);
-}
-
-
-/* Similar to READ_WORD_NEXT, this is for fetching the second
- * half of a LONG into (hopefully) the same register
- *
- * TODO: Handle BIG_ENDIAN
- */
-void uop_prefetch_next_into(struct uop *uop, struct cpu *cpu) {
-  uop_prefetch_generic(uop, cpu);
-}
-
 
 /* TODO: Sign extend? */
 void uop_read_word(struct uop *uop, struct cpu *cpu) {

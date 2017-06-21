@@ -44,12 +44,6 @@ void instr_uop_push(struct instr *instr, enum instr_uops code,
   case INSTR_UOP_PREFETCH:
     instr_uop_push_full(instr, uop_prefetch, code, data1, data2, size, ext);
     break;
-  case INSTR_UOP_PREFETCH_INTO:
-    instr_uop_push_full(instr, uop_prefetch_into, code, data1, data2, size, ext);
-    break;
-  case INSTR_UOP_PREFETCH_NEXT_INTO:
-    instr_uop_push_full(instr, uop_prefetch_next_into, code, data1, data2, size, ext);
-    break;
   case INSTR_UOP_READ_BYTE:
     instr_uop_push_full(instr, uop_read_byte, code, data1, data2, size, ext);
     break;
@@ -108,14 +102,6 @@ void instr_uop_push_boot_prefetch(struct instr *instr) {
 
 void instr_uop_push_prefetch(struct instr *instr) {
   instr_uop_push(instr, INSTR_UOP_PREFETCH, 0, 0, INSTR_WORD, EXT_NONE);
-}
-
-void instr_uop_push_prefetch_into(struct instr *instr, LONG reg) {
-  instr_uop_push(instr, INSTR_UOP_PREFETCH_INTO, reg, 0, INSTR_WORD, EXT_NONE);
-}
-
-void instr_uop_push_prefetch_next_into(struct instr *instr, LONG reg) {
-  instr_uop_push(instr, INSTR_UOP_PREFETCH_NEXT_INTO, reg, 0, INSTR_WORD, EXT_NONE);
 }
 
 void instr_uop_push_read_word(struct instr *instr, LONG address_reg, LONG target_reg) {

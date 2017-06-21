@@ -3,7 +3,9 @@
 #include "uop.h"
 #include "ea.h"
 
-/* Address from (An). Just copy the address of the An into the target_reg */
+/* Address from (An). Just copy the address of the An into the target_reg
+ * then prefetch a new WORD.
+ */
 static void ea_addr_mem(struct instr *instr, int ea_reg, LONG target_reg) {
   instr_uop_push_nop(instr);
   instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
@@ -11,7 +13,9 @@ static void ea_addr_mem(struct instr *instr, int ea_reg, LONG target_reg) {
   instr_uop_push_prefetch(instr);
 }
 
-/* Address from (An)+. Put An into target_reg, then increment An as required */
+/* Address from (An)+. Put An into target_reg, then increment An as required
+ * followed by a prefetch.
+ */
 static void ea_addr_mem_inc(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
   instr_uop_push_nop(instr);
   instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
@@ -19,7 +23,9 @@ static void ea_addr_mem_inc(struct instr *instr, int ea_reg, enum instr_sizes si
   instr_uop_push_prefetch(instr);
 }
 
-/* Address from -(An). This is easier, because there is an extra uOP for decrement available */
+/* Address from -(An). Decrement An first, then copy to target_reg,
+ * and finally a prefetch.
+ */
 static void ea_addr_mem_dec(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
   instr_uop_push_nop(instr);
   instr_uop_push_dec_reg(instr, REG_AREG(ea_reg), size);
@@ -29,7 +35,10 @@ static void ea_addr_mem_dec(struct instr *instr, int ea_reg, enum instr_sizes si
   instr_uop_push_prefetch(instr);
 }
 
-/* Address from d16(An). Copy An to target_reg, fetch d16 from prefetch, add d16 to target_reg */
+/* Address from d16(An). Copy An to target_reg, 
+ * d16 is already in IRC, so add that to target_reg,
+ * then another prefetch.
+ */
 static void ea_addr_mem_offset(struct instr *instr, int ea_reg, LONG target_reg) {
   instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
   instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg);
@@ -47,7 +56,11 @@ static void ea_addr_mem_offset_reg(struct instr *instr, int ea_reg, enum instr_s
   unused(target_reg);
 }
 
-/* Address from d16(PC). Copy PC to target_reg, fetch d16 from prefetch, add d16 to target_reg */
+/* Address from d16(PC). Identical to d16(An), except
+ * PC has moved after prefetching, so target_reg needs to
+ * be decremented by one WORD.
+ * Finish off by prefetching.
+ */
 static void ea_addr_pc_offset(struct instr *instr, LONG target_reg) {
   instr_uop_push_reg_copy_long(instr, REG_PC, target_reg);
   instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg);
@@ -73,6 +86,9 @@ static void ea_addr_short(struct instr *instr, LONG target_reg) {
 }
 
 /* Address from $xxxxxxxx.L
+ * After the first prefetch, the full value is in IRD (High WORD)
+ * and IRC (Low WORD), so just copy those two into target_reg,
+ * then do the last prefetch.
  */
 static void ea_addr_long(struct instr *instr, LONG target_reg) {
   instr_uop_push_nop(instr);
@@ -85,21 +101,24 @@ static void ea_addr_long(struct instr *instr, LONG target_reg) {
   instr_uop_push_prefetch(instr);
 }
 
-void ea_read_immediate(struct instr *instr, LONG reg_num, enum instr_sizes size) {
+/* Before doing anything, the first WORD (High in case of .L, Low in case of .W)
+ * is already in IRC. Copy that first into its appropriate place, then prefetch.
+ * If .W, it's done, otherwise, repeat for the Low WORD of the .L operation.
+ */
+void ea_read_immediate(struct instr *instr, LONG target_reg, enum instr_sizes size) {
   if(size == INSTR_LONG) {
-    instr_uop_push_nop(instr);
-    instr_uop_push_nop(instr);
-    instr_uop_push_nop(instr);
-    instr_uop_push_prefetch_into(instr, REG_WORD_HIGH(reg_num));
-    instr_uop_push_nop(instr);
-    instr_uop_push_nop(instr);
-    instr_uop_push_nop(instr);
-    instr_uop_push_prefetch_next_into(instr, REG_WORD_LOW(reg_num));
+    instr_uop_push_reg_copy_word(instr, REG_IRC_W, REG_WORD_HIGH(target_reg));
   } else {
+    instr_uop_push_reg_copy_word(instr, REG_IRC_W, REG_WORD_LOW(target_reg));
+  }
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+  if(size == INSTR_LONG) {
+    instr_uop_push_reg_copy_word(instr, REG_IRC_W, REG_WORD_LOW(target_reg));
     instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);
-    instr_uop_push_nop(instr);
-    instr_uop_push_prefetch_into(instr, REG_WORD_LOW(reg_num));
+    instr_uop_push_prefetch(instr);
   }
 }
 
