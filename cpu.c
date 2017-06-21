@@ -130,20 +130,23 @@ void cpu_step_instr(struct cpu *cpu) {
   int pos;
   struct uop *uop;
 
-  /* uOPs all consume 2 cycles */
-  if((cpu->internal->cycles & 1) == 0) {
-    pos = cpu->exec->uops_pos;
-    /* Check if previous instruction has ended */
-    if(cpu->exec->instr->uops[pos]->code == INSTR_UOP_END) {
-      cpu->internal->icycle = cpu->exec->cycles;
-      cpu_initiate_next_instruction(cpu);
-      pos = cpu->exec->uops_pos;
+  pos = cpu->exec->uops_pos;
+  /* Check if previous instruction has ended */
+  if(cpu->exec->instr->uops[pos]->code == INSTR_UOP_END) {
+    if((cpu->exec->cycles % 2) == 1) {
+      /* TODO: Transitionally. Should never end up on an odd cycle after an instruction */
+      cpu_debug_info(cpu);
+      printf("ERROR! Instruction either wrong or not on 1c uOPs yet: %s\n", cpu->exec->mnemonic(cpu, cpu->exec->instr_addr));
+      exit(-104);
     }
-    printf("DEBUG: pos == %d\n", pos);
-    uop = cpu->exec->instr->uops[pos];
-    cpu_debug_info(cpu);
-    uop->uop(uop, cpu);
+    cpu->internal->icycle = cpu->exec->cycles;
+    cpu_initiate_next_instruction(cpu);
+    pos = cpu->exec->uops_pos;
   }
+  printf("DEBUG: pos == %d\n", pos);
+  uop = cpu->exec->instr->uops[pos];
+  cpu_debug_info(cpu);
+  uop->uop(uop, cpu);
   cpu->internal->cycles++;
   cpu->exec->cycles++;
 }

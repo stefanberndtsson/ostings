@@ -54,13 +54,13 @@ static void subtract(struct uop *uop, struct cpu *cpu) {
   result = cpu->internal->r.a[EA_HIGH_REG(op)] - src_value;
   cpu->internal->r.a[EA_HIGH_REG(op)] = result;
 
-  /* Special cases. WORD size take longer. So skip next uOP if: 
+  /* Special cases. WORD size take longer. So skip next two uOPs if: 
    * size == LONG && EA is NOT Immediate
    * otherwise, inc as usual.
    */
   if(size_long && ((EA_MODE(op) != EA_EXTENDED) ||
      ((EA_MODE(op) == EA_EXTENDED) && (EA_REG(op) != EA_IMMEDIATE)))) {
-    cpu->exec->uops_pos += 2;
+    cpu->exec->uops_pos += 3;
   } else {
     cpu->exec->uops_pos++;
   }
@@ -73,8 +73,12 @@ void instr_suba_setup_regs(struct cpu *cpu) {
   instr->cpu = cpu;
 
   instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_short(instr, subtract, INSTR_UOP_SPECIAL);
+  instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_end(instr);
 
@@ -90,8 +94,12 @@ void add_ea_variant(struct cpu *cpu, int size, int ea_mode, int ea_reg) {
   ea_read(instr, ea_mode, ea_reg, size, REG_VALUE(0));
   
   instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_short(instr, subtract, INSTR_UOP_SPECIAL);
+  instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_end(instr);
 

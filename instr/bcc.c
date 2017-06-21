@@ -63,8 +63,8 @@ static void determine_short_jump(struct uop *uop, struct cpu *cpu) {
     cpu->internal->r.pc += jmp_distance - 2;
     cpu->exec->uops_pos++;
   } else {
-    /* Skip one uOP */
-    cpu->exec->uops_pos += 2;
+    /* Skip two uOPs */
+    cpu->exec->uops_pos += 3;
   }
 }
 
@@ -105,8 +105,8 @@ static void determine_long_jump(struct uop *uop, struct cpu *cpu) {
      */
     jmp_distance = SIGN_EXT_WORD(cpu->internal->r.irc);
     cpu->internal->r.pc += jmp_distance - 2;
-    /* If jumping, skip next uOP */
-    cpu->exec->uops_pos += 2;
+    /* If jumping, skip next two uOPs */
+    cpu->exec->uops_pos += 3;
   } else {
     /* Do not skip */
     cpu->exec->uops_pos++;
@@ -120,8 +120,13 @@ static struct instr *instr_bcc_short_setup(struct cpu *cpu) {
   instr->cpu = cpu;
 
   instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_short(instr, determine_short_jump, INSTR_UOP_SPECIAL);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);
@@ -137,10 +142,17 @@ static struct instr *instr_bcc_long_setup(struct cpu *cpu) {
   instr->cpu = cpu;
 
   instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_short(instr, determine_long_jump, INSTR_UOP_SPECIAL);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   

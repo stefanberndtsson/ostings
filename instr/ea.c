@@ -10,11 +10,13 @@ static void new_pc_from_irc_and_reg(struct uop *uop, struct cpu *cpu) {
 
 /* Address from (An). Just copy the address of the An into the target_reg */
 static void ea_addr_mem(struct instr *instr, int ea_reg, LONG target_reg, int jump_before_last_prefetch) {
+  instr_uop_push_nop(instr);
   if(jump_before_last_prefetch) {
     instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), REG_PC);
   } else {
     instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
   }
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
 }
 
@@ -34,15 +36,20 @@ static void ea_uop_reg_copy_and_inc(struct uop *uop, struct cpu *cpu) {
 
 /* Address from (An)+. Put An into target_reg, then increment An as required */
 static void ea_addr_mem_inc(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
+  instr_uop_push_nop(instr);
   instr_uop_push_full(instr, ea_uop_reg_copy_and_inc, INSTR_UOP_EA_SPECIAL,
                       REG_AREG(ea_reg), target_reg, size, EXT_NONE);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
 }
 
 /* Address from -(An). This is easier, because there is an extra uOP for decrement available */
 static void ea_addr_mem_dec(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
+  instr_uop_push_nop(instr);
   instr_uop_push_predec_reg(instr, REG_AREG(ea_reg), size);
+  instr_uop_push_nop(instr);
   instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
 }
 
@@ -68,8 +75,10 @@ static void ea_addr_mem_offset(struct instr *instr, int ea_reg, LONG target_reg,
   if(jump_before_last_prefetch) {
     target_reg = REG_PC;
   }
+  instr_uop_push_nop(instr);
   instr_uop_push_full(instr, ea_uop_add_irc_to_ea_reg, INSTR_UOP_EA_SPECIAL,
                       ea_reg, target_reg, INSTR_WORD, EXT_NONE);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
 }
 
@@ -106,8 +115,10 @@ static void ea_addr_pc_offset(struct instr *instr, LONG target_reg, int jump_bef
   if(jump_before_last_prefetch) {
     target_reg = REG_PC;
   }
+  instr_uop_push_nop(instr);
   instr_uop_push_full(instr, ea_uop_add_irc_to_pc, INSTR_UOP_EA_SPECIAL,
                       target_reg, 0, INSTR_WORD, EXT_NONE);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
 }
 
@@ -134,22 +145,33 @@ static void ea_addr_short(struct instr *instr, LONG target_reg, int jump_before_
  */
 static void ea_addr_long(struct instr *instr, LONG target_reg, int jump_before_last_prefetch) {
   instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch_into(instr, REG_WORD_HIGH(target_reg));
   if(jump_before_last_prefetch) {
+    instr_uop_push_nop(instr);
     instr_uop_push_full(instr, new_pc_from_irc_and_reg, INSTR_UOP_EA_SPECIAL, target_reg, 0, INSTR_LONG, EXT_NONE);
   } else {
     instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
   }
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch_next_into(instr, REG_WORD_LOW(target_reg));
 }
 
 void ea_read_immediate(struct instr *instr, LONG reg_num, enum instr_sizes size) {
   if(size == INSTR_LONG) {
     instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
     instr_uop_push_prefetch_into(instr, REG_WORD_HIGH(reg_num));
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);
     instr_uop_push_prefetch_next_into(instr, REG_WORD_LOW(reg_num));
   } else {
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);
     instr_uop_push_prefetch_into(instr, REG_WORD_LOW(reg_num));
   }
@@ -208,10 +230,15 @@ void ea_addr_jmp(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes 
 void ea_read_from_addr(struct instr *instr, enum instr_sizes size, LONG address_value_reg, LONG target_reg) {
   if(size == INSTR_LONG) {
     instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
     instr_uop_push_read_word(instr, address_value_reg, REG_WORD_HIGH(target_reg));
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);
     instr_uop_push_read_next_word(instr, address_value_reg, REG_WORD_LOW(target_reg));
   } else {
+    instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);
     instr_uop_push_read_word(instr, address_value_reg, REG_WORD_LOW(target_reg));
   }
@@ -219,7 +246,6 @@ void ea_read_from_addr(struct instr *instr, enum instr_sizes size, LONG address_
 
 /* Destroys cpu->internal->r.value[7] */
 void ea_read(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes size, LONG target_reg) {
-  /* ea_addr_long differs from the others due to it reading two words, not one for the address */
   ea_addr(instr, ea_mode, ea_reg, size, REG_VALUE(7));
   ea_read_from_addr(instr, size, REG_VALUE(7), target_reg);
 }

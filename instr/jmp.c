@@ -27,13 +27,17 @@ static void add_variant(struct cpu *cpu, int ea_mode, int ea_reg) {
   struct instr *instr;
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
-  if(!(ea_mode == EA_EXTENDED && ea_reg == EA_LONG)) {
+  if(!(ea_mode == EA_EXTENDED && ea_reg == EA_LONG) && !(ea_mode == EA_MEM)) {
+    instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);
   }
   if(ea_mode == EA_MEM_OFFSET_REG || (ea_mode == EA_EXTENDED && ea_reg == EA_PC_OFFSET_REG)) {
     instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
   }
   ea_addr_jmp(instr, ea_mode, ea_reg, INSTR_LONG, REG_VALUE(0));
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);

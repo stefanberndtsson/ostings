@@ -4,6 +4,17 @@
 #include "mmu.h"
 #include "cpu.h"
 
+/* Check if MMU is on a tick aligned with when CPU is allowed access to
+ * MMU protected memory
+ */
+static int mmu_in_cpu_window(struct mmu *mmu) {
+  if((mmu->tick_alignment % 8) < 4) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
 /* These functions fetch their address and read/write data via the cpu->external interface 
  * to somewhat simulate a CPU read/write request.
  * Read data will be written to cpu->external->data, and at some point, either immediately,
@@ -30,7 +41,7 @@ void mmu_read_word(struct mmu *mmu) {
   
   mmu->cpu->external->data = area->read_word(area->data, addr);
   
-  if(area->mmu_protected == MMU_NOT_PROTECTED) {
+  if(area->mmu_protected == MMU_NOT_PROTECTED || mmu_in_cpu_window(mmu)) {
     mmu->cpu->external->data_available = 1;
   } else {
     mmu->read_in_progress = 1;
@@ -132,7 +143,7 @@ void mmu_tick(struct hw *hw) {
    * TODO: Write stuff.
    */
   if(mmu->read_in_progress) {
-    if((mmu->tick_alignment % 8) < 4) {
+    if(mmu_in_cpu_window(mmu)) {
       printf("DEBUG: Making data available\n");
       mmu->cpu->external->data_available = 1;
     }

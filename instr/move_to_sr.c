@@ -32,11 +32,17 @@ void instr_move_to_sr_setup(struct cpu *cpu) {
 
   /* Write to SR */
   instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_reg_copy_word(instr, REG_IRD_W, REG_SR_W);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
 
   /* Remaining Prefetch */
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);

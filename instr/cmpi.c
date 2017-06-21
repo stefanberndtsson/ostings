@@ -103,7 +103,9 @@ static void add_ea_variant(struct cpu *cpu, int size, int ea_mode, int ea_reg) {
 
   ea_read_immediate(instr, REG_VALUE(0), size);
   ea_read(instr, ea_mode, ea_reg, size, REG_VALUE(2));
+  instr_uop_push_nop(instr);
   instr_uop_push_full(instr, compare, INSTR_UOP_SPECIAL, REG_VALUE(1), REG_VALUE(2), size, EXT_NONE);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);
 

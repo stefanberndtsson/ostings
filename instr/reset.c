@@ -42,11 +42,17 @@ void instr_reset_setup(struct cpu *cpu) {
   instr->cpu = cpu;
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
   instr_uop_push_short(instr, set_reset_pin, INSTR_UOP_SPECIAL);
   for(i=0;i<RESET_UOPS;i++) {
     instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
   }
+  instr_uop_push_nop(instr);
   instr_uop_push_short(instr, clr_reset_pin, INSTR_UOP_SPECIAL);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);
   

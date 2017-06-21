@@ -9,14 +9,14 @@
 static void dummy_fill_cart(struct cart *cart) {
   FILE *fp;
 
-  //cart->memory[0] = 0xFA;
-  //cart->memory[1] = 0x52;
-  //cart->memory[2] = 0x23;
-  //cart->memory[3] = 0x5F;
-  //cart->memory[4] = 0x4E;
-  //cart->memory[5] = 0x71;
-  //cart->memory[6] = 0x60;
-  //cart->memory[7] = 0xFC;
+  cart->memory[0] = 0xFA;
+  cart->memory[1] = 0x52;
+  cart->memory[2] = 0x23;
+  cart->memory[3] = 0x5F;
+  cart->memory[4] = 0x4E;
+  cart->memory[5] = 0x71;
+  cart->memory[6] = 0x60;
+  cart->memory[7] = 0xFC;
   
   fp = fopen(CARTFILE, "rb");
   if(!fp) {
