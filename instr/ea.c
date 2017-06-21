@@ -177,6 +177,7 @@ void ea_read_from_addr(struct instr *instr, enum instr_sizes size, LONG address_
   } else {
     instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
     instr_uop_push_read_word(instr, address_value_reg, REG_WORD_LOW(target_reg));
   }
 }
