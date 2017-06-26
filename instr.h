@@ -46,17 +46,17 @@ enum instr_uops {
   INSTR_UOP_NOP=1,
   INSTR_UOP_NOPCNT,
   INSTR_UOP_BOOT_PREFETCH,
-  INSTR_UOP_PREFETCH=4,
+  INSTR_UOP_PREFETCH,
   INSTR_UOP_READ_BYTE,
-  INSTR_UOP_READ_WORD=8,
-  INSTR_UOP_READ_NEXT_WORD=9,
+  INSTR_UOP_READ_WORD,
+  INSTR_UOP_READ_NEXT_WORD,
   INSTR_UOP_WRITE_BYTE,
   INSTR_UOP_WRITE_WORD,
   INSTR_UOP_WRITE_NEXT_WORD,
-  INSTR_UOP_REG_COPY=13,
+  INSTR_UOP_REG_COPY,
   INSTR_UOP_REG_SWAP,
-  INSTR_UOP_SPECIAL=15,
-  INSTR_UOP_EA_SPECIAL=16,
+  INSTR_UOP_SPECIAL,
+  INSTR_UOP_EA_SPECIAL,
   INSTR_UOP_DEC_REG,
   INSTR_UOP_INC_REG,
   INSTR_UOP_ADD,
@@ -102,8 +102,13 @@ void instr_uop_push_nop(struct instr *);
 void instr_uop_push_boot_prefetch(struct instr *);
 void instr_uop_push_prefetch(struct instr *);
 void instr_uop_push_end(struct instr *);
+void instr_uop_push_read_byte(struct instr *, LONG, LONG);
 void instr_uop_push_read_word(struct instr *, LONG, LONG);
 void instr_uop_push_read_next_word(struct instr *, LONG, LONG);
+void instr_uop_push_write_byte(struct instr *, LONG, LONG);
+void instr_uop_push_write_word(struct instr *, LONG, LONG);
+void instr_uop_push_write_next_word(struct instr *, LONG, LONG);
+void instr_uop_push_reg_copy_byte(struct instr *, LONG, LONG);
 void instr_uop_push_reg_copy_word(struct instr *, LONG, LONG);
 void instr_uop_push_reg_copy_long(struct instr *, LONG, LONG);
 void instr_uop_push_dec_reg(struct instr *, LONG, enum instr_sizes);
@@ -123,5 +128,6 @@ void instr_bcc_setup(struct cpu *);
 void instr_lea_setup(struct cpu *);
 void instr_suba_setup(struct cpu *);
 void instr_jmp_setup(struct cpu *);
+void instr_move_b_setup(struct cpu *);
 
 #endif /* OSTIS_INSTR_H */

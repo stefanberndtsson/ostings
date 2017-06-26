@@ -63,6 +63,26 @@ void uop_prefetch(struct uop *uop, struct cpu *cpu) {
   }
 }
 
+
+/* TODO: Sign extend? */
+void uop_read_byte(struct uop *uop, struct cpu *cpu) {
+  if(!cpu->mmu->read_in_progress) {
+    cpu->external->data_available = 0;
+    cpu->external->address = cpu->internal->l[uop->data1];
+    mmu_read_byte(cpu->mmu);
+  }
+  if(cpu->external->data_available) {
+    /* Waitstate resolve can only occur on odd cycles */
+    if(!cpu->mmu->read_in_progress || (cpu->mmu->read_in_progress && (cpu->exec->cycles%2 == 1))) {
+      cpu->internal->w[uop->data2] = (cpu->internal->w[uop->data2]&0xff00) | (cpu->external->data&0xff);
+      mmu_clear_read_progress(cpu->mmu);
+      cpu->exec->uops_pos++;
+    }
+  }
+  return;
+}
+
+
 /* TODO: Sign extend? */
 void uop_read_word(struct uop *uop, struct cpu *cpu) {
   if(!cpu->mmu->read_in_progress) {
@@ -101,12 +121,33 @@ void uop_read_next_word(struct uop *uop, struct cpu *cpu) {
 }
 
 
+/* TODO: Sign extend? */
+void uop_write_byte(struct uop *uop, struct cpu *cpu) {
+  if(!cpu->mmu->write_in_progress) {
+    cpu->external->data_available = 0;
+    cpu->external->address = cpu->internal->l[uop->data1];
+    cpu->external->data = cpu->internal->w[uop->data2];
+    mmu_write_byte(cpu->mmu);
+  }
+  if(cpu->external->data_available) {
+    /* Waitstate resolve can only occur on odd cycles */
+    if(!cpu->mmu->write_in_progress || (cpu->mmu->write_in_progress && (cpu->exec->cycles%2 == 1))) {
+      mmu_clear_write_progress(cpu->mmu);
+      cpu->exec->uops_pos++;
+    }
+  }
+  return;
+}
+
+
 /* TODO: Sign extend */
 void uop_reg_copy(struct uop *uop, struct cpu *cpu) {
   if(uop->size == INSTR_LONG) {
     cpu->internal->l[uop->data2] = cpu->internal->l[uop->data1];
-  } else {
+  } else if(uop->size == INSTR_WORD) {
     cpu->internal->w[uop->data2] = cpu->internal->w[uop->data1];
+  } else if(uop->size == INSTR_BYTE) {
+    cpu->internal->w[uop->data2] = (cpu->internal->w[uop->data2]&0xff00)|(cpu->internal->w[uop->data1]&0xff);
   }
   cpu->exec->uops_pos++;
 }
@@ -221,22 +262,6 @@ void uop_ea_special(struct uop *uop, struct cpu *cpu) {
   unused(uop);
   unused(cpu);
   printf("DEBUG-UOP: Unimplemented (should never be called): %s\n", "uop_ea_special");
-  exit(-100);
-}
-
-/* TODO: Unimplemented */
-void uop_read_byte(struct uop *uop, struct cpu *cpu) {
-  unused(uop);
-  unused(cpu);
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_read_byte");
-  exit(-100);
-}
-
-/* TODO: Unimplemented */
-void uop_write_byte(struct uop *uop, struct cpu *cpu) {
-  unused(uop);
-  unused(cpu);
-  printf("DEBUG-UOP: Unimplemented: %s\n", "uop_write_byte");
   exit(-100);
 }
 

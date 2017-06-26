@@ -182,8 +182,92 @@ void ea_read_from_addr(struct instr *instr, enum instr_sizes size, LONG address_
   }
 }
 
-/* Destroys cpu->internal->r.value[7] */
-void ea_read(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes size, LONG target_reg) {
-  ea_addr(instr, ea_mode, ea_reg, size, REG_VALUE(7));
-  ea_read_from_addr(instr, size, REG_VALUE(7), target_reg);
+void ea_write_to_addr(struct instr *instr, enum instr_sizes size, LONG address_value_reg, LONG source_reg) {
+  if(size == INSTR_LONG) {
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_write_word(instr, address_value_reg, REG_WORD_HIGH(source_reg));
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_write_next_word(instr, address_value_reg, REG_WORD_LOW(source_reg));
+  } else if(size == INSTR_WORD) {
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_write_word(instr, address_value_reg, REG_WORD_LOW(source_reg));
+  } else if(size == INSTR_BYTE) {
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_write_byte(instr, address_value_reg, REG_WORD_LOW(source_reg));
+  }
 }
+
+/* Destroys cpu->internal->r.value[7]
+ * TODO: EA_DN and EA_AN are incorrect in number of uOPs.
+ */
+void ea_read(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes size, LONG target_reg) {
+  if(ea_mode == EA_DN) {
+    if(size == INSTR_BYTE) {
+      instr_uop_push_reg_copy_byte(instr, REG_WORD_LOW(REG_DREG(ea_reg)), REG_WORD_LOW(target_reg));
+    } else if(size == INSTR_WORD) {
+      instr_uop_push_reg_copy_byte(instr, REG_WORD_LOW(REG_DREG(ea_reg)), REG_WORD_LOW(target_reg));
+    } else if(size == INSTR_LONG) {
+      instr_uop_push_reg_copy_byte(instr, REG_DREG(ea_reg), target_reg);
+    }
+  } else if(ea_mode == EA_AN) {
+    if(size == INSTR_BYTE) {
+      instr_uop_push_reg_copy_byte(instr, REG_WORD_LOW(REG_AREG(ea_reg)), REG_WORD_LOW(target_reg));
+    } else if(size == INSTR_WORD) {
+      instr_uop_push_reg_copy_byte(instr, REG_WORD_LOW(REG_AREG(ea_reg)), REG_WORD_LOW(target_reg));
+    } else if(size == INSTR_LONG) {
+      instr_uop_push_reg_copy_byte(instr, REG_AREG(ea_reg), target_reg);
+    }
+  } else if(ea_mode == EA_EXTENDED && ea_reg == EA_IMMEDIATE) {
+    if(size == INSTR_LONG) {
+      instr_uop_push_reg_copy_word(instr, REG_IRC_W, REG_WORD_HIGH(target_reg));
+      instr_uop_push_nop(instr);
+      instr_uop_push_nop(instr);
+      instr_uop_push_prefetch(instr);
+      instr_uop_push_reg_copy_word(instr, REG_IRC_W, REG_WORD_LOW(target_reg));
+      instr_uop_push_nop(instr);
+      instr_uop_push_nop(instr);
+      instr_uop_push_prefetch(instr);
+    } else {
+      instr_uop_push_reg_copy_word(instr, REG_IRC_W, REG_WORD_LOW(target_reg));
+      instr_uop_push_nop(instr);
+      instr_uop_push_nop(instr);
+      instr_uop_push_prefetch(instr);
+    }
+  } else {
+    ea_addr(instr, ea_mode, ea_reg, size, REG_VALUE(7));
+    ea_read_from_addr(instr, size, REG_VALUE(7), target_reg);
+  }
+}
+
+/* TODO: EA_DN and EA_AN are incorrect in number of uOPs */
+void ea_write(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes size, LONG source_reg) {
+  if(ea_mode == EA_DN) {
+    if(size == INSTR_BYTE) {
+      instr_uop_push_reg_copy_byte(instr, REG_WORD_LOW(source_reg), REG_WORD_LOW(REG_DREG(ea_reg)));
+    } else if(size == INSTR_WORD) {
+      instr_uop_push_reg_copy_byte(instr, REG_WORD_LOW(source_reg), REG_WORD_LOW(REG_DREG(ea_reg)));
+    } else if(size == INSTR_LONG) {
+      instr_uop_push_reg_copy_byte(instr, source_reg, REG_DREG(ea_reg));
+    }
+  } else if(ea_mode == EA_AN) {
+    if(size == INSTR_BYTE) {
+      instr_uop_push_reg_copy_byte(instr, REG_WORD_LOW(source_reg), REG_WORD_LOW(REG_AREG(ea_reg)));
+    } else if(size == INSTR_WORD) {
+      instr_uop_push_reg_copy_byte(instr, REG_WORD_LOW(source_reg), REG_WORD_LOW(REG_AREG(ea_reg)));
+    } else if(size == INSTR_LONG) {
+      instr_uop_push_reg_copy_byte(instr, source_reg, REG_AREG(ea_reg));
+    }
+  } else {
+    ea_addr(instr, ea_mode, ea_reg, size, REG_VALUE(7));
+    ea_write_to_addr(instr, size, REG_VALUE(7), source_reg);
+  }
+}
+

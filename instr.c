@@ -104,12 +104,32 @@ void instr_uop_push_prefetch(struct instr *instr) {
   instr_uop_push(instr, INSTR_UOP_PREFETCH, 0, 0, INSTR_WORD, EXT_NONE);
 }
 
+void instr_uop_push_read_byte(struct instr *instr, LONG address_reg, LONG target_reg) {
+  instr_uop_push(instr, INSTR_UOP_READ_BYTE, address_reg, target_reg, INSTR_BYTE, EXT_NONE);
+}
+
 void instr_uop_push_read_word(struct instr *instr, LONG address_reg, LONG target_reg) {
   instr_uop_push(instr, INSTR_UOP_READ_WORD, address_reg, target_reg, INSTR_WORD, EXT_NONE);
 }
 
 void instr_uop_push_read_next_word(struct instr *instr, LONG address_reg, LONG target_reg) {
   instr_uop_push(instr, INSTR_UOP_READ_NEXT_WORD, address_reg, target_reg, INSTR_WORD, EXT_NONE);
+}
+
+void instr_uop_push_write_byte(struct instr *instr, LONG address_reg, LONG source_reg) {
+  instr_uop_push(instr, INSTR_UOP_WRITE_BYTE, address_reg, source_reg, INSTR_BYTE, EXT_NONE);
+}
+
+void instr_uop_push_write_word(struct instr *instr, LONG address_reg, LONG source_reg) {
+  instr_uop_push(instr, INSTR_UOP_WRITE_WORD, address_reg, source_reg, INSTR_WORD, EXT_NONE);
+}
+
+void instr_uop_push_write_next_word(struct instr *instr, LONG address_reg, LONG source_reg) {
+  instr_uop_push(instr, INSTR_UOP_WRITE_NEXT_WORD, address_reg, source_reg, INSTR_WORD, EXT_NONE);
+}
+
+void instr_uop_push_reg_copy_byte(struct instr *instr, LONG src_reg, LONG target_reg) {
+  instr_uop_push(instr, INSTR_UOP_REG_COPY, src_reg, target_reg, INSTR_BYTE, EXT_NONE);
 }
 
 void instr_uop_push_reg_copy_word(struct instr *instr, LONG src_reg, LONG target_reg) {

@@ -27,6 +27,7 @@ static int mmu_in_cpu_window(struct mmu *mmu) {
  */
 void mmu_read_byte(struct mmu *mmu) {
   unused(mmu);
+  exit(-111);
   /* TODO: All */
 }
 
@@ -52,6 +53,8 @@ void mmu_read_word(struct mmu *mmu) {
 
 void mmu_write_byte(struct mmu *mmu) {
   unused(mmu);
+  printf("WRITE BYTE not implemented: %08X <= %02X\n", mmu->cpu->external->address, mmu->cpu->external->data);
+  exit(-112);
   /* TODO: All */
 }
 
@@ -131,6 +134,10 @@ struct mmu *mmu_setup(struct hw **hws) {
 }
 
 void mmu_clear_read_progress(struct mmu *mmu) {
+  mmu->read_in_progress = 0;
+}
+
+void mmu_clear_write_progress(struct mmu *mmu) {
   mmu->read_in_progress = 0;
 }
 

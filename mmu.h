@@ -70,5 +70,6 @@ void mmu_write_byte(struct mmu *);
 void mmu_write_word(struct mmu *);
 WORD mmu_peek_word(struct mmu *, LONG);
 void mmu_clear_read_progress(struct mmu *);
+void mmu_clear_write_progress(struct mmu *);
 
 #endif /* OSTIS_MMU_H */
