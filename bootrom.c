@@ -43,7 +43,7 @@ struct bootrom *bootrom_setup(struct hw **hws) {
                          (read_word_t *)bootrom_read_word,
                          NULL, NULL,
                          (read_word_t *)bootrom_peek_word,
-                         bootrom, MMU_NOT_PROTECTED);
+                         bootrom, MMU_NOT_PROTECTED, 0);
   mmu_register_area(hws[HW_MMU]->data, bootrom->start, bootrom->size, area);
   
   return bootrom;

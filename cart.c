@@ -55,7 +55,7 @@ struct cart *cart_setup(struct hw **hws) {
                          (read_word_t *)cart_read_word,
                          NULL, NULL,
                          (read_word_t *)cart_peek_word,
-                         cart, MMU_NOT_PROTECTED);
+                         cart, MMU_NOT_PROTECTED, 0);
   mmu_register_area(hws[HW_MMU]->data, cart->start, cart->size, area);
   
   return cart;

@@ -43,7 +43,7 @@ struct rom *rom_setup(struct hw **hws) {
                          (read_word_t *)rom_read_word,
                          NULL, NULL,
                          (read_word_t *)rom_peek_word,
-                         rom, MMU_NOT_PROTECTED);
+                         rom, MMU_NOT_PROTECTED, 0);
   mmu_register_area(hws[HW_MMU]->data, rom->start, rom->size, area);
   
   return rom;

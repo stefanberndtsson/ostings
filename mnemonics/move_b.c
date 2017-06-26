@@ -26,6 +26,14 @@ static char *mnemonics_move_b(struct cpu *cpu, LONG addr) {
   src_ea_string = mnemonics_ea(cpu, addr, size, src_ea_mode, src_ea_reg, src_ea_offset);
   
   dst_ea_offset = 0;
+  /* DST EA is offset by 2 bytes in some cases */
+  if(src_ea_mode == EA_MEM_OFFSET || src_ea_mode == EA_MEM_OFFSET_REG || src_ea_mode == EA_EXTENDED) {
+    dst_ea_offset += 2;
+  }
+  /* In the case of EA being absolute LONG, offset is shifter another 2 bytes */
+  if((src_ea_mode == EA_EXTENDED) && (src_ea_reg == EA_LONG)) {
+    dst_ea_offset += 2;
+  }
   dst_ea_mode = EA_HIGH_MODE(op);
   dst_ea_reg = EA_HIGH_REG(op);
   dst_ea_string = mnemonics_ea(cpu, addr, size, dst_ea_mode, dst_ea_reg, dst_ea_offset);

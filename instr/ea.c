@@ -13,6 +13,13 @@ static void ea_addr_mem(struct instr *instr, int ea_reg, LONG target_reg) {
   instr_uop_push_prefetch(instr);
 }
 
+/* Write version of ea_addr_mem, without the prefetch */
+static void ea_write_addr_mem(struct instr *instr, int ea_reg, LONG target_reg) {
+  instr_uop_push_nop(instr);
+  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
+}
+
+
 /* Address from (An)+. Put An into target_reg, then increment An as required
  * followed by a prefetch.
  */
@@ -22,6 +29,13 @@ static void ea_addr_mem_inc(struct instr *instr, int ea_reg, enum instr_sizes si
   instr_uop_push_inc_reg(instr, REG_AREG(ea_reg), size);
   instr_uop_push_prefetch(instr);
 }
+
+/* Write version of ea_addr_mem_inc, without the prefetch */
+static void ea_write_addr_mem_inc(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
+  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
+  instr_uop_push_inc_reg(instr, REG_AREG(ea_reg), size);
+}
+
 
 /* Address from -(An). Decrement An first, then copy to target_reg,
  * and finally a prefetch.
@@ -35,11 +49,28 @@ static void ea_addr_mem_dec(struct instr *instr, int ea_reg, enum instr_sizes si
   instr_uop_push_prefetch(instr);
 }
 
+/* Write version of ea_addr_mem_dec, without the prefetch */
+static void ea_write_addr_mem_dec(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
+  instr_uop_push_nop(instr);
+  instr_uop_push_dec_reg(instr, REG_AREG(ea_reg), size);
+  instr_uop_push_nop(instr);
+  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
+}
+
+
 /* Address from d16(An). Copy An to target_reg, 
  * d16 is already in IRC, so add that to target_reg,
  * then another prefetch.
  */
 static void ea_addr_mem_offset(struct instr *instr, int ea_reg, LONG target_reg) {
+  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
+  instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+}
+
+/* Write version of ea_addr_mem_offset, without the prefetch */
+static void ea_write_addr_mem_offset(struct instr *instr, int ea_reg, LONG target_reg) {
   instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
   instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg);
   instr_uop_push_nop(instr);
@@ -55,6 +86,15 @@ static void ea_addr_mem_offset_reg(struct instr *instr, int ea_reg, enum instr_s
   unused(size);
   unused(target_reg);
 }
+
+/* Write version of ea_addr_mem_offset_reg, without the prefetch */
+static void ea_write_addr_mem_offset_reg(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
+  unused(instr);
+  unused(ea_reg);
+  unused(size);
+  unused(target_reg);
+}
+
 
 /* Address from d16(PC). Identical to d16(An), except
  * PC has moved after prefetching, so target_reg needs to
@@ -85,6 +125,13 @@ static void ea_addr_short(struct instr *instr, LONG target_reg) {
   unused(target_reg);
 }
 
+/* Write version of ea_addr_short, without the prefetch */
+static void ea_write_addr_short(struct instr *instr, LONG target_reg) {
+  unused(instr);
+  unused(target_reg);
+}
+
+
 /* Address from $xxxxxxxx.L
  * After the first prefetch, the full value is in IRD (High WORD)
  * and IRC (Low WORD), so just copy those two into target_reg,
@@ -100,6 +147,19 @@ static void ea_addr_long(struct instr *instr, LONG target_reg) {
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
 }
+
+/* Write version of ea_addr_long, without the last prefetch */
+static void ea_write_addr_long(struct instr *instr, LONG target_reg) {
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+  instr_uop_push_reg_copy_word(instr, REG_IRD_W, REG_WORD_HIGH(target_reg));
+  instr_uop_push_reg_copy_word(instr, REG_IRC_W, REG_WORD_LOW(target_reg));
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+}
+
 
 /* Before doing anything, the first WORD (High in case of .L, Low in case of .W)
  * is already in IRC. Copy that first into its appropriate place, then prefetch.
@@ -271,3 +331,65 @@ void ea_write(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes siz
   }
 }
 
+/* Special case since MOVE isn't equivalent to EA-READ+EA-WRITE 
+ * TODO: reg,X and X,reg
+ */
+void ea_move(struct instr *instr,
+             int src_ea_mode, int src_ea_reg,
+             int dst_ea_mode, int dst_ea_reg,
+             enum instr_sizes size) {
+  ea_read(instr, src_ea_mode, src_ea_reg, size, REG_VALUE(0));
+  switch(dst_ea_mode) {
+  case EA_DN:
+  case EA_AN:
+    /* Unimplemented */
+    break;
+  case EA_MEM:
+    ea_write_addr_mem(instr, dst_ea_reg, REG_VALUE(1));
+    break;
+  case EA_MEM_INC:
+    ea_write_addr_mem_inc(instr, dst_ea_reg, size, REG_VALUE(1));
+    break;
+  case EA_MEM_DEC:
+    ea_write_addr_mem_dec(instr, dst_ea_reg, size, REG_VALUE(1));
+    break;
+  case EA_MEM_OFFSET:
+    ea_write_addr_mem_offset(instr, dst_ea_reg, REG_VALUE(1));
+    break;
+  case EA_MEM_OFFSET_REG:
+    ea_write_addr_mem_offset_reg(instr, dst_ea_reg, size, REG_VALUE(1));
+    break;
+  case EA_EXTENDED:
+    switch(dst_ea_reg) {
+    case EA_PC_OFFSET:
+    case EA_PC_OFFSET_REG:
+      /* Not writable */
+      break;
+    case EA_SHORT:
+      ea_write_addr_short(instr, REG_VALUE(1));
+      break;
+    case EA_LONG:
+      ea_write_addr_long(instr, REG_VALUE(1));
+      break;
+    case EA_IMMEDIATE:
+      /* Not writable */
+      break;
+    }
+    break;
+  }
+
+  if(size == INSTR_LONG) {
+    instr_uop_push_nop(instr);
+    instr_uop_push_write_word(instr, REG_VALUE(1), REG_WORD_HIGH(REG_VALUE(0)));
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_write_next_word(instr, REG_VALUE(1), REG_WORD_LOW(REG_VALUE(0)));
+  } else if(size == INSTR_WORD) {
+    instr_uop_push_nop(instr);
+    instr_uop_push_write_word(instr, REG_VALUE(1), REG_WORD_LOW(REG_VALUE(0)));
+  } else if(size == INSTR_BYTE) {
+    instr_uop_push_nop(instr);
+    instr_uop_push_write_byte(instr, REG_VALUE(1), REG_WORD_LOW(REG_VALUE(0)));
+  }
+}

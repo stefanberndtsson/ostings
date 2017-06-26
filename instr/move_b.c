@@ -16,8 +16,7 @@ static void add_ea_variant(struct cpu *cpu, int src_ea_mode, int src_ea_reg, int
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
 
-  ea_read(instr, src_ea_mode, src_ea_reg, INSTR_BYTE, REG_VALUE(0));
-  ea_write(instr, dst_ea_mode, dst_ea_reg, INSTR_BYTE, REG_VALUE(0));
+  ea_move(instr, src_ea_mode, src_ea_reg, dst_ea_mode, dst_ea_reg, INSTR_BYTE);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);

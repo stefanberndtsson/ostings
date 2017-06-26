@@ -57,7 +57,7 @@ struct ram *ram_setup(struct hw **hws) {
                          (write_byte_t *)ram_write_byte,
                          (write_word_t *)ram_write_word,
                          (read_word_t *)ram_peek_word,
-                         ram, MMU_PROTECTED);
+                         ram, MMU_PROTECTED, 0);
   mmu_register_area(hws[HW_MMU]->data, ram->start, ram->size, area);
   
   return ram;

@@ -24,6 +24,8 @@ static int mmu_in_cpu_window(struct mmu *mmu) {
  *
  * This all applies when the area is MMU protected. If not, everything is done immediately,
  * and data_available is set right away.
+ *
+ * TODO: extra waitstates for specific memory types.
  */
 void mmu_read_byte(struct mmu *mmu) {
   unused(mmu);
@@ -52,10 +54,22 @@ void mmu_read_word(struct mmu *mmu) {
 }
 
 void mmu_write_byte(struct mmu *mmu) {
-  unused(mmu);
-  printf("WRITE BYTE not implemented: %08X <= %02X\n", mmu->cpu->external->address, mmu->cpu->external->data);
-  exit(-112);
-  /* TODO: All */
+  LONG addr;
+  BYTE data;
+  struct mmu_area *area;
+  
+  addr = mmu->cpu->external->address&0xffffff;
+  data = mmu->cpu->external->data&0xff;
+  area = mmu->areas[addr];
+
+  printf("DEBUG-MMU: WRITE_BYTE(%08X, %02X)\n", addr, data);
+
+  if(area->mmu_protected == MMU_NOT_PROTECTED || mmu_in_cpu_window(mmu)) {
+    area->write_byte(area->data, addr, data);
+    mmu->cpu->external->data_available = 1;
+  } else {
+    mmu->write_in_progress = 1;
+  }
 }
 
 void mmu_write_word(struct mmu *mmu) {
@@ -66,8 +80,8 @@ void mmu_write_word(struct mmu *mmu) {
 WORD mmu_peek_word(struct mmu *mmu, LONG addr) {
   struct mmu_area *area;
 
-  area = mmu->areas[addr];
-  return area->peek_word(area->data, addr);
+  area = mmu->areas[addr&0xffffff];
+  return area->peek_word(area->data, addr&0xffffff);
 }
 
 
@@ -76,6 +90,8 @@ WORD mmu_peek_word(struct mmu *mmu, LONG addr) {
  */
 void mmu_register_area(struct mmu *mmu, LONG start, LONG size, struct mmu_area *area) {
   LONG i;
+
+  start = start&0xffffff;
   
   for(i=start;i<start+size;i++) {
     mmu->areas[i] = area;
@@ -104,7 +120,8 @@ static struct mmu_area *default_mmu_area() {
 struct mmu_area *mmu_create_area(read_byte_t *read_byte, read_word_t *read_word,
                                  write_byte_t *write_byte, write_word_t *write_word,
                                  read_word_t *peek_word,
-                                 void *data, enum mmu_protection protected) {
+                                 void *data, enum mmu_protection protected,
+                                 int waitstates) {
   struct mmu_area *area;
   area = default_mmu_area();
   
@@ -115,6 +132,7 @@ struct mmu_area *mmu_create_area(read_byte_t *read_byte, read_word_t *read_word,
   if(peek_word)  { area->peek_word  = peek_word; }
   area->data = data;
   area->mmu_protected = protected;
+  area->waitstates = waitstates;
 
   return area;
 }
@@ -138,7 +156,7 @@ void mmu_clear_read_progress(struct mmu *mmu) {
 }
 
 void mmu_clear_write_progress(struct mmu *mmu) {
-  mmu->read_in_progress = 0;
+  mmu->write_in_progress = 0;
 }
 
 void mmu_tick(struct hw *hw) {
@@ -152,6 +170,14 @@ void mmu_tick(struct hw *hw) {
   if(mmu->read_in_progress) {
     if(mmu_in_cpu_window(mmu)) {
       printf("DEBUG: Making data available\n");
+      mmu->cpu->external->data_available = 1;
+    }
+  }
+
+  if(mmu->write_in_progress) {
+    if(mmu_in_cpu_window(mmu)) {
+      printf("DEBUG: Actually writing data\n");
+      mmu_write_byte(mmu);
       mmu->cpu->external->data_available = 1;
     }
   }

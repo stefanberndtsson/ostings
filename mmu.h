@@ -25,6 +25,7 @@ enum mmu_protection {
  * A segment of memory, RAM, ROM, and so on, with its corresponding read/write functions
  *
  * MMU protected: Flag indicating whether or not to return data immediately, or align to 4 cycles with MMU
+ * Waitstates:    Number of extra waitstates when reading/writing from/to the area
  * Data:          Data specific to actual area
  * 
  * Read Byte:     Read BYTE from area
@@ -35,6 +36,7 @@ enum mmu_protection {
  */
 struct mmu_area {
   int mmu_protected;
+  int waitstates;
   void *data;
 
   read_byte_t *read_byte;
@@ -62,7 +64,7 @@ struct mmu {
 void mmu_tick(struct hw *);
 struct mmu *mmu_setup(struct hw **);
 // struct mmu_area *mmu_create_area(void *, void *, void *, void *, void *, void *, enum mmu_protection);
-struct mmu_area *mmu_create_area(read_byte_t *, read_word_t *, write_byte_t *, write_word_t *, read_word_t *, void *, enum mmu_protection);
+struct mmu_area *mmu_create_area(read_byte_t *, read_word_t *, write_byte_t *, write_word_t *, read_word_t *, void *, enum mmu_protection, int);
 void mmu_register_area(struct mmu *, LONG, LONG, struct mmu_area *);
 void mmu_read_byte(struct mmu *);
 void mmu_read_word(struct mmu *);
