@@ -182,9 +182,11 @@ static char *ea_immediate(struct cpu *cpu, LONG addr, enum instr_sizes size, int
   }
   
   ea = (char *)ostis_alloc(8);
-  if(size == INSTR_WORD) {
+  if(size == INSTR_BYTE) {
+    snprintf(ea, 7, "#$%X", value&0xff);
+  } else if(size == INSTR_WORD) {
     snprintf(ea, 7, "#$%X", value&0xffff);
-  } else {
+  } else if(size == INSTR_LONG) {
     snprintf(ea, 7, "#$%X", value);
   }
   return ea;

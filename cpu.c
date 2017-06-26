@@ -142,9 +142,9 @@ void cpu_step_instr(struct cpu *cpu) {
     cpu_initiate_next_instruction(cpu);
     pos = cpu->exec->uops_pos;
   }
-  printf("DEBUG: pos == %d\n", pos);
   uop = cpu->exec->instr->uops[pos];
   if(cpu->internal->cycles > 320) {
+    printf("DEBUG: pos == %d\n", pos);
     cpu_debug_info(cpu);
   }
   uop->uop(uop, cpu);
