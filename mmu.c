@@ -28,9 +28,35 @@ static int mmu_in_cpu_window(struct mmu *mmu) {
  * TODO: extra waitstates for specific memory types.
  */
 void mmu_read_byte(struct mmu *mmu) {
-  unused(mmu);
-  exit(-111);
-  /* TODO: All */
+  LONG addr;
+  struct mmu_area *area;
+  
+  addr = mmu->cpu->external->address;
+  area = mmu->areas[addr];
+
+  printf("DEBUG-MMU: READ_BYTE(%08X)\n", addr);
+  
+  mmu->cpu->external->data = area->read_byte(area->data, addr);
+  
+  /* Initialise waitstate counter depending on area setting */
+  if(!mmu->read_in_progress) {
+    mmu->waitstate_counter = area->waitstates;
+  }
+
+  /* Allow immediate read when:
+   * Waitstate counter has reached 0
+   * ...AND...
+   * Area is not protected, or mmu is in CPU access window.
+   *
+   * Otherwise set read in progress flag.
+   */
+  if(mmu->waitstate_counter <= 0 && (area->mmu_protected == MMU_NOT_PROTECTED || mmu_in_cpu_window(mmu))) {
+    mmu->cpu->external->data_available = 1;
+  } else {
+    mmu->read_in_progress = 1;
+  }
+  
+  printf("DEBUG: Read Byte from $%08x\n", addr);
 }
 
 void mmu_read_word(struct mmu *mmu) {

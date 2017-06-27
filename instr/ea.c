@@ -238,11 +238,16 @@ void ea_read_from_addr(struct instr *instr, enum instr_sizes size, LONG address_
     instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);
     instr_uop_push_read_next_word(instr, address_value_reg, REG_WORD_LOW(target_reg));
-  } else {
+  } else if(size == INSTR_WORD) {
     instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);
     instr_uop_push_read_word(instr, address_value_reg, REG_WORD_LOW(target_reg));
+  } else if(size == INSTR_BYTE) {
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_nop(instr);
+    instr_uop_push_read_byte(instr, address_value_reg, REG_WORD_LOW(target_reg));
   }
 }
 

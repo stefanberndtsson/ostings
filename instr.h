@@ -129,5 +129,6 @@ void instr_lea_setup(struct cpu *);
 void instr_suba_setup(struct cpu *);
 void instr_jmp_setup(struct cpu *);
 void instr_move_b_setup(struct cpu *);
+void instr_btst_setup(struct cpu *);
 
 #endif /* OSTIS_INSTR_H */

@@ -101,6 +101,7 @@ struct cpu *cpu_setup(struct hw **hws) {
   instr_suba_setup(cpu);
   instr_jmp_setup(cpu);
   instr_move_b_setup(cpu);
+  instr_btst_setup(cpu);
 
   /* TODO: This will probably move into the the setup of each instruction eventually,
    * but to make it possible for unimplemented instructions to have correct mnemonics
@@ -145,7 +146,7 @@ void cpu_step_instr(struct cpu *cpu) {
     pos = cpu->exec->uops_pos;
   }
   uop = cpu->exec->instr->uops[pos];
-  if(cpu->internal->cycles > 920) {
+  if(cpu->internal->cycles > 420) {
     printf("DEBUG: pos == %d\n", pos);
     cpu_debug_info(cpu);
   }
