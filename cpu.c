@@ -120,6 +120,7 @@ void cpu_initiate_next_instruction(struct cpu *cpu) {
   printf("\n\n===========================================\n");
   printf("DEBUG-New Instruction: %08X %04X %s\n",
          cpu->exec->instr_addr, cpu->exec->op, cpu->exec->mnemonic(cpu, cpu->exec->instr_addr));
+  printf("DEBUG: Cycles of last instruction: %d\n", cpu->exec->cycles);
   cpu->exec->uops_pos = 0;
   cpu->exec->cycles = 0;
   cpu->exec->counter = -1;
@@ -144,7 +145,7 @@ void cpu_step_instr(struct cpu *cpu) {
     pos = cpu->exec->uops_pos;
   }
   uop = cpu->exec->instr->uops[pos];
-  if(cpu->internal->cycles > 320) {
+  if(cpu->internal->cycles > 920) {
     printf("DEBUG: pos == %d\n", pos);
     cpu_debug_info(cpu);
   }

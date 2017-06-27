@@ -128,12 +128,16 @@ void uop_write_byte(struct uop *uop, struct cpu *cpu) {
     cpu->external->address = cpu->internal->l[uop->data1];
     cpu->external->data = cpu->internal->w[uop->data2];
     mmu_write_byte(cpu->mmu);
+    printf("DEBUG-UOP-WRITE: Initiating write at %d\n", cpu->exec->cycles);
   }
   if(cpu->external->data_available) {
     /* Waitstate resolve can only occur on odd cycles */
     if(!cpu->mmu->write_in_progress || (cpu->mmu->write_in_progress && (cpu->exec->cycles%2 == 1))) {
       mmu_clear_write_progress(cpu->mmu);
       cpu->exec->uops_pos++;
+      printf("DEBUG-UOP-WRITE: Actually wrote data at %d\n", cpu->exec->cycles);
+    } else {
+      printf("DEBUG-UOP-WRITE: Could not write data at %d, progress %d\n", cpu->exec->cycles, cpu->mmu->write_in_progress);
     }
   }
   return;

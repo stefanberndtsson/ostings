@@ -8,7 +8,7 @@
  * MMU protected memory
  */
 static int mmu_in_cpu_window(struct mmu *mmu) {
-  if((mmu->tick_alignment % 8) < 4) {
+  if(((mmu->tick_alignment-1) % 8) < 4) {
     return 0;
   } else {
     return 1;
@@ -182,6 +182,6 @@ void mmu_tick(struct hw *hw) {
     }
   }
   
+  printf("DEBUG: Ticking MMU... (%d => %d)\n", mmu->tick_alignment, mmu_in_cpu_window(mmu));
   mmu->tick_alignment++;
-  printf("DEBUG: Ticking MMU...\n");
 }

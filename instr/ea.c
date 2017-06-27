@@ -75,6 +75,8 @@ static void ea_write_addr_mem_offset(struct instr *instr, int ea_reg, LONG targe
   instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
 }
 
 /* Address from d8(An,Rn.S).
@@ -158,6 +160,8 @@ static void ea_write_addr_long(struct instr *instr, LONG target_reg) {
   instr_uop_push_reg_copy_word(instr, REG_IRC_W, REG_WORD_LOW(target_reg));
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
 }
 
 
