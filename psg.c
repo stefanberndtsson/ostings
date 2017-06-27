@@ -44,7 +44,7 @@ struct psg *psg_setup(struct hw **hws) {
                          (write_byte_t *)psg_write_byte,
                          (write_word_t *)psg_write_word,
                          (read_word_t *)psg_peek_word,
-                         psg, MMU_PROTECTED, 2);
+                         psg, MMU_PROTECTED, 4);
   mmu_register_area(hws[HW_MMU]->data, psg->start, psg->size, area);
   
   return psg;

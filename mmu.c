@@ -44,7 +44,19 @@ void mmu_read_word(struct mmu *mmu) {
   
   mmu->cpu->external->data = area->read_word(area->data, addr);
   
-  if(area->mmu_protected == MMU_NOT_PROTECTED || mmu_in_cpu_window(mmu)) {
+  /* Initialise waitstate counter depending on area setting */
+  if(!mmu->read_in_progress) {
+    mmu->waitstate_counter = area->waitstates;
+  }
+
+  /* Allow immediate read when:
+   * Waitstate counter has reached 0
+   * ...AND...
+   * Area is not protected, or mmu is in CPU access window.
+   *
+   * Otherwise set read in progress flag.
+   */
+  if(mmu->waitstate_counter <= 0 && (area->mmu_protected == MMU_NOT_PROTECTED || mmu_in_cpu_window(mmu))) {
     mmu->cpu->external->data_available = 1;
   } else {
     mmu->read_in_progress = 1;
@@ -64,7 +76,19 @@ void mmu_write_byte(struct mmu *mmu) {
 
   printf("DEBUG-MMU: WRITE_BYTE(%08X, %02X)\n", addr, data);
 
-  if(area->mmu_protected == MMU_NOT_PROTECTED || mmu_in_cpu_window(mmu)) {
+  /* Initialise waitstate counter depending on area setting */
+  if(!mmu->write_in_progress) {
+    mmu->waitstate_counter = area->waitstates;
+  }
+
+  /* Allow immediate write when:
+   * Waitstate counter has reached 0
+   * ...AND...
+   * Area is not protected, or mmu is in CPU access window.
+   *
+   * Otherwise set write in progress flag, and return here later.
+   */
+  if(mmu->waitstate_counter <= 0 && (area->mmu_protected == MMU_NOT_PROTECTED || mmu_in_cpu_window(mmu))) {
     area->write_byte(area->data, addr, data);
     mmu->cpu->external->data_available = 1;
   } else {
@@ -168,17 +192,29 @@ void mmu_tick(struct hw *hw) {
    * TODO: Write stuff.
    */
   if(mmu->read_in_progress) {
-    if(mmu_in_cpu_window(mmu)) {
-      printf("DEBUG: Making data available\n");
-      mmu->cpu->external->data_available = 1;
+    /* Decrease waitstate counter and do nothing, or tell reader that data is available */
+    if(mmu->waitstate_counter > 0) {
+      printf("DEBUG-MMU-READ: Decreasing waitstate counter: %d\n", mmu->waitstate_counter);
+      mmu->waitstate_counter--;
+    } else {
+      if(mmu_in_cpu_window(mmu)) {
+        printf("DEBUG: Making data available\n");
+        mmu->cpu->external->data_available = 1;
+      }
     }
   }
 
   if(mmu->write_in_progress) {
-    if(mmu_in_cpu_window(mmu)) {
-      printf("DEBUG: Actually writing data\n");
-      mmu_write_byte(mmu);
-      mmu->cpu->external->data_available = 1;
+    /* Decrease waitstate counter and do nothing, or perform actual write */
+    if(mmu->waitstate_counter > 0) {
+      printf("DEBUG-MMU-WRITE: Decreasing waitstate counter: %d\n", mmu->waitstate_counter);
+      mmu->waitstate_counter--;
+    } else {
+      if(mmu_in_cpu_window(mmu)) {
+        printf("DEBUG: Actually writing data\n");
+        mmu_write_byte(mmu);
+        mmu->cpu->external->data_available = 1;
+      }
     }
   }
   

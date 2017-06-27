@@ -59,6 +59,7 @@ struct mmu {
   int read_in_progress;
   int write_in_progress;
   int tick_alignment;
+  int waitstate_counter;
 };
 
 void mmu_tick(struct hw *);
