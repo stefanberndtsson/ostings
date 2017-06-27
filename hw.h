@@ -15,6 +15,7 @@ enum hw_components {
   HW_ROM,
   HW_BOOTROM,
   HW_CART,
+  HW_MFP,
   HW_COUNT
 };
 
