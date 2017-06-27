@@ -20,6 +20,7 @@ void mnemonics_setup(struct cpu *cpu) {
   mnemonics_suba_setup(cpu);
   mnemonics_jmp_setup(cpu);
   mnemonics_move_b_setup(cpu);
+  mnemonics_btst_setup(cpu);
 }
 
 void mnemonics_register(struct cpu *cpu, WORD op, WORD op_mask, mnemonics_t *mnemonic) {
