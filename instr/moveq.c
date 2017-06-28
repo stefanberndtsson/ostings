@@ -17,9 +17,9 @@ static void add_variant(struct cpu *cpu, int reg) {
   instr->cpu = cpu;
   snprintf(instr->code, 31, "MOVEQ");
 
-  instr_uop_push_reg_copy_word(instr, REG_IRD_W, REG_WORD_LOW(REG_VALUE(0)));
-  instr_uop_push_sign_ext_to_long(instr, REG_VALUE(0), INSTR_BYTE);
-  instr_uop_push_reg_copy_long(instr, REG_VALUE(0), REG_DREG(reg));
+  instr_uop_push_reg_copy_ext_to_long(instr, REG_IRD_W, REG_DREG(reg), INSTR_BYTE);
+  instr_uop_push_set_zn_flags(instr, REG_DREG(reg), INSTR_LONG);
+  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);
 

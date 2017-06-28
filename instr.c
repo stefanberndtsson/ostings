@@ -83,11 +83,14 @@ void instr_uop_push(struct instr *instr, enum instr_uops code,
   case INSTR_UOP_ADD:
     instr_uop_push_full(instr, uop_add, code, data1, data2, size, ext);
     break;
-  case INSTR_UOP_SIGN_EXT_WORD:
-    instr_uop_push_full(instr, uop_sign_ext_word, code, data1, data2, size, ext);
+  case INSTR_UOP_REG_COPY_EXT_TO_WORD:
+    instr_uop_push_full(instr, uop_reg_copy_ext_to_word, code, data1, data2, size, ext);
     break;
-  case INSTR_UOP_SIGN_EXT_LONG:
-    instr_uop_push_full(instr, uop_sign_ext_long, code, data1, data2, size, ext);
+  case INSTR_UOP_REG_COPY_EXT_TO_LONG:
+    instr_uop_push_full(instr, uop_reg_copy_ext_to_long, code, data1, data2, size, ext);
+    break;
+  case INSTR_UOP_SET_ZN_FLAGS:
+    instr_uop_push_full(instr, uop_set_basic_flags, code, data1, data2, size, ext);
     break;
   case INSTR_UOP_MAX_COUNT:
     break;
@@ -158,11 +161,15 @@ void instr_uop_push_add_word_to_long(struct instr *instr, LONG src_reg, LONG tar
   instr_uop_push(instr, INSTR_UOP_ADD, src_reg, target_reg, INSTR_WORD, EXT_LONG);
 }
 
-void instr_uop_push_sign_ext_to_word(struct instr *instr, LONG reg, enum instr_sizes from_size) {
-  instr_uop_push(instr, INSTR_UOP_SIGN_EXT_WORD, reg, 0, from_size, EXT_WORD);
+void instr_uop_push_reg_copy_ext_to_word(struct instr *instr, LONG source_reg, LONG target_reg, enum instr_sizes from_size) {
+  instr_uop_push(instr, INSTR_UOP_REG_COPY_EXT_TO_WORD, source_reg, target_reg, from_size, EXT_WORD);
 }
 
-void instr_uop_push_sign_ext_to_long(struct instr *instr, LONG reg, enum instr_sizes from_size) {
-  instr_uop_push(instr, INSTR_UOP_SIGN_EXT_LONG, reg, 0, from_size, EXT_LONG);
+void instr_uop_push_reg_copy_ext_to_long(struct instr *instr, LONG source_reg, LONG target_reg, enum instr_sizes from_size) {
+  instr_uop_push(instr, INSTR_UOP_REG_COPY_EXT_TO_LONG, source_reg, target_reg, from_size, EXT_LONG);
+}
+
+void instr_uop_push_set_zn_flags(struct instr *instr, LONG source_reg, enum instr_sizes from_size) {
+  instr_uop_push(instr, INSTR_UOP_SET_ZN_FLAGS, source_reg, 0, from_size, EXT_LONG);
 }
 

@@ -22,8 +22,9 @@ static char *uops_names[INSTR_UOP_MAX_COUNT] = {
   "DEC_REG",
   "INC_REG",
   "ADD",
-  "SIGN_EXT_WORD",
-  "SIGN_EXT_LONG"
+  "REG_COPY_EXT_TO_WORD",
+  "REG_COPY_EXT_TO_LONG",
+  "SET_ZN_FLAGS",
 };
 
 static char *states[3] = {
@@ -69,6 +70,17 @@ void cpu_clr_reset_pin(struct cpu *cpu) {
   unused(cpu);
   /* TODO: All */
   return;
+}
+
+/* Set Z and N flags */
+void cpu_set_zn_flags(struct cpu *cpu, int z, int n) {
+  int mask = 0xfff3; /* Mask off everything but Z and N */
+  WORD tmp_sr;
+
+  tmp_sr = cpu->internal->r.sr;
+  tmp_sr &= mask;
+  tmp_sr |= (z<<2)|(n<<3);
+  cpu->internal->r.sr = tmp_sr;
 }
 
 struct cpu *cpu_setup(struct hw **hws) {

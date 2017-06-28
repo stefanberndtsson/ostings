@@ -131,12 +131,15 @@ void uop_inc_reg(struct uop *, struct cpu *);
 void uop_add(struct uop *, struct cpu *);
 
 
-/* Sign extend reg1 from size to WORD */
-void uop_sign_ext_word(struct uop *, struct cpu *);
+/* Same as reg_copy, except it sign extends to WORD size */
+void uop_reg_copy_ext_to_word(struct uop *, struct cpu *);
 
 
-/* Sign extend reg1 from size to LONG */
-void uop_sign_ext_long(struct uop *, struct cpu *);
+/* Same as reg_copy, except it sign extends to LONG size */
+void uop_reg_copy_ext_to_long(struct uop *, struct cpu *);
+
+/* Set flags for Z and N based on reg1 and size */
+void uop_set_basic_flags(struct uop *, struct cpu *);
 
 
 /* This is a dummy function */

@@ -246,7 +246,7 @@ void uop_add(struct uop *uop, struct cpu *cpu) {
   cpu->exec->uops_pos++;
 }
 
-void uop_sign_ext_word(struct uop *uop, struct cpu *cpu) {
+void uop_reg_copy_ext_to_word(struct uop *uop, struct cpu *cpu) {
   WORD value;
   value = cpu->internal->w[uop->data1];
 
@@ -254,21 +254,44 @@ void uop_sign_ext_word(struct uop *uop, struct cpu *cpu) {
   if(uop->size == INSTR_BYTE) {
     value = SIGN_EXT_BYTE(value&0xff);
   }
-  cpu->internal->w[uop->data1] = value;
+  cpu->internal->w[uop->data2] = value;
   cpu->exec->uops_pos++;
 }
 
-void uop_sign_ext_long(struct uop *uop, struct cpu *cpu) {
+void uop_reg_copy_ext_to_long(struct uop *uop, struct cpu *cpu) {
   LONG value;
-  value = cpu->internal->l[uop->data1];
+  /* reg1 is of WORD/BYTE size, anything else is silly */
+  value = cpu->internal->w[uop->data1];
 
-  /* Only BYTE and WORD makes sense. Do nothing for LONG */
   if(uop->size == INSTR_BYTE) {
     value = SIGN_EXT_WORD(SIGN_EXT_BYTE(value&0xff));
   } else if(uop->size == INSTR_WORD) {
     value = SIGN_EXT_WORD(value&0xffff);
   }
-  cpu->internal->l[uop->data1] = value;
+  cpu->internal->l[uop->data2] = value;
+  cpu->exec->uops_pos++;
+}
+
+
+void uop_set_basic_flags(struct uop *uop, struct cpu *cpu) {
+  LONG value;
+  int z = 0;
+  int n = 0;
+  
+  if(uop->size == INSTR_BYTE) {
+    value = cpu->internal->w[uop->data1];
+    if(value == 0) { z = 1; }
+    if(value&0x80) { n = 1; }
+  } else if(uop->size == INSTR_WORD) {
+    value = cpu->internal->w[uop->data1];
+    if(value == 0) { z = 1; }
+    if(value&0x8000) { n = 1; }
+  } else if(uop->size == INSTR_LONG) {
+    value = cpu->internal->l[uop->data1];
+    if(value == 0) { z = 1; }
+    if(value&0x80000000) { n = 1; }
+  }
+  cpu_set_zn_flags(cpu, z, n);
   cpu->exec->uops_pos++;
 }
 
