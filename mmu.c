@@ -96,7 +96,7 @@ void mmu_write_byte(struct mmu *mmu) {
   BYTE data;
   struct mmu_area *area;
   
-  addr = mmu->cpu->external->address&0xffffff;
+  addr = mmu->cpu->external->address;
   data = mmu->cpu->external->data&0xff;
   area = mmu->areas[addr];
 

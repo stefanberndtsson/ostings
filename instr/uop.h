@@ -131,6 +131,14 @@ void uop_inc_reg(struct uop *, struct cpu *);
 void uop_add(struct uop *, struct cpu *);
 
 
+/* Sign extend reg1 from size to WORD */
+void uop_sign_ext_word(struct uop *, struct cpu *);
+
+
+/* Sign extend reg1 from size to LONG */
+void uop_sign_ext_long(struct uop *, struct cpu *);
+
+
 /* This is a dummy function */
 void uop_end(struct uop *, struct cpu *);
 

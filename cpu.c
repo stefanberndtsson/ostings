@@ -21,7 +21,9 @@ static char *uops_names[INSTR_UOP_MAX_COUNT] = {
   "EA_SPECIAL",
   "DEC_REG",
   "INC_REG",
-  "ADD"
+  "ADD",
+  "SIGN_EXT_WORD",
+  "SIGN_EXT_LONG"
 };
 
 static char *states[3] = {
@@ -103,6 +105,7 @@ struct cpu *cpu_setup(struct hw **hws) {
   instr_jmp_setup(cpu);
   instr_move_b_setup(cpu);
   instr_btst_setup(cpu);
+  instr_moveq_setup(cpu);
 
   /* TODO: This will probably move into the the setup of each instruction eventually,
    * but to make it possible for unimplemented instructions to have correct mnemonics

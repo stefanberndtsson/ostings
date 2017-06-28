@@ -27,7 +27,7 @@ void uop_nopcnt(struct uop *uop, struct cpu *cpu) {
 void uop_boot_prefetch(struct uop *uop, struct cpu *cpu) {
   unused(uop);
   if(!cpu->mmu->read_in_progress) {
-    cpu->external->address = cpu->internal->r.pc;
+    cpu->external->address = cpu->internal->r.pc&0xffffff;
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
@@ -47,7 +47,7 @@ void uop_boot_prefetch(struct uop *uop, struct cpu *cpu) {
 void uop_prefetch(struct uop *uop, struct cpu *cpu) {
   unused(uop);
   if(!cpu->mmu->read_in_progress) {
-    cpu->external->address = cpu->internal->r.pc;
+    cpu->external->address = cpu->internal->r.pc&0xffffff;
     cpu->internal->r.ir = cpu->internal->r.irc;
     mmu_read_word(cpu->mmu);
   }
@@ -68,7 +68,7 @@ void uop_prefetch(struct uop *uop, struct cpu *cpu) {
 void uop_read_byte(struct uop *uop, struct cpu *cpu) {
   if(!cpu->mmu->read_in_progress) {
     cpu->external->data_available = 0;
-    cpu->external->address = cpu->internal->l[uop->data1];
+    cpu->external->address = cpu->internal->l[uop->data1]&0xffffff;
     mmu_read_byte(cpu->mmu);
   }
   if(cpu->external->data_available) {
@@ -87,7 +87,7 @@ void uop_read_byte(struct uop *uop, struct cpu *cpu) {
 void uop_read_word(struct uop *uop, struct cpu *cpu) {
   if(!cpu->mmu->read_in_progress) {
     cpu->external->data_available = 0;
-    cpu->external->address = cpu->internal->l[uop->data1];
+    cpu->external->address = cpu->internal->l[uop->data1]&0xffffff;
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
@@ -106,7 +106,7 @@ void uop_read_word(struct uop *uop, struct cpu *cpu) {
 void uop_read_next_word(struct uop *uop, struct cpu *cpu) {
   if(!cpu->mmu->read_in_progress) {
     cpu->external->data_available = 0;
-    cpu->external->address = cpu->internal->l[uop->data1] + 2;
+    cpu->external->address = (cpu->internal->l[uop->data1] + 2)&0xffffff;
     mmu_read_word(cpu->mmu);
   }
   if(cpu->external->data_available) {
@@ -125,7 +125,7 @@ void uop_read_next_word(struct uop *uop, struct cpu *cpu) {
 void uop_write_byte(struct uop *uop, struct cpu *cpu) {
   if(!cpu->mmu->write_in_progress) {
     cpu->external->data_available = 0;
-    cpu->external->address = cpu->internal->l[uop->data1];
+    cpu->external->address = cpu->internal->l[uop->data1]&0xffffff;
     cpu->external->data = cpu->internal->w[uop->data2];
     mmu_write_byte(cpu->mmu);
     printf("DEBUG-UOP-WRITE: Initiating write at %d\n", cpu->exec->cycles);
@@ -245,6 +245,33 @@ void uop_add(struct uop *uop, struct cpu *cpu) {
   }
   cpu->exec->uops_pos++;
 }
+
+void uop_sign_ext_word(struct uop *uop, struct cpu *cpu) {
+  WORD value;
+  value = cpu->internal->w[uop->data1];
+
+  /* Only BYTE really makes sense here, do nothing otherwise */
+  if(uop->size == INSTR_BYTE) {
+    value = SIGN_EXT_BYTE(value&0xff);
+  }
+  cpu->internal->w[uop->data1] = value;
+  cpu->exec->uops_pos++;
+}
+
+void uop_sign_ext_long(struct uop *uop, struct cpu *cpu) {
+  LONG value;
+  value = cpu->internal->l[uop->data1];
+
+  /* Only BYTE and WORD makes sense. Do nothing for LONG */
+  if(uop->size == INSTR_BYTE) {
+    value = SIGN_EXT_WORD(SIGN_EXT_BYTE(value&0xff));
+  } else if(uop->size == INSTR_WORD) {
+    value = SIGN_EXT_WORD(value&0xffff);
+  }
+  cpu->internal->l[uop->data1] = value;
+  cpu->exec->uops_pos++;
+}
+
 
 void uop_end(struct uop *uop, struct cpu *cpu) {
   unused(uop);

@@ -83,6 +83,12 @@ void instr_uop_push(struct instr *instr, enum instr_uops code,
   case INSTR_UOP_ADD:
     instr_uop_push_full(instr, uop_add, code, data1, data2, size, ext);
     break;
+  case INSTR_UOP_SIGN_EXT_WORD:
+    instr_uop_push_full(instr, uop_sign_ext_word, code, data1, data2, size, ext);
+    break;
+  case INSTR_UOP_SIGN_EXT_LONG:
+    instr_uop_push_full(instr, uop_sign_ext_long, code, data1, data2, size, ext);
+    break;
   case INSTR_UOP_MAX_COUNT:
     break;
   }
@@ -150,5 +156,13 @@ void instr_uop_push_inc_reg(struct instr *instr, LONG reg, enum instr_sizes size
 
 void instr_uop_push_add_word_to_long(struct instr *instr, LONG src_reg, LONG target_reg) {
   instr_uop_push(instr, INSTR_UOP_ADD, src_reg, target_reg, INSTR_WORD, EXT_LONG);
+}
+
+void instr_uop_push_sign_ext_to_word(struct instr *instr, LONG reg, enum instr_sizes from_size) {
+  instr_uop_push(instr, INSTR_UOP_SIGN_EXT_WORD, reg, 0, from_size, EXT_WORD);
+}
+
+void instr_uop_push_sign_ext_to_long(struct instr *instr, LONG reg, enum instr_sizes from_size) {
+  instr_uop_push(instr, INSTR_UOP_SIGN_EXT_LONG, reg, 0, from_size, EXT_LONG);
 }
 
