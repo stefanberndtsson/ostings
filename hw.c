@@ -42,7 +42,7 @@ struct hw **hw_setup() {
   hw_register(hws, HW_BOOTROM, NULL, bootrom_setup(hws));
   hw_register(hws, HW_CART, NULL, cart_setup(hws));
   hw_register(hws, HW_PSG, NULL, psg_setup(hws));
-  hw_register(hws, HW_MFP, NULL, mfp_setup(hws));
+  hw_register(hws, HW_MFP, mfp_tick, mfp_setup(hws));
 
   return hws;
 }

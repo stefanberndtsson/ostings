@@ -49,3 +49,8 @@ struct mfp *mfp_setup(struct hw **hws) {
   
   return mfp;
 }
+
+/* Just accept ticks, but do nothing for now */
+void mfp_tick(struct hw *hw) {
+  unused(hw);
+}

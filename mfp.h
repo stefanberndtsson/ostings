@@ -23,6 +23,7 @@ struct mfp {
   struct hw **hws;
 };
 
+void mfp_tick(struct hw *);
 struct mfp *mfp_setup(struct hw **);
 
 #endif /* OSTIS_MFP_H */
