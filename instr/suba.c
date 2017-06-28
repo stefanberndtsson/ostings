@@ -71,6 +71,7 @@ void instr_suba_setup_regs(struct cpu *cpu) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "SUBA");
 
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
@@ -90,6 +91,7 @@ void add_ea_variant(struct cpu *cpu, int size, int ea_mode, int ea_reg) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "SUBA");
 
   ea_read(instr, ea_mode, ea_reg, size, REG_VALUE(0));
   

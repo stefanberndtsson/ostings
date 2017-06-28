@@ -19,5 +19,6 @@ void mnemonics_suba_setup(struct cpu *);
 void mnemonics_jmp_setup(struct cpu *);
 void mnemonics_move_b_setup(struct cpu *);
 void mnemonics_btst_setup(struct cpu *);
+void mnemonics_moveq_setup(struct cpu *);
 
 #endif /* OSTIS_MNEMONICS_H */

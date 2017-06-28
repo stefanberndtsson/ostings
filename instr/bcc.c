@@ -118,7 +118,8 @@ static struct instr *instr_bcc_short_setup(struct cpu *cpu) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
-
+  snprintf(instr->code, 31, "BCC.S");
+  
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
@@ -134,12 +135,12 @@ static struct instr *instr_bcc_short_setup(struct cpu *cpu) {
   return instr;
 }
 
-/* TODO: Unimplemented */
 static struct instr *instr_bcc_long_setup(struct cpu *cpu) {
   struct instr *instr;
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "BCC");
 
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);

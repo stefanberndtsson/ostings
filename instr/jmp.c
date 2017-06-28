@@ -4,7 +4,7 @@
 #include "uop.h"
 #include "ea.h"
 
-/* LEA */
+/* JMP */
 
 #define OP 0x4EC0
 #define OP_MASK 0x4EC0
@@ -27,6 +27,7 @@ static void add_variant(struct cpu *cpu, int ea_mode, int ea_reg) {
   struct instr *instr;
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "JMP");
   if(!(ea_mode == EA_EXTENDED && ea_reg == EA_LONG) && !(ea_mode == EA_MEM)) {
     instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);

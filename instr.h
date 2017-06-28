@@ -92,6 +92,7 @@ struct uop {
 struct instr {
   struct cpu *cpu;
   struct uop *uops[MAX_UOPS];
+  char code[32];
   int uops_count;
 };
 

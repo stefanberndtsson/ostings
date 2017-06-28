@@ -35,6 +35,7 @@ void instr_unimplemented_setup(struct cpu *cpu) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "Unimplemented");
   instr_uop_push_short(instr, unimplemented_halt, INSTR_UOP_SPECIAL);
   instr_uop_push_end(instr);
 

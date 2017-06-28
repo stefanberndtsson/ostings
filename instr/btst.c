@@ -37,6 +37,7 @@ static void add_im_variant(struct cpu *cpu, int ea_mode, int ea_reg) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "BTST #x");
 
   ea_read_immediate(instr, REG_VALUE(0), INSTR_BYTE);
   ea_read(instr, ea_mode, ea_reg, INSTR_BYTE, REG_VALUE(1));
@@ -54,6 +55,7 @@ static void add_reg_variant(struct cpu *cpu, int reg, int ea_mode, int ea_reg) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "BTST Dn");
 
   /* When EA is Dn, size is LONG and takes an extra 2 cycles */
   if(ea_mode == EA_DN) {

@@ -100,6 +100,7 @@ static void add_ea_variant(struct cpu *cpu, int size, int ea_mode, int ea_reg) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "CMPI");
 
   ea_read_immediate(instr, REG_VALUE(0), size);
   ea_read(instr, ea_mode, ea_reg, size, REG_VALUE(2));

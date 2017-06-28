@@ -32,7 +32,8 @@ static char *states[3] = {
 
 void cpu_debug_info(struct cpu *cpu) {
   int i;
-  printf("-----------------------------------------------------------------------\n");
+  printf("----------------------- [%s] %s -----------------------\n",
+         cpu->exec->instr->code, cpu->exec->mnemonic(cpu, cpu->exec->instr_addr));
   for(i=0;i<8;i++) {
     printf("D%d: %08X %-20s A%d: %08X\n", i, cpu->internal->r.d[i], "", i, cpu->internal->r.a[i]);
   }
@@ -166,6 +167,10 @@ void cpu_instr_register(struct cpu *cpu, WORD op, WORD op_mask, struct instr *in
   for(i=0;i<65536;i++) {
     if((i&op_mask) == (op&op_mask)) {
       cpu->internal->instr[i] = instr;
+      if(!instr->code) {
+        printf("%04X missing code\n", i);
+        exit(-112);
+      }
     }
   }
 }

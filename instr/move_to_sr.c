@@ -26,6 +26,7 @@ void instr_move_to_sr_setup(struct cpu *cpu) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "MOVE xx,SR");
 
   /* Fetch immediate word */
   ea_read_immediate(instr, REG_VALUE(0), INSTR_WORD);

@@ -19,6 +19,7 @@ void instr_nop_setup(struct cpu *cpu) {
 
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "NOP");
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);

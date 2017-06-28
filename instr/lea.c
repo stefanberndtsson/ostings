@@ -21,6 +21,7 @@ static void add_variant(struct cpu *cpu, int reg, int ea_mode, int ea_reg) {
   struct instr *instr;
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "LEA");
   ea_addr(instr, ea_mode, ea_reg, INSTR_LONG, REG_AREG(reg));
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);

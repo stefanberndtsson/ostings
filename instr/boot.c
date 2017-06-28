@@ -33,6 +33,7 @@ struct instr *instr_boot_setup(struct cpu *cpu) {
   struct instr *instr;
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
+  snprintf(instr->code, 31, "BOOT-SEQUENCE");
   instr_uop_push_short(instr, set_addresses, INSTR_UOP_SPECIAL);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
