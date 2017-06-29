@@ -11,62 +11,137 @@
 
 #define BUILD_OP(ea_mode, ea_reg) (0x4ec0|(ea_mode<<3)|ea_reg)
 
-/*
- * uOPs:
- * NOP (not for $xxxx.L)
- * NOP (only for d8(An,Rn.S) and d8(PC,Rn.S))
- * EA
- * set_pc
- * Prefetch
- */
+static void add_variant_mem(struct instr *instr, int ea_reg) {
+  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), REG_PC);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+  instr_uop_push_end(instr);
+}
 
-/*  n, p, n, p, rc, p
- */
+static void add_variant_mem_offset(struct instr *instr, int ea_reg) {
+  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), REG_PC);
+  instr_uop_push_add_word_to_long(instr, REG_IRC_W, REG_PC);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+  instr_uop_push_end(instr);
+}
+
+/* TODO: Not implemented */
+static void add_variant_mem_offset_reg(struct instr *instr, int ea_reg) {
+  unused(instr);
+  unused(ea_reg);
+}
+
+static void add_variant_pc_offset(struct instr *instr) {
+  instr_uop_push_nop(instr);
+  instr_uop_push_add_word_to_long(instr, REG_IRC_W, REG_PC);
+  instr_uop_push_dec_reg(instr, REG_PC, INSTR_WORD);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+  instr_uop_push_end(instr);
+}
+
+/* TODO: Not implemented */
+static void add_variant_pc_offset_reg(struct instr *instr) {
+  unused(instr);
+}
+
+/* TODO: Not implemented */
+static void add_variant_short(struct instr *instr) {
+  unused(instr);
+}
+
+/* TODO: Not implemented */
+static void add_variant_long(struct instr *instr) {
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+  instr_uop_push_reg_copy_word(instr, REG_IRD_W, REG_WORD_HIGH(REG_PC));
+  instr_uop_push_reg_copy_word(instr, REG_IRC_W, REG_WORD_LOW(REG_PC));
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_nop(instr);
+  instr_uop_push_prefetch(instr);
+  instr_uop_push_end(instr);
+}
 
 static void add_variant(struct cpu *cpu, int ea_mode, int ea_reg) {
   struct instr *instr;
   instr = (struct instr *)ostis_alloc(sizeof(struct instr));
   instr->cpu = cpu;
   snprintf(instr->code, 31, "JMP");
-  if(!(ea_mode == EA_EXTENDED && ea_reg == EA_LONG) && !(ea_mode == EA_MEM)) {
-    instr_uop_push_nop(instr);
-    instr_uop_push_nop(instr);
+
+  switch(ea_mode) {
+  case EA_MEM:
+    add_variant_mem(instr, ea_reg);
+    break;
+  case EA_MEM_OFFSET:
+    add_variant_mem_offset(instr, ea_reg);
+    break;
+  case EA_MEM_OFFSET_REG:
+    add_variant_mem_offset_reg(instr, ea_reg);
+    break;
+  case EA_EXTENDED:
+    switch(ea_reg) {
+    case EA_PC_OFFSET:
+      add_variant_pc_offset(instr);
+      break;
+    case EA_PC_OFFSET_REG:
+      add_variant_pc_offset_reg(instr);
+      break;
+    case EA_SHORT:
+      add_variant_short(instr);
+      break;
+    case EA_LONG:
+      add_variant_long(instr);
+      break;
+    }
+    break;
   }
-  if(ea_mode == EA_MEM_OFFSET_REG || (ea_mode == EA_EXTENDED && ea_reg == EA_PC_OFFSET_REG)) {
-    instr_uop_push_nop(instr);
-    instr_uop_push_nop(instr);
-  }
-  ea_addr(instr, ea_mode, ea_reg, INSTR_LONG, REG_PC);
-  instr_uop_push_nop(instr);
-  instr_uop_push_nop(instr);
-  instr_uop_push_nop(instr);
-  instr_uop_push_prefetch(instr);
-  instr_uop_push_end(instr);
   cpu_instr_register(cpu, BUILD_OP(ea_mode, ea_reg), 0xFFFF, instr);
 }
 
 void instr_jmp_setup(struct cpu *cpu) {
   int ea_reg;
   
-  /* Add (An),Ar */
+  /* Add (An) */
   for(ea_reg=0;ea_reg<8;ea_reg++) {
     add_variant(cpu, EA_MEM, ea_reg);
   }
-  /* Add d16(An),Ar */
+  /* Add d16(An) */
   for(ea_reg=0;ea_reg<8;ea_reg++) {
     add_variant(cpu, EA_MEM_OFFSET, ea_reg);
   }
-  /* Add d8(An,Rn.S),Ar */
+  /* Add d8(An,Rn.S) */
   for(ea_reg=0;ea_reg<8;ea_reg++) {
     add_variant(cpu, EA_MEM_OFFSET_REG, ea_reg);
   }
-  /* Add $xxxx.W,Ar */
+  /* Add $xxxx.W */
   add_variant(cpu, EA_EXTENDED, EA_SHORT);
-  /* Add $xxxx.L,Ar */
+  /* Add $xxxx.L */
   add_variant(cpu, EA_EXTENDED, EA_LONG);
-  /* Add d16(PC),Ar */
+  /* Add d16(PC) */
   add_variant(cpu, EA_EXTENDED, EA_PC_OFFSET);
-  /* Add d8(PC,Rn.S),Ar */
+  /* Add d8(PC,Rn.S) */
   add_variant(cpu, EA_EXTENDED, EA_PC_OFFSET_REG);
 }
 

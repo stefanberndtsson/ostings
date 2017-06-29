@@ -24,8 +24,6 @@ static void add_variant(struct cpu *cpu, int reg, int ea_mode, int ea_reg) {
   snprintf(instr->code, 31, "LEA");
   ea_addr(instr, ea_mode, ea_reg, INSTR_LONG, REG_AREG(reg));
   instr_uop_push_nop(instr);
-  instr_uop_push_nop(instr);
-  instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);
   cpu_instr_register(cpu, BUILD_OP(reg, ea_mode, ea_reg), 0xFFFF, instr);

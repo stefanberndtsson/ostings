@@ -4,7 +4,7 @@
 #include "uop.h"
 #include "ea.h"
 
-/* CMPI */
+/* MOVE.B */
 
 #define OP 0x1000
 #define OP_MASK 0xf000
@@ -18,7 +18,10 @@ static void add_ea_variant(struct cpu *cpu, int src_ea_mode, int src_ea_reg, int
   snprintf(instr->code, 31, "MOVE.B");
 
   ea_move(instr, src_ea_mode, src_ea_reg, dst_ea_mode, dst_ea_reg, INSTR_BYTE);
-  instr_uop_push_nop(instr);
+  /* The first uNOP is replaced with a reg_copy in ea_move when dst is Dn */
+  if(dst_ea_mode != EA_DN) {
+    instr_uop_push_nop(instr);
+  }
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
