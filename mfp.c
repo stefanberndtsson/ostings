@@ -44,7 +44,7 @@ struct mfp *mfp_setup(struct hw **hws) {
                          (write_byte_t *)mfp_write_byte,
                          (write_word_t *)mfp_write_word,
                          (read_word_t *)mfp_peek_word,
-                         mfp, MMU_PROTECTED, 4);
+                         mfp, MMU_PROTECTED, 0);
   mmu_register_area(hws[HW_MMU]->data, mfp->start, mfp->size, area);
   
   return mfp;
