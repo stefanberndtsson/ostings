@@ -86,7 +86,7 @@ void cpu_set_flags(struct cpu *cpu, WORD mask, int x, int n, int z, int v, int c
   flags = (x<<4)|(n<<3)|(z<<2)|(v<<1)|(c<<0);
 
   /* Mask off unused flags */
-  flags &= mask;
+  flags &= ~mask;
 
   /* Mask off SR and set new flags */
   cpu->internal->r.sr = (cpu->internal->r.sr&mask) | flags;

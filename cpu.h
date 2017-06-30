@@ -82,6 +82,21 @@ struct cpu;
 
 #define SET_XNZVC(cpu, x, n, z, v, c) cpu_set_flags(cpu, MASK_XNZVC, (x), (n), (z), (v), (c))
 
+#define CHK_MASK(size) (size==INSTR_BYTE ? 0x80 : size==INSTR_WORD ? 0x8000 : 0x80000000)
+#define CHK_MASKED(size, val) ((val)&CHK_MASK(size))
+#define VAL_MASK(size) (size==INSTR_BYTE ? 0xff : size==INSTR_WORD ? 0xffff : 0xffffffff)
+#define VAL_MASKED(size, val) ((val)&VAL_MASK(size))
+
+#define CHK_N(size, val) (val&CHK_MASK(size))
+#define CHK_Z(val) (val==0)
+#define CHK_V_PART1(size, src, dst, result) (!CHK_MASKED(size,src)&&CHK_MASKED(size,dst)&&!CHK_MASKED(size,result))
+#define CHK_V_PART2(size, src, dst, result) (CHK_MASKED(size,src)&&!CHK_MASKED(size,dst)&&CHK_MASKED(size,result))
+#define CHK_V(size, src, dst, result) (CHK_V_PART1(size, src, dst, result) || CHK_V_PART2(size, src, dst, result))
+#define CHK_C_PART1(size, src, dst) (CHK_MASKED(size,src)&&!CHK_MASKED(size,dst))
+#define CHK_C_PART2(size, dst, result) (CHK_MASKED(size,result)&&!CHK_MASKED(size,dst))
+#define CHK_C_PART3(size, src, result) (CHK_MASKED(size,src)&&CHK_MASKED(size,result))
+#define CHK_C(size, src, dst, result) (CHK_C_PART1(size, src, dst) || CHK_C_PART2(size, dst, result) || CHK_C_PART3(size, src, result))
+  
 struct cpu {
   struct cpu_internal *internal;
   struct cpu_external *external;

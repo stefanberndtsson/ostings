@@ -46,29 +46,13 @@
  *
  */
 
-static void set_flags_cmp(struct cpu *cpu, int src_masked, int dst_masked, int result_masked, int result) {
+static void set_flags_cmp(struct cpu *cpu, enum instr_sizes size, int src, int dst, int result) {
   int n,z,v,c;
-  n = z = v = c = 0;
-  
-  /* Negative? */
-  if(result_masked) {
-    n = 1;
-  }
 
-  /* Zero? */
-  if(result==0) {
-    z = 1;
-  }
-
-  /* oVerflow? */
-  if((!src_masked && dst_masked && !result_masked) || (src_masked && !dst_masked && result_masked)) {
-    v = 1;
-  }
-  
-  /* Carry? */
-  if((src_masked && !dst_masked) || (result_masked && !dst_masked) || (src_masked && result_masked)) {
-    c = 1;
-  }
+  n = CHK_N(size, result);
+  z = CHK_Z(result);
+  v = CHK_V(size, src, dst, result);
+  c = CHK_C(size, src, dst, result);
   SET_NZVC(cpu, n, z, v, c);
 }
 
@@ -76,29 +60,13 @@ static void set_flags_cmp(struct cpu *cpu, int src_masked, int dst_masked, int r
  */
 static void compare(struct uop *uop, struct cpu *cpu) {
   LONG immediate, fetched;
-  LONG size_mask;
   LONG result;
 
   immediate = cpu->internal->r.value[0];
   fetched = cpu->internal->r.value[2];
+  result = VAL_MASKED(uop->size, fetched - immediate);
 
-  result = fetched - immediate;
-  if(uop->size == INSTR_BYTE) {
-    immediate &= 0xff;
-    fetched &= 0xff;
-    size_mask = 0x80;
-  }
-  if(uop->size == INSTR_WORD) {
-    immediate &= 0xffff;
-    fetched &= 0xffff;
-    size_mask = 0x8000;
-  }
-  if(uop->size == INSTR_LONG) {
-    size_mask = 0x80000000;
-  }
-  
-  set_flags_cmp(cpu, immediate&size_mask, fetched&size_mask, result&size_mask, result);
-  
+  set_flags_cmp(cpu, uop->size, immediate, fetched, result);
   cpu->exec->uops_pos++;
 }
 

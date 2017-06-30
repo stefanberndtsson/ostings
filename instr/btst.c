@@ -27,7 +27,7 @@ static void test_bit(struct uop *uop, struct cpu *cpu) {
   }
   value = cpu->internal->r.value[1];
   result = value&(1<<bitnum);
-  SET_Z(cpu, result);
+  SET_Z(cpu, CHK_Z(result));
   cpu->exec->uops_pos++;
 }
 

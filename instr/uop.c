@@ -275,24 +275,20 @@ void uop_reg_copy_ext_to_long(struct uop *uop, struct cpu *cpu) {
 /* Set ZN according to value, clear V and C */
 void uop_set_basic_flags(struct uop *uop, struct cpu *cpu) {
   LONG value;
-  int n = 0;
-  int z = 0;
-  int v = 0;
-  int c = 0;
-  
-  if(uop->size == INSTR_BYTE) {
-    value = cpu->internal->w[uop->data1];
-    if(value == 0) { z = 1; }
-    if(value&0x80) { n = 1; }
-  } else if(uop->size == INSTR_WORD) {
-    value = cpu->internal->w[uop->data1];
-    if(value == 0) { z = 1; }
-    if(value&0x8000) { n = 1; }
-  } else if(uop->size == INSTR_LONG) {
+  int n,z,v,c;
+
+  if(uop->size == INSTR_LONG) {
     value = cpu->internal->l[uop->data1];
-    if(value == 0) { z = 1; }
-    if(value&0x80000000) { n = 1; }
+  } else {
+    value = cpu->internal->w[uop->data1];
   }
+
+  /* Check negative and zero, clear overflow and carry */
+  n = CHK_N(uop->size, value);
+  z = CHK_Z(value);
+  v = 0;
+  c = 0;
+
   SET_NZVC(cpu, n, z, v, c);
   cpu->exec->uops_pos++;
 }
