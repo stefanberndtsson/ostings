@@ -34,12 +34,6 @@ static void ea_addr_mem(struct instr *instr, int ea_reg, LONG target_reg) {
   instr_uop_push_nop(instr);
 }
 
-/* Write version of ea_addr_mem, without the prefetch */
-static void ea_write_addr_mem(struct instr *instr, int ea_reg, LONG target_reg) {
-  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
-  instr_uop_push_nop(instr);
-}
-
 
 /* Address from (An)+. Put An into target_reg, then increment An as required
  * followed by a prefetch.
@@ -49,25 +43,11 @@ static void ea_addr_mem_inc(struct instr *instr, int ea_reg, enum instr_sizes si
   instr_uop_push_inc_reg(instr, REG_AREG(ea_reg), size);
 }
 
-/* Write version of ea_addr_mem_inc, without the prefetch */
-static void ea_write_addr_mem_inc(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
-  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
-  instr_uop_push_inc_reg(instr, REG_AREG(ea_reg), size);
-}
-
 
 /* Address from -(An). Decrement An first, then copy to target_reg,
  * and finally a prefetch.
  */
 static void ea_addr_mem_dec(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
-  instr_uop_push_dec_reg(instr, REG_AREG(ea_reg), size);
-  instr_uop_push_nop(instr);
-  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
-  instr_uop_push_nop(instr);
-}
-
-/* Write version of ea_addr_mem_dec, without the prefetch */
-static void ea_write_addr_mem_dec(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
   instr_uop_push_dec_reg(instr, REG_AREG(ea_reg), size);
   instr_uop_push_nop(instr);
   instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
@@ -88,28 +68,11 @@ static void ea_addr_mem_offset(struct instr *instr, int ea_reg, LONG target_reg)
   instr_uop_push_nop(instr);
 }
 
-/* Write version of ea_addr_mem_offset, without the prefetch */
-static void ea_write_addr_mem_offset(struct instr *instr, int ea_reg, LONG target_reg) {
-  instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
-  instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg);
-  instr_uop_push_nop(instr);
-  instr_uop_push_prefetch(instr);
-  instr_uop_push_nop(instr);
-  instr_uop_push_nop(instr);
-}
 
 /* Address from d8(An,Rn.S).
  * TODO: Unimplemented.
  */
 static void ea_addr_mem_offset_reg(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
-  unused(instr);
-  unused(ea_reg);
-  unused(size);
-  unused(target_reg);
-}
-
-/* Write version of ea_addr_mem_offset_reg, without the prefetch */
-static void ea_write_addr_mem_offset_reg(struct instr *instr, int ea_reg, enum instr_sizes size, LONG target_reg) {
   unused(instr);
   unused(ea_reg);
   unused(size);
@@ -131,6 +94,7 @@ static void ea_addr_pc_offset(struct instr *instr, LONG target_reg) {
   instr_uop_push_nop(instr);
 }
 
+
 /* Address from d8(PC,Rn.S).
  * TODO: Unimplemented.
  */
@@ -140,16 +104,11 @@ static void ea_addr_pc_offset_reg(struct instr *instr, enum instr_sizes size, LO
   unused(target_reg);
 }
 
+
 /* Address from $xxxx.W
  * TODO: Unimplemented.
  */
 static void ea_addr_short(struct instr *instr, LONG target_reg) {
-  unused(instr);
-  unused(target_reg);
-}
-
-/* Write version of ea_addr_short, without the prefetch */
-static void ea_write_addr_short(struct instr *instr, LONG target_reg) {
   unused(instr);
   unused(target_reg);
 }
@@ -161,20 +120,6 @@ static void ea_write_addr_short(struct instr *instr, LONG target_reg) {
  * then do the last prefetch.
  */
 static void ea_addr_long(struct instr *instr, LONG target_reg) {
-  instr_uop_push_nop(instr);
-  instr_uop_push_nop(instr);
-  instr_uop_push_nop(instr);
-  instr_uop_push_prefetch(instr);
-  instr_uop_push_reg_copy_word(instr, REG_IRD_W, REG_WORD_HIGH(target_reg));
-  instr_uop_push_reg_copy_word(instr, REG_IRC_W, REG_WORD_LOW(target_reg));
-  instr_uop_push_nop(instr);
-  instr_uop_push_prefetch(instr);
-  instr_uop_push_nop(instr);
-  instr_uop_push_nop(instr);
-}
-
-/* Write version of ea_addr_long, without the last prefetch */
-static void ea_write_addr_long(struct instr *instr, LONG target_reg) {
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
@@ -358,19 +303,19 @@ void ea_move(struct instr *instr,
     /* Unimplemented */
     break;
   case EA_MEM:
-    ea_write_addr_mem(instr, dst_ea_reg, REG_VALUE(1));
+    ea_addr_mem(instr, dst_ea_reg, REG_VALUE(1));
     break;
   case EA_MEM_INC:
-    ea_write_addr_mem_inc(instr, dst_ea_reg, size, REG_VALUE(1));
+    ea_addr_mem_inc(instr, dst_ea_reg, size, REG_VALUE(1));
     break;
   case EA_MEM_DEC:
-    ea_write_addr_mem_dec(instr, dst_ea_reg, size, REG_VALUE(1));
+    ea_addr_mem_dec(instr, dst_ea_reg, size, REG_VALUE(1));
     break;
   case EA_MEM_OFFSET:
-    ea_write_addr_mem_offset(instr, dst_ea_reg, REG_VALUE(1));
+    ea_addr_mem_offset(instr, dst_ea_reg, REG_VALUE(1));
     break;
   case EA_MEM_OFFSET_REG:
-    ea_write_addr_mem_offset_reg(instr, dst_ea_reg, size, REG_VALUE(1));
+    ea_addr_mem_offset_reg(instr, dst_ea_reg, size, REG_VALUE(1));
     break;
   case EA_EXTENDED:
     switch(dst_ea_reg) {
@@ -379,10 +324,10 @@ void ea_move(struct instr *instr,
       /* Not writable */
       break;
     case EA_SHORT:
-      ea_write_addr_short(instr, REG_VALUE(1));
+      ea_addr_short(instr, REG_VALUE(1));
       break;
     case EA_LONG:
-      ea_write_addr_long(instr, REG_VALUE(1));
+      ea_addr_long(instr, REG_VALUE(1));
       break;
     case EA_IMMEDIATE:
       /* Not writable */
