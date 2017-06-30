@@ -5,6 +5,7 @@
 #include "ea.h"
 
 /* SUBA */
+/* Flags unaffected */
 
 #define OP_REGS 0x90c0
 #define OP_MASK_REGS 0xf0f0

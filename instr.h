@@ -62,7 +62,7 @@ enum instr_uops {
   INSTR_UOP_ADD,
   INSTR_UOP_REG_COPY_EXT_TO_WORD,
   INSTR_UOP_REG_COPY_EXT_TO_LONG,
-  INSTR_UOP_SET_ZN_FLAGS,
+  INSTR_UOP_SET_BASIC_FLAGS,
   INSTR_UOP_MAX_COUNT
 };
 
@@ -120,7 +120,7 @@ void instr_uop_push_inc_reg(struct instr *, LONG, enum instr_sizes);
 void instr_uop_push_add_word_to_long(struct instr *, LONG, LONG);
 void instr_uop_push_reg_copy_ext_to_word(struct instr *, LONG, LONG, enum instr_sizes);
 void instr_uop_push_reg_copy_ext_to_long(struct instr *, LONG, LONG, enum instr_sizes);
-void instr_uop_push_set_zn_flags(struct instr *, LONG, enum instr_sizes);
+void instr_uop_push_set_basic_flags(struct instr *, LONG, enum instr_sizes);
 
 /* Very special boot instruction */
 struct instr *instr_boot_setup(struct cpu *);

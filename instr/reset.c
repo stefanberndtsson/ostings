@@ -4,6 +4,7 @@
 #include "uop.h"
 
 /* RESET */
+/* Flags unaffected */
 
 #define OP 0x4e70
 #define OP_MASK 0xffff

@@ -5,6 +5,7 @@
 #include "ea.h"
 
 /* BTST */
+/* Z HIGH if tested bit is 0 */
 
 #define OP_IM 0x0800
 #define OP_IM_MASK 0xffc0
@@ -26,9 +27,7 @@ static void test_bit(struct uop *uop, struct cpu *cpu) {
   }
   value = cpu->internal->r.value[1];
   result = value&(1<<bitnum);
-  if(result == 0) { /* Z set if bit was 0 */
-    cpu->internal->r.sr = (cpu->internal->r.sr & 0xfffb) | (1<<2);
-  }
+  SET_Z(cpu, result);
   cpu->exec->uops_pos++;
 }
 

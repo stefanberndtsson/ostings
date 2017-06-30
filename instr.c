@@ -89,7 +89,7 @@ void instr_uop_push(struct instr *instr, enum instr_uops code,
   case INSTR_UOP_REG_COPY_EXT_TO_LONG:
     instr_uop_push_full(instr, uop_reg_copy_ext_to_long, code, data1, data2, size, ext);
     break;
-  case INSTR_UOP_SET_ZN_FLAGS:
+  case INSTR_UOP_SET_BASIC_FLAGS:
     instr_uop_push_full(instr, uop_set_basic_flags, code, data1, data2, size, ext);
     break;
   case INSTR_UOP_MAX_COUNT:
@@ -169,7 +169,7 @@ void instr_uop_push_reg_copy_ext_to_long(struct instr *instr, LONG source_reg, L
   instr_uop_push(instr, INSTR_UOP_REG_COPY_EXT_TO_LONG, source_reg, target_reg, from_size, EXT_LONG);
 }
 
-void instr_uop_push_set_zn_flags(struct instr *instr, LONG source_reg, enum instr_sizes from_size) {
-  instr_uop_push(instr, INSTR_UOP_SET_ZN_FLAGS, source_reg, 0, from_size, EXT_LONG);
+void instr_uop_push_set_basic_flags(struct instr *instr, LONG source_reg, enum instr_sizes from_size) {
+  instr_uop_push(instr, INSTR_UOP_SET_BASIC_FLAGS, source_reg, 0, from_size, EXT_LONG);
 }
 

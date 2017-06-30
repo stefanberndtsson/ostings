@@ -5,6 +5,7 @@
 #include "ea.h"
 
 /* Bcc */
+/* Flags unaffected */
 
 #define SHORT_OP 0x6000
 #define SHORT_OP_MASK 0xf000

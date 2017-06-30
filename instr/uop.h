@@ -138,7 +138,7 @@ void uop_reg_copy_ext_to_word(struct uop *, struct cpu *);
 /* Same as reg_copy, except it sign extends to LONG size */
 void uop_reg_copy_ext_to_long(struct uop *, struct cpu *);
 
-/* Set flags for Z and N based on reg1 and size */
+/* Set flags for Z and N based on reg1 and size, clear V and C */
 void uop_set_basic_flags(struct uop *, struct cpu *);
 
 

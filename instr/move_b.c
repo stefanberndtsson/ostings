@@ -5,6 +5,14 @@
 #include "ea.h"
 
 /* MOVE.B */
+/* Flags:
+ * X - Not affected
+ * N - If value is negative
+ * Z - If value is 0
+ * V - Cleared
+ * C - Cleared
+ */
+
 
 #define OP 0x1000
 #define OP_MASK 0xf000
@@ -22,7 +30,8 @@ static void add_ea_variant(struct cpu *cpu, int src_ea_mode, int src_ea_reg, int
   if(dst_ea_mode != EA_DN) {
     instr_uop_push_nop(instr);
   }
-  instr_uop_push_nop(instr);
+  /* At this point, value having been moved is in r.value[0] */
+  instr_uop_push_set_basic_flags(instr, REG_VALUE(0), INSTR_BYTE);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);

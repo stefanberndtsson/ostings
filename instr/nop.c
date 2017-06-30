@@ -4,6 +4,7 @@
 #include "uop.h"
 
 /* NOP */
+/* Flags unaffected */
 
 #define OP 0x4e71
 #define OP_MASK 0xffff

@@ -5,6 +5,7 @@
 #include "ea.h"
 
 /* MOVEtoSR */
+/* Flags: Set as part of SR */
 
 #define OP 0x46FC
 // #define OP_MASK 0xffc0

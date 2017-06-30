@@ -272,11 +272,13 @@ void uop_reg_copy_ext_to_long(struct uop *uop, struct cpu *cpu) {
   cpu->exec->uops_pos++;
 }
 
-
+/* Set ZN according to value, clear V and C */
 void uop_set_basic_flags(struct uop *uop, struct cpu *cpu) {
   LONG value;
-  int z = 0;
   int n = 0;
+  int z = 0;
+  int v = 0;
+  int c = 0;
   
   if(uop->size == INSTR_BYTE) {
     value = cpu->internal->w[uop->data1];
@@ -291,7 +293,7 @@ void uop_set_basic_flags(struct uop *uop, struct cpu *cpu) {
     if(value == 0) { z = 1; }
     if(value&0x80000000) { n = 1; }
   }
-  cpu_set_zn_flags(cpu, z, n);
+  SET_NZVC(cpu, n, z, v, c);
   cpu->exec->uops_pos++;
 }
 

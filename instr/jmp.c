@@ -5,6 +5,7 @@
 #include "ea.h"
 
 /* JMP */
+/* Flags unaffected */
 
 #define OP 0x4EC0
 #define OP_MASK 0x4EC0

@@ -5,6 +5,13 @@
 #include "ea.h"
 
 /* CMPI */
+/* Flags:
+ * X - Not affected
+ * N - If (EA - value) is negative
+ * Z - If EA same as value
+ * V - If (EA - value) overflows
+ * C - If (EA - value) carries
+ */
 
 #define OP 0x0C00
 #define OP_MASK 0xff00
@@ -62,7 +69,7 @@ static void set_flags_cmp(struct cpu *cpu, int src_masked, int dst_masked, int r
   if((src_masked && !dst_masked) || (result_masked && !dst_masked) || (src_masked && result_masked)) {
     c = 1;
   }
-  cpu->internal->r.sr = (cpu->internal->r.sr & 0xff00) | (n<<3) | (z<<2) | (v<<1) | (c<<0);
+  SET_NZVC(cpu, n, z, v, c);
 }
 
 /* Compare what's in VALUE[0] (immediate) with VALUE[2] (EA-fetched)

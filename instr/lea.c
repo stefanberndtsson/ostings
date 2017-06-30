@@ -5,6 +5,7 @@
 #include "ea.h"
 
 /* LEA */
+/* Flags unaffected */
 
 #define OP 0x41C0
 #define OP_MASK 0xF1C0
