@@ -63,6 +63,8 @@ enum instr_uops {
   INSTR_UOP_REG_COPY_EXT_TO_WORD,
   INSTR_UOP_REG_COPY_EXT_TO_LONG,
   INSTR_UOP_SET_BASIC_FLAGS,
+  INSTR_UOP_SUB,
+  INSTR_UOP_SET_SUB_FLAGS,
   INSTR_UOP_MAX_COUNT
 };
 
@@ -73,6 +75,7 @@ enum instr_uops {
  * code:  Code for the micro operation
  * data1: Data value specific to the uOP in question
  * data2: Second data value
+ * data3: Third data value
  * size:  BYTE/WORD/LONG size of operation, when relevant
  * ext:   Some uOPs can sign extend values, this specifies if, and to what size
  */
@@ -81,6 +84,7 @@ struct uop {
   enum instr_uops code;
   LONG data1;
   LONG data2;
+  LONG data3;
   enum instr_sizes size;
   enum instr_extend ext;
 };
@@ -99,9 +103,9 @@ struct instr {
   int uops_count;
 };
 
-void instr_uop_push_full(struct instr *, instr_uop *, enum instr_uops, LONG, LONG, enum instr_sizes, enum instr_extend);
+void instr_uop_push_full(struct instr *, instr_uop *, enum instr_uops, LONG, LONG, LONG, enum instr_sizes, enum instr_extend);
 void instr_uop_push_short(struct instr *, instr_uop *, enum instr_uops);
-void instr_uop_push(struct instr *, enum instr_uops, LONG, LONG, enum instr_sizes, enum instr_extend);
+void instr_uop_push(struct instr *, enum instr_uops, LONG, LONG, LONG, enum instr_sizes, enum instr_extend);
 void instr_uop_push_nop(struct instr *);
 void instr_uop_push_boot_prefetch(struct instr *);
 void instr_uop_push_prefetch(struct instr *);
@@ -117,10 +121,12 @@ void instr_uop_push_reg_copy_word(struct instr *, LONG, LONG);
 void instr_uop_push_reg_copy_long(struct instr *, LONG, LONG);
 void instr_uop_push_dec_reg(struct instr *, LONG, enum instr_sizes);
 void instr_uop_push_inc_reg(struct instr *, LONG, enum instr_sizes);
-void instr_uop_push_add_word_to_long(struct instr *, LONG, LONG);
+void instr_uop_push_add_word_to_long(struct instr *, LONG, LONG, LONG);
 void instr_uop_push_reg_copy_ext_to_word(struct instr *, LONG, LONG, enum instr_sizes);
 void instr_uop_push_reg_copy_ext_to_long(struct instr *, LONG, LONG, enum instr_sizes);
 void instr_uop_push_set_basic_flags(struct instr *, LONG, enum instr_sizes);
+void instr_uop_push_sub(struct instr *, LONG, LONG, LONG, enum instr_sizes, enum instr_extend);
+void instr_uop_push_set_sub_flags(struct instr *, LONG, LONG, LONG, enum instr_sizes);
 
 /* Very special boot instruction */
 struct instr *instr_boot_setup(struct cpu *);

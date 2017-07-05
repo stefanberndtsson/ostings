@@ -26,7 +26,7 @@ static void add_variant_mem(struct instr *instr, int ea_reg) {
 
 static void add_variant_mem_offset(struct instr *instr, int ea_reg) {
   instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), REG_PC);
-  instr_uop_push_add_word_to_long(instr, REG_IRC_W, REG_PC);
+  instr_uop_push_add_word_to_long(instr, REG_IRC_W, REG_PC, REG_PC);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);
@@ -46,7 +46,7 @@ static void add_variant_mem_offset_reg(struct instr *instr, int ea_reg) {
 
 static void add_variant_pc_offset(struct instr *instr) {
   instr_uop_push_nop(instr);
-  instr_uop_push_add_word_to_long(instr, REG_IRC_W, REG_PC);
+  instr_uop_push_add_word_to_long(instr, REG_IRC_W, REG_PC, REG_PC);
   instr_uop_push_dec_reg(instr, REG_PC, INSTR_WORD);
   instr_uop_push_nop(instr);
   instr_uop_push_nop(instr);

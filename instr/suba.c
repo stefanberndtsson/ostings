@@ -27,6 +27,7 @@
  */
 
 /* Compare what's in VALUE[0] (immediate) with VALUE[2] (EA-fetched)
+ * TODO: Make use of uop_sub instead
  */
 static void subtract(struct uop *uop, struct cpu *cpu) {
   WORD op;

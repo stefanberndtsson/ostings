@@ -41,7 +41,7 @@ static void add_im_variant(struct cpu *cpu, int ea_mode, int ea_reg) {
   ea_read_immediate(instr, REG_VALUE(0), INSTR_BYTE);
   ea_read(instr, ea_mode, ea_reg, INSTR_BYTE, REG_VALUE(1));
   instr_uop_push_nop(instr);
-  instr_uop_push_full(instr, test_bit, INSTR_UOP_SPECIAL, REG_VALUE(0), REG_VALUE(1), INSTR_BYTE, EXT_NONE);
+  instr_uop_push_full(instr, test_bit, INSTR_UOP_SPECIAL, REG_VALUE(0), REG_VALUE(1), 0, INSTR_BYTE, EXT_NONE);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);
@@ -60,7 +60,7 @@ static void add_reg_variant(struct cpu *cpu, int reg, int ea_mode, int ea_reg) {
   if(ea_mode == EA_DN) {
     instr_uop_push_reg_copy_long(instr, REG_DREG(ea_reg), REG_VALUE(1));
     instr_uop_push_reg_copy_long(instr, REG_DREG(reg), REG_VALUE(0));
-    instr_uop_push_full(instr, test_bit, INSTR_UOP_SPECIAL, REG_VALUE(0), REG_VALUE(1), INSTR_LONG, EXT_NONE);
+    instr_uop_push_full(instr, test_bit, INSTR_UOP_SPECIAL, REG_VALUE(0), REG_VALUE(1), 0, INSTR_LONG, EXT_NONE);
     instr_uop_push_prefetch(instr);
     instr_uop_push_nop(instr);
     instr_uop_push_nop(instr);
@@ -68,7 +68,7 @@ static void add_reg_variant(struct cpu *cpu, int reg, int ea_mode, int ea_reg) {
   } else {
     ea_read(instr, ea_mode, ea_reg, INSTR_BYTE, REG_VALUE(1));
     instr_uop_push_reg_copy_long(instr, REG_DREG(reg), REG_VALUE(0));
-    instr_uop_push_full(instr, test_bit, INSTR_UOP_SPECIAL, REG_VALUE(0), REG_VALUE(1), INSTR_BYTE, EXT_NONE);
+    instr_uop_push_full(instr, test_bit, INSTR_UOP_SPECIAL, REG_VALUE(0), REG_VALUE(1), 0, INSTR_BYTE, EXT_NONE);
     instr_uop_push_nop(instr);
     instr_uop_push_prefetch(instr);
     instr_uop_push_end(instr);

@@ -46,30 +46,6 @@
  *
  */
 
-static void set_flags_cmp(struct cpu *cpu, enum instr_sizes size, int src, int dst, int result) {
-  int n,z,v,c;
-
-  n = CHK_N(size, result);
-  z = CHK_Z(result);
-  v = CHK_V(size, src, dst, result);
-  c = CHK_C(size, src, dst, result);
-  SET_NZVC(cpu, n, z, v, c);
-}
-
-/* Compare what's in VALUE[0] (immediate) with VALUE[2] (EA-fetched)
- */
-static void compare(struct uop *uop, struct cpu *cpu) {
-  LONG immediate, fetched;
-  LONG result;
-
-  immediate = cpu->internal->r.value[0];
-  fetched = cpu->internal->r.value[2];
-  result = VAL_MASKED(uop->size, fetched - immediate);
-
-  set_flags_cmp(cpu, uop->size, immediate, fetched, result);
-  cpu->exec->uops_pos++;
-}
-
 static void add_ea_variant(struct cpu *cpu, int size, int ea_mode, int ea_reg) {
   struct instr *instr;
 
@@ -80,8 +56,8 @@ static void add_ea_variant(struct cpu *cpu, int size, int ea_mode, int ea_reg) {
   ea_read_immediate(instr, REG_VALUE(0), size);
   ea_read(instr, ea_mode, ea_reg, size, REG_VALUE(2));
   instr_uop_push_nop(instr);
-  instr_uop_push_full(instr, compare, INSTR_UOP_SPECIAL, REG_VALUE(1), REG_VALUE(2), size, EXT_NONE);
-  instr_uop_push_nop(instr);
+  instr_uop_push_sub(instr, REG_VALUE(0), REG_VALUE(2), REG_VALUE(7), size, EXT_NONE);
+  instr_uop_push_set_sub_flags(instr, REG_VALUE(0), REG_VALUE(2), REG_VALUE(7), size);
   instr_uop_push_prefetch(instr);
   instr_uop_push_end(instr);
 

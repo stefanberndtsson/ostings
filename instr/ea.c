@@ -61,7 +61,7 @@ static void ea_addr_mem_dec(struct instr *instr, int ea_reg, enum instr_sizes si
  */
 static void ea_addr_mem_offset(struct instr *instr, int ea_reg, LONG target_reg) {
   instr_uop_push_reg_copy_long(instr, REG_AREG(ea_reg), target_reg);
-  instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg);
+  instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg, target_reg);
   instr_uop_push_nop(instr);
   instr_uop_push_prefetch(instr);
   instr_uop_push_nop(instr);
@@ -87,7 +87,7 @@ static void ea_addr_mem_offset_reg(struct instr *instr, int ea_reg, enum instr_s
  */
 static void ea_addr_pc_offset(struct instr *instr, LONG target_reg) {
   instr_uop_push_reg_copy_long(instr, REG_PC, target_reg);
-  instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg);
+  instr_uop_push_add_word_to_long(instr, REG_IRC_W, target_reg, target_reg);
   instr_uop_push_dec_reg(instr, target_reg, INSTR_WORD);
   instr_uop_push_prefetch(instr);
   instr_uop_push_nop(instr);

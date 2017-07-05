@@ -237,11 +237,11 @@ void uop_add(struct uop *uop, struct cpu *cpu) {
   target_reg += src_reg;
 
   if(target_size == INSTR_BYTE) {
-    cpu->internal->w[uop->data2] = (cpu->internal->w[uop->data2]&0xff00) | (target_reg&0xff);
+    cpu->internal->w[uop->data3] = (cpu->internal->w[uop->data3]&0xff00) | (target_reg&0xff);
   } else if(target_size == INSTR_WORD) {
-    cpu->internal->w[uop->data2] = target_reg&0xffff;
+    cpu->internal->w[uop->data3] = target_reg&0xffff;
   } else if(target_size == INSTR_LONG) {
-    cpu->internal->l[uop->data2] = target_reg;
+    cpu->internal->l[uop->data3] = target_reg;
   }
   cpu->exec->uops_pos++;
 }
@@ -293,6 +293,86 @@ void uop_set_basic_flags(struct uop *uop, struct cpu *cpu) {
   cpu->exec->uops_pos++;
 }
 
+
+/* Subtract reg1 from reg2, store in reg3 */
+void uop_sub(struct uop *uop, struct cpu *cpu) {
+  LONG src_reg, target_reg;
+  enum instr_sizes target_size;
+
+  /* src_reg size is uop->size */
+  /* target_reg size is uop->size, unless
+   * uop->ext is EXT_WORD or EXT_LONG,
+   * in which case target_reg size is either
+   * WORD or LONG respectively.
+   */
+
+  if(uop->size == INSTR_BYTE) {
+    src_reg = cpu->internal->w[uop->data1]&0xff;
+    if(uop->ext == EXT_LONG) {
+      src_reg = SIGN_EXT_WORD(SIGN_EXT_BYTE(src_reg));
+    } else if(uop->ext == EXT_WORD) {
+      src_reg = SIGN_EXT_BYTE(src_reg);
+    }
+  } else if(uop->size == INSTR_WORD) {
+    src_reg = cpu->internal->w[uop->data1];
+    if(uop->ext == EXT_LONG) {
+      src_reg = SIGN_EXT_WORD(src_reg);
+    }
+  } else if(uop->size == INSTR_LONG) {
+    src_reg = cpu->internal->l[uop->data1];
+  }
+
+  if(uop->ext == EXT_LONG) {
+    target_reg = cpu->internal->l[uop->data2];
+    target_size = INSTR_LONG;
+  } else if(uop->ext == EXT_WORD) {
+    target_reg = cpu->internal->w[uop->data2]&0xffff;
+    target_size = INSTR_WORD;
+  } else if(uop->ext == EXT_NONE) {
+    if(uop->size == INSTR_BYTE) {
+      target_reg = cpu->internal->w[uop->data2]&0xff;
+      target_size = INSTR_BYTE;
+    } else if(uop->size == INSTR_WORD) {
+      target_reg = cpu->internal->w[uop->data2];
+      target_size = INSTR_WORD;
+    } else if(uop->size == INSTR_LONG) {
+      target_reg = cpu->internal->l[uop->data2];
+      target_size = INSTR_LONG;
+    }
+  }
+
+  target_reg -= src_reg;
+
+  if(target_size == INSTR_BYTE) {
+    cpu->internal->w[uop->data3] = (cpu->internal->w[uop->data3]&0xff00) | (target_reg&0xff);
+  } else if(target_size == INSTR_WORD) {
+    cpu->internal->w[uop->data3] = target_reg&0xffff;
+  } else if(target_size == INSTR_LONG) {
+    cpu->internal->l[uop->data3] = target_reg;
+  }
+  cpu->exec->uops_pos++;
+}
+
+/* Set flags related to subtract operation (including CMP) */
+void uop_set_sub_flags(struct uop *uop, struct cpu *cpu) {
+  LONG src, dst, result;
+  int n,z,v,c;
+  enum instr_sizes size;
+
+  src = cpu->internal->l[uop->data1];
+  dst = cpu->internal->l[uop->data2];
+  result = cpu->internal->l[uop->data3];
+
+  size = uop->size;
+  
+  n = CHK_N(size, result);
+  z = CHK_Z(result);
+  v = CHK_V(size, src, dst, result);
+  c = CHK_C(size, src, dst, result);
+  SET_NZVC(cpu, n, z, v, c);
+
+  cpu->exec->uops_pos++;
+}
 
 void uop_end(struct uop *uop, struct cpu *cpu) {
   unused(uop);

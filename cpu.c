@@ -25,6 +25,8 @@ static char *uops_names[INSTR_UOP_MAX_COUNT] = {
   "REG_COPY_EXT_TO_WORD",
   "REG_COPY_EXT_TO_LONG",
   "SET_BASIC_FLAGS",
+  "SUB",
+  "SET_SUB_FLAGS"
 };
 
 static char *states[3] = {

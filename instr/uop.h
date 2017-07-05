@@ -127,7 +127,7 @@ void uop_dec_reg(struct uop *, struct cpu *);
 void uop_inc_reg(struct uop *, struct cpu *);
 
 
-/* Add reg1 to reg2, sign extend if requested */
+/* Add reg1 to reg2, sign extend if requested, store in reg3 */
 void uop_add(struct uop *, struct cpu *);
 
 
@@ -141,8 +141,13 @@ void uop_reg_copy_ext_to_long(struct uop *, struct cpu *);
 /* Set flags for Z and N based on reg1 and size, clear V and C */
 void uop_set_basic_flags(struct uop *, struct cpu *);
 
+/* Subtract reg1 from reg2, store in reg3 */
+void uop_sub(struct uop *, struct cpu *);
 
-/* This is a dummy function */
+/* Set flags related to subtract operation (including CMP) */
+void uop_set_sub_flags(struct uop *, struct cpu *);
+
+  /* This is a dummy function */
 void uop_end(struct uop *, struct cpu *);
 
 #endif /* OSTIS_UOPS_H */
