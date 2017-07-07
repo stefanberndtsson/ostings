@@ -225,9 +225,7 @@ void ea_write_to_addr(struct instr *instr, enum instr_sizes size, LONG address_v
   }
 }
 
-/* Destroys cpu->internal->r.value[7]
- * TODO: EA_DN and EA_AN are incorrect in number of uOPs.
- */
+/* Destroys cpu->internal->r.value[7] */
 void ea_read(struct instr *instr, int ea_mode, int ea_reg, enum instr_sizes size, LONG target_reg) {
   if(ea_mode == EA_DN) {
     ea_dn(instr, ea_reg, size, target_reg);
