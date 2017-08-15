@@ -2,7 +2,7 @@ Q=
 
 CUTEST_TEST_DIR=./test
 
-all::
+checkall:
 	test -f $(PRG) && make -s cutest && make -s check
 
 cutest:
@@ -11,4 +11,4 @@ cutest:
 -include cutest/src/cutest.mk
 -include cutest/src/coverage.mk
 
-$(CUTEST_TEST_DIR)/main_test: $(filter-out main.c,$(SRC)) $(LIB)
+$(CUTEST_TEST_DIR)/main_test:: $(filter-out main.c,$(SRC)) $(LIB)
